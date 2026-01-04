@@ -1,7 +1,7 @@
 {
   "appTitle": "Data Structure Playground",
-  "footer": "© {{year}} Data Structure Playground. Built for learning.",
-  "notFound": "Page not found",
+  "footer": "© {{year}} DS.PLAY. Built for developers.",
+  "notFound": "Page Not Found",
   "operations": "Operations",
   "value": "Value",
   "insert": "Insert",
@@ -11,19 +11,31 @@
   "randomize": "Randomize",
   "algorithmLog": "Algorithm Log",
   "ready": "Ready",
-  "complexityAnalysis": "Complexity Analysis",
-  "treeHeight": "Tree Height",
-  "timeComplexity": "Time Complexity",
+  "complexityAnalysis": "Complexity",
+  "treeHeight": "Height",
+  "timeComplexity": "Time",
   "status": "Status",
   "mode": {
-    "auto": "Auto (Algorithm)",
-    "manual": "Manual (Sandbox)"
+    "auto": "Auto",
+    "manual": "Manual"
   },
   "home": {
-    "title": "Master Data Structures",
-    "subtitle": "Visually & Interactively",
-    "description": "A modern playground to visualize, build, and understand complex data structures through interactive animations and step-by-step execution.",
-    "startLearning": "Start Learning",
-    "comingSoon": "Coming Soon"
+    "title": "Data Structure Playground",
+    "subtitle": "A place to play with structures.",
+    "description": "Just a handy tool to see how data structures actually look and behave.",
+    "startLearning": "Start Exploring",
+    "comingSoon": "Coming Soon",
+    "structures": {
+      "avl-tree": { "name": "AVL Tree", "description": "The first self-balancing BST where heights of two child subtrees of any node differ by at most one, ensuring stable O(log N) performance." },
+      "bloom-filter": { "name": "Bloom Filter", "description": "A space-efficient probabilistic structure used to test whether an element is a member of a set with zero false negatives." },
+      "min-max-heap": { "name": "Min-Max Heap", "description": "A complete binary tree providing constant-time access to both the minimum and maximum elements, ideal for double-ended priority queues." },
+      "binomial-heap": { "name": "Binomial Heap", "description": "A collection of binomial trees that supports standard heap operations plus ultra-fast merging of two heaps in logarithmic time." },
+      "fibonacci-heap": { "name": "Fibonacci Heap", "description": "A priority queue data structure with superior amortized time complexity, key to optimizing Dijkstra's shortest path algorithm." },
+      "b-tree": { "name": "B-Tree", "description": "A multi-way self-balancing tree optimized for storage systems, minimizing disk I/O for large-scale data reading and writing." },
+      "b-plus-tree": { "name": "B+ Tree", "description": "A variation of B-Tree where all data resides in leaves, enabling better range queries and sequential access—the backbone of modern databases." },
+      "red-black-tree": { "name": "Red-Black Tree", "description": "A classic balanced BST using node coloring and rotations, widely used in systems like C++ STL maps and Java's TreeMap." },
+      "trie": { "name": "Trie", "description": "A prefix tree designed for efficient retrieval of keys in a set of strings, commonly used in search engine autocomplete and spell checkers." },
+      "patricia-trie": { "name": "Patricia Trie", "description": "A space-optimized Trie that compacts nodes with only one child, significantly reducing memory footprint for sparse datasets." }
+    }
   }
 }

@@ -9,7 +9,6 @@ export const HomePage: React.FC = () => {
   const [completedMap, setCompletedStatus] = React.useState<Record<string, boolean>>({});
 
   React.useEffect(() => {
-    // Check completion status for all structures
     const status: Record<string, boolean> = {};
     structures.forEach(s => {
       status[s.id] = localStorage.getItem(`ds-playground-${s.id}-completed`) === 'true';
@@ -18,69 +17,72 @@ export const HomePage: React.FC = () => {
   }, []);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-12">
-      <div className="text-center space-y-4 py-12">
-        <h1 className="text-5xl font-extrabold text-slate-900 tracking-tight">
-          {t('home.title')}
-          <span className="block text-blue-600 mt-2">{t('home.subtitle')}</span>
-        </h1>
-        <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-          {t('home.description')}
-        </p>
+    <div className="relative min-h-screen bg-white font-sans">
+      {/* Subtle Background */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:32px_32px] opacity-30" />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {structures.map((struct) => {
-          const isCompleted = completedMap[struct.id];
-          return (
-            <Link 
-              key={struct.id} 
-              to={struct.implemented ? struct.path : '#'}
-              className={`
-                group relative overflow-hidden rounded-2xl border transition-all duration-300
-                ${struct.implemented 
-                  ? 'bg-white border-slate-200 hover:border-blue-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer' 
-                  : 'bg-slate-50 border-slate-100 opacity-75 cursor-not-allowed'}
-              `}
-            >
-              <div className="p-6 h-full flex flex-col">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className={`text-xl font-bold ${struct.implemented ? 'text-slate-900 group-hover:text-blue-600' : 'text-slate-50'}`}>
-                    {struct.name}
-                  </h3>
-                  {isCompleted ? (
-                    <div className="flex items-center gap-1.5 bg-green-500 text-white px-2 py-1 rounded-lg text-[10px] font-black uppercase shadow-lg shadow-green-200 animate-in zoom-in">
-                        <CheckCircle2 size={12} /> Done
+      <div className="relative z-10 max-w-5xl mx-auto px-6 py-20 md:py-28">
+        <div className="space-y-4 mb-20">
+          <h1 className="text-5xl md:text-7xl font-black text-slate-900 tracking-tight">
+            {t('home.title')}
+          </h1>
+          <h2 className="text-3xl md:text-4xl font-bold text-blue-600 tracking-tight">
+            {t('home.subtitle')}
+          </h2>
+          <p className="text-slate-500 max-w-2xl text-lg font-medium leading-relaxed">
+            {t('home.description')}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {structures.map((struct) => {
+            const isCompleted = completedMap[struct.id];
+            return (
+              <Link 
+                key={struct.id} 
+                to={struct.implemented ? struct.path : '#'}
+                className={`
+                  group relative overflow-hidden rounded-3xl border transition-all duration-300
+                  ${struct.implemented 
+                    ? 'bg-white border-slate-200 hover:border-blue-400 hover:shadow-xl cursor-pointer' 
+                    : 'bg-slate-50 border-slate-100 opacity-60 cursor-not-allowed'}
+                `}
+              >
+                <div className="p-8 h-full flex flex-col relative z-10">
+                  <div className="flex justify-between items-start mb-6">
+                    <div className={`
+                        w-12 h-12 rounded-2xl flex items-center justify-center transition-all
+                        ${struct.implemented ? 'bg-slate-900 text-white group-hover:bg-blue-600' : 'bg-slate-200 text-slate-400'}
+                    `}>
+                        {isCompleted ? <CheckCircle2 size={24} /> : struct.implemented ? <span className="font-black text-lg">{struct.name[0]}</span> : <Construction size={20} />}
                     </div>
-                  ) : struct.implemented ? (
-                    <CheckCircle2 className="text-slate-200" size={20} />
-                  ) : (
-                    <Construction className="text-slate-400" size={20} />
-                  )}
+                    {isCompleted && (
+                        <span className="bg-blue-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter shadow-lg">Done</span>
+                    )}
+                  </div>
+                  
+                  <h3 className={`text-xl font-black mb-2 tracking-tight ${struct.implemented ? 'text-slate-900' : 'text-slate-400'}`}>
+                    {t(`home.structures.${struct.id}.name`, { defaultValue: struct.name })}
+                  </h3>
+                  
+                  <p className="text-slate-500 text-sm leading-relaxed mb-8 flex-grow font-medium">
+                    {t(`home.structures.${struct.id}.description`, { defaultValue: struct.description })}
+                  </p>
+                  
+                  <div className={`flex items-center text-xs font-black uppercase tracking-widest ${struct.implemented ? 'text-blue-600' : 'text-slate-300'}`}>
+                    {struct.implemented ? (
+                      <span className="flex items-center gap-2">
+                        {isCompleted ? 'Review' : t('home.startLearning')} <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                      </span>
+                    ) : t('home.comingSoon')}
+                  </div>
                 </div>
-                
-                <p className="text-slate-600 mb-6 flex-grow">
-                  {struct.description}
-                </p>
-                
-                <div className="flex items-center text-sm font-medium">
-                  {struct.implemented ? (
-                    <span className="text-blue-600 flex items-center group-hover:underline">
-                      {isCompleted ? 'Review Course' : t('home.startLearning')} <ArrowRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
-                    </span>
-                  ) : (
-                    <span className="text-slate-400 uppercase tracking-wider text-xs font-bold">
-                      {t('home.comingSoon')}
-                    </span>
-                  )}
-                </div>
-              </div>
-              
-              {/* Decoration */}
-              <div className={`absolute -right-4 -bottom-4 w-24 h-24 rounded-full opacity-10 transition-transform group-hover:scale-150 ${isCompleted ? 'bg-green-600' : struct.implemented ? 'bg-blue-600' : 'bg-slate-400'}`} />
-            </Link>
-          );
-        })}
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
