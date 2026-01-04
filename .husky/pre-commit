@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+# No complex sh loading needed for Husky 9+ 
+
+
+echo "\n🚀 [Pre-commit] Starting integrity check..."
+
+# Use subshell to avoid changing directory permanently
+(
+  cd app && npm run build
+)
+
+if [ $? -ne 0 ]; then
+    echo "\n❌ [Pre-commit] Error: Build failed!"
+    echo "💡 Please fix the TypeScript errors before committing."
+    exit 1
+fi
+
+echo "✅ [Pre-commit] Build passed! Proceeding with commit.\n"
