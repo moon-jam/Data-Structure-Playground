@@ -1,0 +1,63 @@
+{
+  "manualRotation": "Manual Rotation",
+  "nodeVal": "Node Val",
+  "left": "Left",
+  "right": "Right",
+  "balanced": "Balanced",
+  "unbalanced": "Unbalanced",
+  "unbalancedNodes": "Unbalanced nodes: {{count}}",
+  "guide": {
+    "title": "Interactive Guide",
+    "showHint": "💡 Get Advice",
+    "hideHint": "Hide Advice",
+    "analyzing": "Analyzing Node {{val}} ...",
+    "caseLL": "Detected LL Case (Left-Left Line)",
+    "caseRR": "Detected RR Case (Right-Right Line)",
+    "caseLR": "Detected LR Case (Left-Heavy Zig-Zag)",
+    "caseRL": "Detected RL Case (Right-Heavy Zig-Zag)",
+    "actionLL": "👉 Drag this node to the **RIGHT**.\n(Imagine pulling the heavy left side down, promoting the left child)",
+    "actionRR": "👉 Drag this node to the **LEFT**.\n(Imagine pulling the heavy right side down, promoting the right child)",
+    "actionLR_step1": "👉 Zig-Zag detected! Cannot rotate parent yet.\nSelect the **Left Child ({{childVal}})** and drag it **LEFT** to straighten the line.",
+    "actionRL_step1": "👉 Zig-Zag detected! Cannot rotate parent yet.\nSelect the **Right Child ({{childVal}})** and drag it **RIGHT** to straighten the line.",
+    "action_step2": "👍 Good! Now it's a straight line. Drag the original node {{val}} to the **{{direction}}** to finish.",
+    "recommendedTarget": "📍 Recommended: Focus on Node **{{val}}**",
+    "lowestWarning": "💡 Hint: In AVL trees, always rebalance starting from the deepest unbalanced node upward.",
+    "helpTitle": "How to Rotate?",
+    "helpDesc": "AVL Trees balance themselves via rotations. You can trigger them by dragging nodes:",
+    "helpRight": "Drag Right (Right Rotate)",
+    "helpRightDesc": "Pulling a node to the right brings its **Left Child** up. Use this when the left side is too heavy.",
+    "helpLeft": "Drag Left (Left Rotate)",
+    "helpLeftDesc": "Pulling a node to the left brings its **Right Child** up. Use this when the right side is too heavy."
+  },
+  "error": {
+    "noRightChild": "Cannot Rotate Left! Node {{val}} has no **Right Child** to pull up.",
+    "noLeftChild": "Cannot Rotate Right! Node {{val}} has no **Left Child** to pull up."
+  },
+  "wiki": {
+    "title": "AVL Tree Encyclopedia",
+    "concept": "1. Mathematical Definition",
+    "conceptDesc": "The core of an AVL tree is maintaining a strict **Balance Factor (BF)**. For any node `n`:\n\n- `H(L)`: Height of the left subtree\n- `H(R)`: Height of the right subtree\n- **Formula:** `BF(n) = H(L) - H(R)`\n\n**Rule:** A node is balanced if `|BF(n)| ≤ 1`. If `|BF| > 1`, a rotation is required.",
+    "bf": "2. Balance Factor (BF)",
+    "bfFormula": "Formula: BF(n) = Height(Left) - Height(Right)",
+    "bfRule": "When |BF| > 1, the node is considered 'unbalanced' and requires rotation. \n- **BF > 1**: Left-heavy.\n- **BF < -1**: Right-heavy.",
+    "deletion": "3. The Art of Deletion",
+    "deletionDesc": "Deletion follows BST rules followed by rebalancing:\n- **Leaf**: Simple removal.\n- **One child**: Replace with child.\n- **Two children**: Replace with **Inorder Successor** (smallest in right subtree).",
+    "strategies": "4. Rotation Strategies",
+    "caseLL": "LL Case",
+    "caseLLDesc": "Node BF=2, Left Child BF=1. Fix with **[Right Rotate]**.",
+    "caseRR": "RR Case",
+    "caseRRDesc": "Node BF=-2, Right Child BF=-1. Fix with **[Left Rotate]**.",
+    "caseLR": "LR Case",
+    "caseLRDesc": "Node BF=2, Left Child BF=-1. Fix: **[Left Rotate]** child, then **[Right Rotate]** parent.",
+    "caseRL": "RL Case",
+    "caseRLDesc": "Node BF=-2, Right Child BF=1. Fix: **[Right Rotate]** child, then **[Left Rotate]** parent.",
+    "complexity": "5. Complexity",
+    "compTable": "| Operation | Complexity |\n| :--- | :--- |\n| Search | O(log N) |\n| Insert | O(log N) |\n| Delete | O(log N) |"
+  },
+  "hints": {
+    "dragToRotate": "👉 Drag node **Left/Right** to trigger rotation",
+    "clickToSelect": "👉 Click node to select for deletion",
+    "scrollZoom": "👉 Use mouse wheel to Zoom canvas",
+    "manualMode": "👉 In Manual Mode, rebalancing must be done manually based on BF alerts"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "appTitle": "Data Structure Playground",
+  "footer": "© {{year}} 資料結構遊樂場. 為學習而生.",
+  "notFound": "找不到頁面",
+  "operations": "操作",
+  "value": "數值",
+  "insert": "插入",
+  "find": "搜尋",
+  "delete": "刪除",
+  "clear": "清除",
+  "randomize": "隨機產生",
+  "algorithmLog": "演算法日誌",
+  "ready": "就緒",
+  "complexityAnalysis": "複雜度分析",
+  "treeHeight": "樹高度",
+  "timeComplexity": "時間複雜度",
+  "status": "狀態",
+  "mode": {
+    "auto": "自動 (演算法)",
+    "manual": "手動 (沙盒)"
+  },
+  "home": {
+    "title": "視覺化掌握資料結構",
+    "subtitle": "互動式學習",
+    "description": "一個現代化的遊樂場，透過互動動畫與步驟解析，讓你視覺化、構建並深入理解複雜的資料結構。",
+    "startLearning": "開始學習",
+    "comingSoon": "敬請期待"
+  }
+}

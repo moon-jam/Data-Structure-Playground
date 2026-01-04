@@ -1,0 +1,13 @@
+- [ ] bloom filter
+- [ ] min-max heap
+    - [ ] Double-Ended Priority Queues 
+    - [ ] Doubly Ended Heap 
+    - [ ] Symmetric min-max heap
+- [ ] Binomial Heap
+- [ ] Fibonacci Heap
+- [x] AVL Tree
+- [ ] B tree
+- [ ] B+ tree
+- [ ] Red black tree
+- [ ] Trie
+- [ ] Patricia

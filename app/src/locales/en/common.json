@@ -1,0 +1,29 @@
+{
+  "appTitle": "DS Playground",
+  "footer": "© {{year}} Data Structure Playground. Built for learning.",
+  "notFound": "Page not found",
+  "operations": "Operations",
+  "value": "Value",
+  "insert": "Insert",
+  "find": "Find",
+  "delete": "Delete",
+  "clear": "Clear",
+  "randomize": "Randomize",
+  "algorithmLog": "Algorithm Log",
+  "ready": "Ready",
+  "complexityAnalysis": "Complexity Analysis",
+  "treeHeight": "Tree Height",
+  "timeComplexity": "Time Complexity",
+  "status": "Status",
+  "mode": {
+    "auto": "Auto (Algorithm)",
+    "manual": "Manual (Sandbox)"
+  },
+  "home": {
+    "title": "Master Data Structures",
+    "subtitle": "Visually & Interactively",
+    "description": "A modern playground to visualize, build, and understand complex data structures through interactive animations and step-by-step execution.",
+    "startLearning": "Start Learning",
+    "comingSoon": "Coming Soon"
+  }
+}
