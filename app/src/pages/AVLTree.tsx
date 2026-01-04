@@ -11,23 +11,23 @@ import {
 import { useTranslation } from 'react-i18next';
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
-// --- STABLE MINI MARKDOWN ENGINE ---
+// --- ULTIMATE STABLE MINI MARKDOWN ENGINE ---
 const SimpleMarkdown = ({ text, className = '' }: { text: string | null | undefined, className?: string }) => {
   if (!text) return null;
 
   const renderInline = (input: string) => {
-    // FIX: Escaped asterisks correctly to prevent "Nothing to repeat" error
-    const parts = input.split(/(\*\*.*?\*\*|`.*?`|\*.*?\*)/g);
+    // Highly robust split: double stars, then backticks, then single stars
+    const parts = input.split(/(\*\*[^\*]+\*\*|`[^`]+`|\*[^\*]+\*)/g);
     
     return parts.map((part, i) => {
       if (!part) return null;
       if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
-        return <strong key={i} className="font-extrabold text-amber-400 mx-0.5">{part.slice(2, -2)}</strong>;
+        return <strong key={i} className="font-black text-amber-400 mx-0.5">{part.slice(2, -2)}</strong>;
       }
-      if (part.startsWith('`') && part.endsWith('`') && part.length > 2) {
+      if (part.startsWith('`') && part.endsWith('`')) {
         return <code key={i} className="bg-slate-950 px-1.5 py-0.5 rounded text-blue-300 font-mono text-[11px] border border-slate-700/50 mx-0.5 inline-block leading-none shadow-inner">{part.slice(1, -1)}</code>;
       }
-      if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
+      if (part.startsWith('*') && part.endsWith('*')) {
         return <em key={i} className="italic text-slate-300 opacity-80 mx-0.5">{part.slice(1, -1)}</em>;
       }
       return part;
@@ -41,7 +41,6 @@ const SimpleMarkdown = ({ text, className = '' }: { text: string | null | undefi
         const trimmed = line.trim();
         if (!trimmed) return <div key={lineIdx} className="h-2" />;
 
-        // Tables
         if (trimmed.startsWith('|')) {
             if (trimmed.includes('---')) return null;
             const cells = trimmed.split('|').filter((_, i, arr) => i > 0 && i < arr.length - 1);
@@ -57,11 +56,10 @@ const SimpleMarkdown = ({ text, className = '' }: { text: string | null | undefi
             );
         }
 
-        // Lists
         if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
             return (
                 <div key={lineIdx} className="flex gap-3 pl-2 py-0.5 text-sm">
-                    <span className="text-blue-500 font-black">•</span>
+                    <span className="text-blue-500 font-black text-xs">•</span>
                     <div className="flex-grow leading-relaxed">{renderInline(line.trim().substring(2))}</div>
                 </div>
             );
@@ -103,7 +101,7 @@ export const AVLTreePage: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [resetConfirm, setResetConfirm] = useState(false);
 
-  // Playback & History
+  // History & Playback
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [activeOpSteps, setActiveOpSteps] = useState<VisualizationStep[]>([]);
@@ -115,7 +113,6 @@ export const AVLTreePage: React.FC = () => {
   const [currentStepMsg, setCurrentStepMsg] = useState<string | null>(null);
   const [lessonIndex, setLessonIndex] = useState(0);
   
-  // FIX: Cross-environment compatible timer type
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pauseRef = useRef(false);
 
@@ -123,9 +120,8 @@ export const AVLTreePage: React.FC = () => {
     if (historyIndex === -1) {
       setHistory([{ id: 'init', action: 'Initial', steps: [], finalSnapshot: 'null' }]);
       setHistoryIndex(0);
-      if (localStorage.getItem('ds-playground-avl-tree-completed') !== 'true') {
-          setShowHelp(true); setActiveTab('tutorial');
-      }
+      const isCompleted = localStorage.getItem('ds-playground-avl-tree-completed') === 'true';
+      if (!isCompleted) { setShowHelp(true); setActiveTab('tutorial'); }
     }
   }, []);
 
@@ -133,9 +129,8 @@ export const AVLTreePage: React.FC = () => {
     if (activeOpSteps.length > 0 && currentStepIdx >= 0) {
         const step = activeOpSteps[currentStepIdx];
         if (step.payload?.rootSnapshot !== undefined) {
-            const snap = step.payload.rootSnapshot;
-            setRoot(snap);
-            if (mode === 'manual') setUnbalancedData(avlTree.checkBalance(snap));
+            setRoot(step.payload.rootSnapshot);
+            if (mode === 'manual') setUnbalancedData(avlTree.checkBalance(step.payload.rootSnapshot));
             else setUnbalancedData({ allIds: [], lowestId: null });
             setVersion(v => v + 1);
         }
@@ -169,11 +164,7 @@ export const AVLTreePage: React.FC = () => {
   const startNewOperation = (action: string, steps: VisualizationStep[]) => {
       stopPlayback();
       const errorStep = steps.find(s => s.type === 'error');
-      if (errorStep) { 
-          // FIX: Explicitly cast translation result to string
-          setErrorToast(String(t(errorStep.message?.replace('error.', 'avl:error.') || 'Error', errorStep.payload))); 
-          return; 
-      }
+      if (errorStep) { setErrorToast(String(t(errorStep.message?.replace('error.', 'avl:error.') || 'Error', errorStep.payload))); return; }
       setShowHint(false); setPulsingId(null); setActiveOpSteps(steps); setCurrentStepIdx(0);
       const newEntry: HistoryEntry = { id: Math.random().toString(36).substr(2, 9), action, steps, finalSnapshot: avlTree.toJSON() };
       const newHistory = history.slice(0, historyIndex + 1);
@@ -183,7 +174,6 @@ export const AVLTreePage: React.FC = () => {
 
   const handleInsert = () => { if (isPlaying) return; const val = parseInt(inputValue); if (!isNaN(val)) { startNewOperation(`${t('insert')} ${val}`, mode === 'manual' ? avlTree.insertManual(val) : avlTree.insert(val)); setInputValue(''); } };
   const handleDelete = () => { if (isPlaying) return; const val = selectedNode ? selectedNode.value : parseInt(inputValue); if (!isNaN(val)) { startNewOperation(`${t('delete')} ${val}`, mode === 'manual' ? avlTree.deleteManual(val) : avlTree.delete(val)); setInputValue(''); setSelectedNode(null); } };
-  
   const handleNodeDrag = (node: AVLNode, direction: 'left' | 'right') => {
       if (isPlaying) return;
       if (mode === 'manual' && unbalancedData.allIds.includes(node.id)) {
@@ -237,7 +227,7 @@ export const AVLTreePage: React.FC = () => {
       if (activeTab !== 'tutorial') return null;
       if (lessonIndex === 5) {
           localStorage.setItem('ds-playground-avl-tree-completed', 'true');
-          return <div className="text-center py-8 space-y-4 animate-in zoom-in-95"><div className="p-4 bg-green-500/20 rounded-full text-green-400 inline-block shadow-2xl shadow-green-500/20"><Trophy size={48} /></div><h3 className="text-2xl font-bold text-white">Course Done!</h3><p className="text-slate-400 text-sm">{t('avl:tutorial.finish')}</p><button onClick={() => {setActiveTab('logs');}} className="w-full bg-slate-800 text-white py-3 rounded-xl font-bold hover:bg-slate-700 transition-all border border-slate-700 shadow-xl">Explore Sandbox</button></div>;
+          return <div className="text-center py-8 space-y-4 animate-in zoom-in-95"><div className="p-4 bg-green-500/20 rounded-full text-green-400 inline-block shadow-2xl shadow-green-500/20"><Trophy size={48} /></div><h3 className="text-2xl font-bold text-white">Course Done!</h3><p className="text-slate-400 text-sm">{t('avl:tutorial.finish')}</p><button onClick={() => {setActiveTab('logs');}} className="w-full bg-slate-800 text-white py-3 rounded-xl font-bold hover:bg-slate-700 transition-all border border-slate-700 shadow-xl text-xs">Explore Sandbox</button></div>;
       }
       const isDone = unbalancedData.allIds.length === 0 && historyIndex > 0;
       return (<div className="space-y-6">
@@ -260,11 +250,11 @@ export const AVLTreePage: React.FC = () => {
       if (bf > 1) {
           const lNode = node.left;
           if (avlTree.getBalance(lNode) >= 0) { title = t('avl:guide.caseLL'); content = <SimpleMarkdown text={`👉 **步驟：** 請將 **節點 ${node.value}** 向 **右** 拉下，讓左孩子升上來。`} />; if (pulsingId !== node.id) setPulsingId(node.id); } 
-          else { title = t('avl:guide.caseLR'); content = <div className="space-y-2 text-sm"><div className="bg-blue-600 text-white text-[8px] font-black px-2 py-0.5 rounded inline-block uppercase mb-1">Step 1 of 2</div><SimpleMarkdown text={`👉 請先將 **左孩子 (節點 ${lNode?.value})** 向 **左** 拉下。`} /></div>; if (lNode && pulsingId !== lNode.id) setPulsingId(lNode.id); } 
+          else { title = t('avl:guide.caseLR'); content = <div className="space-y-2 text-sm"><div className="bg-blue-600 text-white text-[8px] font-black px-2 py-0.5 rounded inline-block uppercase mb-1">Step 1 of 2</div><SimpleMarkdown text={`👉 請先將 **左孩子 (節點 ${lNode?.value})** 向 **左** 拉下。`} /></div>; if (lNode && pulsingId !== lNode.id) setPulsingId(lNode.id); }
       } else if (bf < -1) {
           const rNode = node.right;
           if (avlTree.getBalance(rNode) <= 0) { title = t('avl:guide.caseRR'); content = <SimpleMarkdown text={`👉 **步驟：** 請將 **節點 ${node.value}** 向 **左** 拉下，讓右孩子升上來。`} />; if (pulsingId !== node.id) setPulsingId(node.id); } 
-          else { title = t('avl:guide.caseRL'); content = <div className="space-y-2 text-sm"><div className="bg-blue-600 text-white text-[8px] font-black px-2 py-0.5 rounded inline-block uppercase mb-1">Step 1 of 2</div><SimpleMarkdown text={`👉 請先對 **右孩子 (節點 ${rNode?.value})** 向 **右** 拉下。`} /></div>; if (rNode && pulsingId !== rNode.id) setPulsingId(rNode.id); } 
+          else { title = t('avl:guide.caseRL'); content = <div className="space-y-2 text-sm"><div className="bg-blue-600 text-white text-[8px] font-black px-2 py-0.5 rounded inline-block uppercase mb-1">Step 1 of 2</div><SimpleMarkdown text={`👉 請先對 **右孩子 (節點 ${rNode?.value})** 向 **右** 拉下。`} /></div>; if (rNode && pulsingId !== rNode.id) setPulsingId(rNode.id); }
       }
       return (
           <div className="bg-amber-950/50 border border-amber-500/30 p-4 rounded-xl text-amber-50 mb-6 relative group shadow-2xl animate-in slide-in-from-top-2">
@@ -279,9 +269,22 @@ export const AVLTreePage: React.FC = () => {
 
   return (
     <div className="h-full w-full flex bg-slate-100 overflow-hidden relative font-sans text-slate-900">
-      {errorToast && <div className="absolute top-6 left-1/2 -translate-x-1/2 z-[10000] bg-red-600 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 border border-red-400 animate-in fade-in slide-in-from-top-4"><AlertCircle size={20} />{errorToast}<X size={18} onClick={() => setErrorToast(null)} className="cursor-pointer" /></div>}
-      {warningToast && <div className="absolute top-20 left-1/2 -translate-x-1/2 z-[9999] bg-amber-500 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 border border-amber-400 animate-in fade-in slide-in-from-top-4"><Info size={20} />{warningToast}<X size={18} onClick={() => setWarningToast(null)} className="cursor-pointer" /></div>}
+      {errorToast && (
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-[10000] bg-red-600 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 border border-red-400 animate-in fade-in slide-in-from-top-4">
+            <AlertCircle size={20} className="shrink-0" />
+            <SimpleMarkdown text={errorToast} className="text-white font-bold" />
+            <X size={18} onClick={() => setErrorToast(null)} className="cursor-pointer hover:bg-white/20 rounded-full" />
+        </div>
+      )}
+      {warningToast && (
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-[9999] bg-amber-500 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 border border-amber-400 animate-in fade-in slide-in-from-top-4">
+            <Info size={20} className="shrink-0" />
+            <SimpleMarkdown text={warningToast} className="text-white font-bold" />
+            <X size={18} onClick={() => setWarningToast(null)} className="cursor-pointer hover:bg-white/20 rounded-full" />
+        </div>
+      )}
 
+      {/* SIDEBAR */}
       <div className={`h-full flex flex-col bg-slate-900 border-r border-slate-800 shrink-0 z-10 shadow-2xl transition-all duration-300 ${isSidebarOpen ? 'w-[320px]' : 'w-0 overflow-hidden'}`}> 
           <div className="flex p-2 gap-1 bg-slate-950/50">
               <button onClick={() => setActiveTab('logs')} className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-2 text-[10px] font-black uppercase transition-all ${activeTab === 'logs' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}><ScrollText size={14} /> Logs</button>
@@ -296,7 +299,8 @@ export const AVLTreePage: React.FC = () => {
                   <section><h4 className="text-blue-400 font-bold text-sm mb-2 uppercase">Definition</h4><SimpleMarkdown text={t('avl:wiki.conceptDesc')} /></section>
                   <div className="bg-slate-950/50 p-4 rounded-2xl border border-slate-800 text-center"><code className="text-blue-400 font-bold text-sm">BF = H(L) - H(R)</code></div>
                   <section><h4 className="text-amber-400 font-bold text-sm mb-2 uppercase">Deletion</h4><SimpleMarkdown text={t('avl:wiki.deletionDesc')} /></section>
-                  <section className="space-y-3"><h4 className="text-indigo-400 font-bold text-sm mb-2 uppercase">Strategies</h4><div className="grid gap-3">{ [ 'LL', 'RR', 'LR', 'RL' ].map(c => (<div key={c} className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/50"><div className="text-white font-bold text-xs mb-1">{t(`avl:wiki.case${c}`)}</div><SimpleMarkdown text={t(`avl:wiki.case${c}Desc`)} /></div>))}</div></section>
+                  <section className="space-y-3"><h4 className="text-indigo-400 font-bold text-sm mb-2 uppercase">Strategies</h4><div className="grid gap-3">{[ 'LL', 'RR', 'LR', 'RL' ].map(c => (<div key={c} className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/50"><div className="text-white font-bold text-xs mb-1">{t(`avl:wiki.case${c}`)}</div><SimpleMarkdown text={t(`avl:wiki.case${c}Desc`)} /></div>))}
+</div></section>
                   <section><h4 className="text-green-400 font-bold text-sm mb-2 uppercase">Complexity</h4><SimpleMarkdown text={t('avl:wiki.compTable')} /></section>
                 </div>
               )}
@@ -304,6 +308,7 @@ export const AVLTreePage: React.FC = () => {
           </div>
       </div>
 
+      {/* --- MAIN CONTENT --- */}
       <div className="flex-grow flex flex-col min-w-0 h-full relative bg-white">
           <div className="flex-grow relative bg-slate-50 overflow-hidden">
                 <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="absolute bottom-6 left-6 z-30 w-10 h-10 bg-slate-900 text-white rounded-2xl shadow-xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all">{isSidebarOpen ? <PanelLeftClose size={20} /> : <PanelLeft size={20} />}</button>
@@ -333,19 +338,20 @@ export const AVLTreePage: React.FC = () => {
 
           {/* BOTTOM BAR */}
           <div className="h-24 bg-white border-t border-slate-200 p-4 flex gap-6 items-center overflow-visible shadow-[0_-10px_40px_rgba(0,0,0,0.03)]">
-                <div className="flex flex-col gap-2 shrink-0">
-                    <div className="flex items-center gap-3">
-                        <div className="flex gap-2 items-center bg-slate-50 p-1 rounded-xl border border-slate-100">
-                            <input type="number" value={inputValue} onChange={(e) => setInputValue(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleInsert()} placeholder="Val" className="w-12 px-2 py-1.5 bg-transparent outline-none font-bold text-xs text-center text-slate-900" />
-                            <button onClick={handleInsert} disabled={isPlaying} className={`px-3 py-1.5 rounded-lg font-black text-white text-[9px] shadow-md ${mode === 'manual' ? 'bg-amber-500' : 'bg-blue-600'}`}>INSERT</button>
+                <div className="flex flex-col gap-2 shrink-0 w-[320px]">
+                    <div className="grid grid-cols-[1fr_auto] gap-3 w-full">
+                        <div className="flex gap-2 items-center bg-slate-50 p-1 rounded-xl border border-slate-100 overflow-hidden">
+                            <input type="number" value={inputValue} onChange={(e) => setInputValue(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleInsert()} placeholder="Val" className="flex-grow min-w-0 px-2 py-1.5 bg-transparent outline-none font-bold text-xs text-center text-slate-900" />
+                            <button onClick={handleInsert} disabled={isPlaying} className={`px-4 py-1.5 rounded-lg font-black text-white text-[9px] shadow-md shrink-0 ${mode === 'manual' ? 'bg-amber-500' : 'bg-blue-600'}`}>INSERT</button>
                         </div>
-                        <button onClick={handleDelete} disabled={isPlaying} className={`px-3 py-2.5 rounded-xl font-black text-white text-[9px] shadow-lg flex items-center gap-2 transition-all ${selectedNode ? 'bg-red-600' : 'bg-slate-300'}`}><Trash2 size={12} /> DELETE</button>
+                        <button onClick={handleDelete} disabled={isPlaying} className={`px-4 py-2.5 rounded-xl font-black text-white text-[9px] shadow-lg flex items-center gap-2 transition-all shrink-0 ${selectedNode ? 'bg-red-600' : 'bg-slate-300'}`}><Trash2 size={12} /> DELETE</button>
                     </div>
-                    <button onClick={handleClear} disabled={isPlaying} className={`flex items-center justify-center gap-2 py-1.5 border border-dashed text-[9px] font-black rounded-lg transition-all uppercase tracking-widest ${resetConfirm ? 'bg-red-600 border-red-600 text-white animate-bounce' : 'border-slate-200 text-slate-400 hover:bg-red-50 hover:text-red-500'}`}><RefreshCw size={12} className={resetConfirm ? 'animate-spin' : ''} /> {resetConfirm ? 'Confirm Reset?' : 'Reset Playground'}</button>
+                    <button onClick={handleClear} disabled={isPlaying} className={`w-full flex items-center justify-center gap-2 py-1.5 border border-dashed text-[9px] font-black rounded-lg transition-all uppercase tracking-widest ${resetConfirm ? 'bg-red-600 border-red-600 text-white animate-bounce' : 'border-slate-200 text-slate-400 hover:bg-red-50 hover:text-red-500'}`}><RefreshCw size={12} className={resetConfirm ? 'animate-spin' : ''} /> {resetConfirm ? 'Confirm Reset?' : 'Reset Playground'}</button>
                 </div>
                 <div className="h-8 w-px bg-slate-100"></div>
                 <div className="flex-grow flex flex-col gap-1">
-                    <div className="flex items-center justify-between"><div className="flex gap-1"><button onClick={handleUndo} disabled={isPlaying || historyIndex <= 0} className="w-8 h-8 rounded-lg border border-slate-100 flex items-center justify-center hover:bg-slate-50 text-slate-600 transition-all"><Undo2 size={16} /></button><button onClick={handleRedo} disabled={isPlaying || historyIndex >= history.length - 1} className="w-8 h-8 rounded-lg border border-slate-100 flex items-center justify-center hover:bg-slate-50 text-slate-600 transition-all"><Redo2 size={16} /></button></div><div className="flex items-center gap-2 bg-slate-50 p-1 rounded-xl border border-slate-100"><button onClick={() => goToStep(0)} disabled={activeOpSteps.length === 0} className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors"><SkipBack size={14} /></button><button onClick={() => goToStep(currentStepIdx - 1)} disabled={activeOpSteps.length <= 0} className="p-1.5 text-slate-600 hover:bg-white rounded-lg shadow-sm transition-all"><ChevronLeft size={18} /></button><button onClick={togglePause} className="w-8 h-8 bg-slate-900 text-white rounded-lg flex items-center justify-center hover:scale-105 transition-all shadow-md active:scale-95">{isPlaying && !isPaused ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" />}</button><button onClick={() => goToStep(currentStepIdx + 1)} disabled={activeOpSteps.length <= 0} className="p-1.5 text-slate-600 hover:bg-white rounded-lg shadow-sm transition-all"><ChevronRight size={18} /></button><button onClick={() => goToStep(activeOpSteps.length - 1)} disabled={activeOpSteps.length === 0} className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors"><SkipForward size={14} /></button></div><div className="relative"><button onClick={() => setShowSpeedMenu(!showSpeedMenu)} className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all ${showSpeedMenu ? 'bg-blue-600 text-white' : 'bg-white border-slate-100 text-slate-400'}`}><Timer size={16} /></button>{showSpeedMenu && (<div className="absolute bottom-full right-0 mb-2 bg-white rounded-xl shadow-2xl border border-slate-100 p-1 flex flex-col gap-0.5 z-50 animate-in slide-in-from-bottom-2">{[0.25, 0.5, 1, 1.5, 2, 3].map(speed => (<button key={speed} onClick={() => { setPlaybackSpeed(speed); setShowSpeedMenu(false); }} className={`px-4 py-2 rounded-xl text-[9px] font-black ${playbackSpeed === speed ? 'bg-blue-600 text-white' : 'hover:bg-slate-50 text-slate-500'}`}>{speed}x</button>))}</div>)}</div></div>
+                    <div className="flex items-center justify-between"><div className="flex gap-1"><button onClick={handleUndo} disabled={isPlaying || historyIndex <= 0} className="w-8 h-8 rounded-lg border border-slate-100 flex items-center justify-center hover:bg-slate-50 text-slate-600 transition-all"><Undo2 size={16} /></button><button onClick={handleRedo} disabled={isPlaying || historyIndex >= history.length - 1} className="w-8 h-8 rounded-lg border border-slate-100 flex items-center justify-center hover:bg-slate-50 text-slate-600 transition-all"><Redo2 size={16} /></button></div><div className="flex items-center gap-2 bg-slate-50 p-1 rounded-xl border border-slate-100"><button onClick={() => goToStep(0)} disabled={activeOpSteps.length === 0} className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors"><SkipBack size={14} /></button><button onClick={() => goToStep(currentStepIdx - 1)} disabled={activeOpSteps.length <= 0} className="p-1.5 text-slate-600 hover:bg-white rounded-lg shadow-sm transition-all"><ChevronLeft size={18} /></button><button onClick={togglePause} className="w-8 h-8 bg-slate-900 text-white rounded-lg flex items-center justify-center hover:scale-105 transition-all shadow-md active:scale-95">{isPlaying && !isPaused ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" />}</button><button onClick={() => goToStep(currentStepIdx + 1)} disabled={activeOpSteps.length <= 0} className="p-1.5 text-slate-600 hover:bg-white rounded-lg shadow-sm transition-all"><ChevronRight size={18} /></button><button onClick={() => goToStep(activeOpSteps.length - 1)} disabled={activeOpSteps.length === 0} className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors"><SkipForward size={14} /></button></div><div className="relative"><button onClick={() => setShowSpeedMenu(!showSpeedMenu)} className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all ${showSpeedMenu ? 'bg-blue-600 text-white' : 'bg-white border-slate-100 text-slate-400'}`}><Timer size={16} /></button>{showSpeedMenu && (<div className="absolute bottom-full right-0 mb-2 bg-white rounded-xl shadow-2xl border border-slate-100 p-1 flex flex-col gap-0.5 z-50 animate-in slide-in-from-bottom-2">{[0.25, 0.5, 1, 1.5, 2, 3].map(speed => (<button key={speed} onClick={() => { setPlaybackSpeed(speed); setShowSpeedMenu(false); }} className={`px-4 py-2 rounded-xl text-[9px] font-black ${playbackSpeed === speed ? 'bg-blue-600 text-white' : 'hover:bg-slate-50 text-slate-500'}`}>{speed}x</button>))}
+</div>)}</div></div>
                     <div className="flex items-center gap-3"><span className="text-[7px] font-black text-slate-400 w-8 text-center">STEP {Math.max(0, currentStepIdx + 1)}</span><input type="range" min="0" max={Math.max(0, activeOpSteps.length - 1)} value={Math.max(0, currentStepIdx)} onChange={(e) => goToStep(parseInt(e.target.value))} className="flex-grow h-1 bg-slate-100 rounded-full accent-blue-600 cursor-pointer" /><span className="text-[7px] font-black text-slate-400 w-8 text-right">{activeOpSteps.length}</span></div>
                 </div>
                 <div className="h-8 w-px bg-slate-100"></div>

@@ -43,10 +43,7 @@ export class AVLTree {
     this.steps = [];
   }
 
-  toJSON(): string {
-    return JSON.stringify(this.root);
-  }
-
+  toJSON(): string { return JSON.stringify(this.root); }
   fromJSON(json: string): void {
     if (!json || json === 'null') this.root = null;
     else this.root = AVLNode.fromJSON(JSON.parse(json));
@@ -59,73 +56,98 @@ export class AVLTree {
     });
   }
 
-  height(node: AVLNode | null): number {
-    return node ? node.height : 0;
-  }
-
+  height(node: AVLNode | null): number { return node ? node.height : 0; }
   getBalance(node: AVLNode | null): number {
     if (!node) return 0;
     return this.height(node.left) - this.height(node.right);
   }
 
+  private patchTree(oldNode: AVLNode, newNode: AVLNode) {
+    if (this.root === oldNode) {
+        this.root = newNode;
+    } else {
+        const parent = this.findParent(this.root, oldNode.value);
+        if (parent) {
+            if (parent.left === oldNode) parent.left = newNode;
+            else parent.right = newNode;
+        }
+    }
+  }
+
   insert(value: number): VisualizationStep[] {
     this.steps = [];
-    this.root = this._insert(this.root, value);
-    this.addStep('complete', `Value ${value} insertion complete`);
+    if (!this.root) {
+        this.root = new AVLNode(value);
+        this.addStep('insert', `Created root node ${value}`, [this.root.id]);
+    } else {
+        this.root = this._insert(this.root, value);
+    }
+    this.addStep('complete', `Value ${value} insertion finished`);
     return this.steps;
   }
 
-  private _insert(node: AVLNode | null, value: number): AVLNode {
-    if (!node) {
-      const newNode = new AVLNode(value);
-      if (!this.root) this.root = newNode; 
-      this.addStep('insert', `New leaf: ${value}`, [newNode.id]);
-      return newNode;
-    }
-    this.addStep('highlight', `Search: ${value} vs ${node.value}`, [node.id]);
-    if (value < node.value) node.left = this._insert(node.left, value);
-    else if (value > node.value) node.right = this._insert(node.right, value);
-    else return node;
+  private _insert(node: AVLNode, value: number): AVLNode {
+    this.addStep('highlight', `Search: ${value} at ${node.value}`, [node.id]);
+
+    if (value < node.value) {
+        if (!node.left) {
+            node.left = new AVLNode(value);
+            this.addStep('insert', `Connected ${value} to the left of ${node.value}`, [node.left.id]);
+        } else {
+            node.left = this._insert(node.left, value);
+        }
+    } else if (value > node.value) {
+        if (!node.right) {
+            node.right = new AVLNode(value);
+            this.addStep('insert', `Connected ${value} to the right of ${node.value}`, [node.right.id]);
+        } else {
+            node.right = this._insert(node.right, value);
+        }
+    } else return node;
 
     node.height = Math.max(this.height(node.left), this.height(node.right)) + 1;
     const b = this.getBalance(node);
-    this.addStep('highlight', `Trace back: ${node.value} (BF: ${b})`, [node.id]);
 
-    if (b > 1) {
-        if (this.getBalance(node.left) >= 0) return this.rightRotate(node, false);
-        else {
-            this.addStep('message', `LR Case: Rotating left child first`);
-            node.left = this.leftRotate(node.left!, false);
-            return this.rightRotate(node, false);
+    if (Math.abs(b) > 1) {
+        if (b > 1) {
+            if (this.getBalance(node.left) >= 0) return this.rightRotate(node, false);
+            else {
+                node.left = this.leftRotate(node.left!, false);
+                return this.rightRotate(node, false);
+            }
+        } else {
+            if (this.getBalance(node.right) <= 0) return this.leftRotate(node, false);
+            else {
+                node.right = this.rightRotate(node.right!, false);
+                return this.leftRotate(node, false);
+            }
         }
-    }
-    if (b < -1) {
-        if (this.getBalance(node.right) <= 0) return this.leftRotate(node, false);
-        else {
-            this.addStep('message', `RL Case: Rotating right child first`);
-            node.right = this.rightRotate(node.right!, false);
-            return this.leftRotate(node, false);
-        }
+    } else {
+        this.addStep('highlight', `Node ${node.value} balanced (BF: ${b})`, [node.id]);
     }
     return node;
   }
 
   insertManual(value: number): VisualizationStep[] {
     this.steps = [];
-    this.root = this._insertBST(this.root, value);
+    if (!this.root) {
+        this.root = new AVLNode(value);
+        this.addStep('insert', `Created root node ${value}`, [this.root.id]);
+    } else {
+        this.root = this._insertBST(this.root, value);
+    }
     this.addStep('complete', `Manual insertion done`);
     return this.steps;
   }
 
-  private _insertBST(node: AVLNode | null, value: number): AVLNode {
-    if (!node) {
-      const newNode = new AVLNode(value);
-      if (!this.root) this.root = newNode;
-      this.addStep('insert', `Created node ${value}`, [newNode.id]);
-      return newNode;
+  private _insertBST(node: AVLNode, value: number): AVLNode {
+    if (value < node.value) {
+        if (!node.left) node.left = new AVLNode(value);
+        else node.left = this._insertBST(node.left, value);
+    } else if (value > node.value) {
+        if (!node.right) node.right = new AVLNode(value);
+        else node.right = this._insertBST(node.right, value);
     }
-    if (value < node.value) node.left = this._insertBST(node.left, value);
-    else if (value > node.value) node.right = this._insertBST(node.right, value);
     node.height = Math.max(this.height(node.left), this.height(node.right)) + 1;
     return node;
   }
@@ -145,12 +167,10 @@ export class AVLTree {
     if (direction === 'left' && !node.right) return [{ type: 'error', message: 'error.noRightChild', payload: {val: value}}];
     if (direction === 'right' && !node.left) return [{ type: 'error', message: 'error.noLeftChild', payload: {val: value}}];
 
-    const newNode = direction === 'left' ? this.leftRotate(node, false) : this.rightRotate(node, false);
-    if (!parent) this.root = newNode;
-    else if (parent.left === node) parent.left = newNode;
-    else parent.right = newNode;
+    // Pointer swapping is internal to leftRotate/rightRotate
+    if (direction === 'left') this.leftRotate(node, false);
+    else this.rightRotate(node, false);
 
-    this.updateHeight(this.root);
     this.addStep('complete', `Rotation finished`);
     return this.steps;
   }
@@ -162,7 +182,9 @@ export class AVLTree {
     y.left = T2;
     y.height = Math.max(this.height(y.left), this.height(y.right)) + 1;
     x.height = Math.max(this.height(x.left), this.height(x.right)) + 1;
-    if (!silent) this.addStep('rotate', `Right rotate: ${y.value} moves down-right`, [y.id, x.id]);
+    
+    this.patchTree(y, x);
+    if (!silent) this.addStep('rotate', `Right rotating at ${y.value}`, [y.id, x.id]);
     return x;
   }
 
@@ -173,26 +195,30 @@ export class AVLTree {
     x.right = T2;
     x.height = Math.max(this.height(x.left), this.height(x.right)) + 1;
     y.height = Math.max(this.height(y.left), this.height(y.right)) + 1;
-    if (!silent) this.addStep('rotate', `Left rotate: ${x.value} moves down-left`, [x.id, y.id]);
+    
+    this.patchTree(x, y);
+    if (!silent) this.addStep('rotate', `Left rotating at ${x.value}`, [x.id, y.id]);
     return y;
   }
 
   delete(value: number): VisualizationStep[] {
     this.steps = [];
     this.root = this._delete(this.root, value, true);
-    this.addStep('complete', `Value ${value} deletion complete`);
+    this.addStep('complete', `Value ${value} deletion finished`);
     return this.steps;
   }
 
   private _delete(node: AVLNode | null, value: number, autoBalance: boolean): AVLNode | null {
     if (!node) return null;
-    this.addStep('highlight', `Search: ${value} vs ${node.value}`, [node.id]);
+    this.addStep('highlight', `Searching ${value}...`, [node.id]);
     if (value < node.value) node.left = this._delete(node.left, value, autoBalance);
     else if (value > node.value) node.right = this._delete(node.right, value, autoBalance);
     else {
+      this.addStep('message', `Found ${value}. Removing...`);
       if (!node.left || !node.right) node = node.left || node.right;
       else {
         const temp = this.minValueNode(node.right);
+        this.addStep('message', `Finding successor: ${temp.value}`);
         node.value = temp.value;
         node.id = temp.id;
         node.right = this._delete(node.right, temp.value, autoBalance);
@@ -202,13 +228,14 @@ export class AVLTree {
     node.height = Math.max(this.height(node.left), this.height(node.right)) + 1;
     if (!autoBalance) return node;
     const b = this.getBalance(node);
-    if (b > 1) {
-        if (this.getBalance(node.left) >= 0) return this.rightRotate(node, false);
-        else { node.left = this.leftRotate(node.left!, false); return this.rightRotate(node, false); }
-    }
-    if (b < -1) {
-        if (this.getBalance(node.right) <= 0) return this.leftRotate(node, false);
-        else { node.right = this.rightRotate(node.right!, false); return this.leftRotate(node, false); }
+    if (Math.abs(b) > 1) {
+        if (b > 1) {
+            if (this.getBalance(node.left) >= 0) return this.rightRotate(node, false);
+            else { node.left = this.leftRotate(node.left!, false); return this.rightRotate(node, false); }
+        } else {
+            if (this.getBalance(node.right) <= 0) return this.leftRotate(node, false);
+            else { node.right = this.rightRotate(node.right!, false); return this.leftRotate(node, false); }
+        }
     }
     return node;
   }
@@ -223,13 +250,6 @@ export class AVLTree {
     if (!node || node.value === val) return null;
     if ((node.left?.value === val) || (node.right?.value === val)) return node;
     return val < node.value ? this.findParent(node.left, val) : this.findParent(node.right, val);
-  }
-
-  private updateHeight(node: AVLNode | null) {
-    if (!node) return;
-    this.updateHeight(node.left);
-    this.updateHeight(node.right);
-    node.height = Math.max(this.height(node.left), this.height(node.right)) + 1;
   }
 
   checkBalance(n: AVLNode | null = this.root): { allIds: string[], lowestId: string | null } {
@@ -248,10 +268,7 @@ export class AVLTree {
     this._check(n.right, ids, depth + 1);
   }
 
-  getNodeById(id: string): AVLNode | null {
-    return this._getById(this.root, id);
-  }
-
+  getNodeById(id: string): AVLNode | null { return this._getById(this.root, id); }
   private _getById(n: AVLNode | null, id: string): AVLNode | null {
     if (!n || n.id === id) return n;
     return this._getById(n.left, id) || this._getById(n.right, id);
