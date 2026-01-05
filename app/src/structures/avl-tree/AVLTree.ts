@@ -171,8 +171,17 @@ export class AVLTree {
     if (direction === 'left') this.leftRotate(node, false);
     else this.rightRotate(node, false);
 
+    // CRITICAL FIX: Manually update heights from root to ensure ancestors (and snapshot) are correct
+    this.updateAllHeights(this.root);
+
     this.addStep('complete', `Rotation finished`);
     return this.steps;
+  }
+
+  private updateAllHeights(node: AVLNode | null): number {
+    if (!node) return 0;
+    node.height = Math.max(this.updateAllHeights(node.left), this.updateAllHeights(node.right)) + 1;
+    return node.height;
   }
 
   public rightRotate(y: AVLNode, silent = true): AVLNode {

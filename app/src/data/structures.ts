@@ -19,7 +19,7 @@ export const structures: StructureDef[] = [
     name: 'Bloom Filter',
     description: 'A space-efficient probabilistic data structure used to test whether an element is a member of a set.',
     path: '/bloom-filter',
-    implemented: false,
+    implemented: true,
   },
   {
     id: 'min-max-heap',

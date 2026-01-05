@@ -1,20 +1,21 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { MainLayout } from './layouts/MainLayout';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { HomePage } from './pages/Home';
 import { AVLTreePage } from './pages/AVLTree';
+import { BloomFilterPage } from './pages/BloomFilter';
+import { MainLayout } from './layouts/MainLayout';
 
 function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<HomePage />} />
           <Route path="avl-tree" element={<AVLTreePage />} />
-          {/* Add other routes here as they are implemented */}
-          <Route path="*" element={<div className="p-12 text-center text-slate-500">Page not found</div>} />
+          <Route path="bloom-filter" element={<BloomFilterPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
 
