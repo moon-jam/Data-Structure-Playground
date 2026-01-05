@@ -255,7 +255,7 @@ export class AVLTree {
     return curr;
   }
 
-  private findParent(node: AVLNode | null, val: number): AVLNode | null {
+  public findParent(node: AVLNode | null, val: number): AVLNode | null {
     if (!node || node.value === val) return null;
     if ((node.left?.value === val) || (node.right?.value === val)) return node;
     return val < node.value ? this.findParent(node.left, val) : this.findParent(node.right, val);

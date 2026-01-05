@@ -12,7 +12,7 @@ Visualize, build, and master complex data structures through interactive animati
 - **Interactive Visualization**: Watch trees grow and balance in real-time with smooth Framer Motion animations.
 - **Gesture Control (Drag-to-Rotate)**: Instead of just clicking buttons, manually pull nodes to perform Left/Right rotations to gain physical intuition of tree balancing.
 - **Algorithm Timeline**: A full playback engine that lets you pause, step forward/backward, and scrub through every comparison and rotation.
-- **Course Mode**: An interactive tutorial that guides beginners through LL, RR, LR, and RL cases with automatic scenario generation.
+- **Course Mode**: An interactive tutorial that guides beginners through LL, RR, LR, and RL cases with automatic scenario generation and advanced rebalancing heuristics for accurate guidance.
 - **Knowledge Base (Wiki)**: Integrated documentation explaining Balance Factors (BF), complexity, and rotation strategies.
 - **Pro Layout**: An IDE-like experience with a collapsible sidebar and zoomable/draggable canvas.
 - **Multi-language Support**: Full support for Traditional Chinese (繁體中文) and English.

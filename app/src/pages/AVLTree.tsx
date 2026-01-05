@@ -164,12 +164,32 @@ export const AVLTreePage: React.FC = () => {
   const handleInsert = () => { if (isPlaying) return; const val = parseInt(inputValue); if (!isNaN(val)) { startNewOperation(`${t('insert')} ${val}`, mode === 'manual' ? avlTree.insertManual(val) : avlTree.insert(val)); setInputValue(''); } };
   const handleDelete = () => { if (isPlaying) return; const val = selectedNode ? selectedNode.value : parseInt(inputValue); if (!isNaN(val)) { startNewOperation(`${t('delete')} ${val}`, mode === 'manual' ? avlTree.deleteManual(val) : avlTree.delete(val)); setInputValue(''); setSelectedNode(null); } };
   
+  // Heuristic: Prioritize Parent over Child if they share the same imbalance sign (fixing Double Rotation blocking loop)
+  const getPriorityUnbalancedNode = (): { id: string, reason: 'lowest' | 'heuristic' } | null => {
+      if (!unbalancedData.lowestId) return null;
+      if (lockedTargetId && unbalancedData.allIds.includes(lockedTargetId)) return { id: lockedTargetId, reason: 'heuristic' };
+      const lowestNode = avlTree.getNodeById(unbalancedData.lowestId);
+      if (lowestNode) {
+          const parent = avlTree.findParent(root, lowestNode.value);
+          if (parent && unbalancedData.allIds.includes(parent.id)) {
+              const bfLowest = avlTree.getBalance(lowestNode);
+              const bfParent = avlTree.getBalance(parent);
+              if (bfLowest * bfParent > 0) return { id: parent.id, reason: 'heuristic' };
+          }
+      }
+      return { id: unbalancedData.lowestId, reason: 'lowest' };
+  };
+
   const handleNodeDrag = (node: AVLNode, direction: 'left' | 'right') => {
       if (isPlaying) return;
-      if (mode === 'manual' && unbalancedData.allIds.includes(node.id)) {
-          if (unbalancedData.lowestId && node.id !== unbalancedData.lowestId && node.id !== lockedTargetId) {
-              const lowestNode = avlTree.getNodeById(unbalancedData.lowestId);
-              setWarningToast(t('avl:guide.lowestWarning') + ` (${t('avl:guide.recommendedTarget', {val: lowestNode?.value})})`);
+      if (mode === 'manual' && unbalancedData.allIds.length > 0) {
+          const target = getPriorityUnbalancedNode();
+          if (unbalancedData.allIds.includes(node.id)) {
+             if (target && node.id !== target.id) {
+                 const targetNode = avlTree.getNodeById(target.id);
+                 const msg = target.reason === 'heuristic' ? t('avl:guide.heuristicWarning') : t('avl:guide.lowestWarning');
+                 setWarningToast(msg + ` (${t('avl:guide.recommendedTarget', {val: targetNode?.value})})`);
+             }
           }
       }
       startNewOperation(`${direction === 'left' ? t('avl:left') : t('avl:right')} @ ${node.value}`, avlTree.rotateNode(node.value, direction));
@@ -243,7 +263,10 @@ export const AVLTreePage: React.FC = () => {
   const renderAdvice = () => {
       if (mode !== 'manual' || unbalancedData.allIds.length === 0 || isPlaying) { if (pulsingId) setPulsingId(null); if (lockedTargetId) setLockedTargetId(null); return null; }
       if (!showHint) { if (pulsingId) setPulsingId(null); return (<button onClick={() => setShowHint(true)} className="w-full py-3 mb-6 bg-amber-500/10 border-2 border-dashed border-amber-500/30 rounded-2xl text-amber-500 font-black text-[10px] uppercase tracking-widest animate-pulse">{t('avl:guide.showHint')}</button>); }
-      let targetId = (lockedTargetId && unbalancedData.allIds.includes(lockedTargetId)) ? lockedTargetId : unbalancedData.lowestId || unbalancedData.allIds[0];
+      const target = getPriorityUnbalancedNode();
+      if (!target) return null;
+      const targetId = target.id;
+      
       if (targetId !== lockedTargetId) setLockedTargetId(targetId);
       const node = avlTree.getNodeById(targetId);
       if (!node) return null;
@@ -251,12 +274,28 @@ export const AVLTreePage: React.FC = () => {
       let content, title = '';
       if (bf > 1) {
           const lNode = node.left;
-          if (avlTree.getBalance(lNode) >= 0) { title = t('avl:guide.caseLL'); content = <SimpleMarkdown text={`👉 **步驟：** 請將 **節點 ${node.value}** 向 **右** 拉下，讓左孩子升上來。`} />; if (pulsingId !== node.id) setPulsingId(node.id); } 
-          else { title = t('avl:guide.caseLR'); content = <div className="space-y-2 text-sm"><div className="bg-blue-600 text-white text-[8px] font-black px-2 py-0.5 rounded inline-block uppercase mb-1">Step 1 of 2</div><SimpleMarkdown text={`👉 請先將 **左孩子 (節點 ${lNode?.value})** 向 **左** 拉下。`} /></div>; if (lNode && pulsingId !== lNode.id) setPulsingId(lNode.id); } 
+          if (avlTree.getBalance(lNode) >= 0) { 
+              title = t('avl:guide.caseLL'); 
+              content = <SimpleMarkdown text={t('avl:guide.actionLL', {val: node.value})} />; 
+              if (pulsingId !== node.id) setPulsingId(node.id); 
+          } 
+          else { 
+              title = t('avl:guide.caseLR'); 
+              content = <div className="space-y-2 text-sm"><div className="bg-blue-600 text-white text-[8px] font-black px-2 py-0.5 rounded inline-block uppercase mb-1">Step 1 of 2</div><SimpleMarkdown text={t('avl:guide.actionLR_step1', {childVal: lNode?.value})} /></div>; 
+              if (lNode && pulsingId !== lNode.id) setPulsingId(lNode.id); 
+          } 
       } else if (bf < -1) {
           const rNode = node.right;
-          if (avlTree.getBalance(rNode) <= 0) { title = t('avl:guide.caseRR'); content = <SimpleMarkdown text={`👉 **步驟：** 請將 **節點 ${node.value}** 向 **左** 拉下，讓右孩子升上來。`} />; if (pulsingId !== node.id) setPulsingId(node.id); } 
-          else { title = t('avl:guide.caseRL'); content = <div className="space-y-2 text-sm"><div className="bg-blue-600 text-white text-[8px] font-black px-2 py-0.5 rounded inline-block uppercase mb-1">Step 1 of 2</div><SimpleMarkdown text={`👉 請先對 **右孩子 (節點 ${rNode?.value})** 向 **右** 拉下。`} /></div>; if (rNode && pulsingId !== rNode.id) setPulsingId(rNode.id); } 
+          if (avlTree.getBalance(rNode) <= 0) { 
+              title = t('avl:guide.caseRR'); 
+              content = <SimpleMarkdown text={t('avl:guide.actionRR', {val: node.value})} />; 
+              if (pulsingId !== node.id) setPulsingId(node.id); 
+          } 
+          else { 
+              title = t('avl:guide.caseRL'); 
+              content = <div className="space-y-2 text-sm"><div className="bg-blue-600 text-white text-[8px] font-black px-2 py-0.5 rounded inline-block uppercase mb-1">Step 1 of 2</div><SimpleMarkdown text={t('avl:guide.actionRL_step1', {childVal: rNode?.value})} /></div>; 
+              if (rNode && pulsingId !== rNode.id) setPulsingId(rNode.id); 
+          } 
       }
       return (
           <div className="bg-amber-950/50 border border-amber-500/30 p-4 rounded-xl text-amber-50 mb-6 relative group shadow-2xl animate-in slide-in-from-top-2">

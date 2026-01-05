@@ -15,6 +15,7 @@ A highly interactive data structure learning platform. The current focus is on T
 - **Location**: `app/src/pages/` and `app/src/components/`
 - **Rendering**: Uses `TreeNode.tsx` recursively.
 - **Animation**: `framer-motion` for layout transitions.
+- **Interaction**: `react-zoom-pan-pinch` for a zoomable/draggable infinite canvas.
 - **Timeline**: `AVLTreePage.tsx` implements an async playback engine that iterates through steps with controllable speed.
 
 ## Development Conventions
@@ -28,7 +29,7 @@ A highly interactive data structure learning platform. The current focus is on T
 - **Auto-deploy**: Pushing to `main` triggers GitHub Actions (`.github/workflows/deploy.yml`).
 
 ## Current Status (TODO.md)
-- [x] AVL Tree (Playback engine, Tutorial mode, Drag interaction)
+- [x] AVL Tree (Playback engine, Tutorial mode, Drag interaction, Advanced Rebalancing Heuristics)
 - [ ] Bloom Filter
 - [ ] Min-Max Heap
 - [ ] B tree / B+ tree
