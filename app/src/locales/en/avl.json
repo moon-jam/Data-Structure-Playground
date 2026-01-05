@@ -92,5 +92,10 @@
     "start": "Start Course",
     "reset": "Retry Level",
     "locked": "Locked"
+  },
+  "bottomBar": {
+    "operations": "Operations",
+    "timeline": "Timeline",
+    "stats": "Information"
   }
 }

@@ -92,5 +92,10 @@
     "start": "開始課程",
     "reset": "重試本關",
     "locked": "尚未解鎖"
+  },
+  "bottomBar": {
+    "operations": "操作區",
+    "timeline": "播放控制",
+    "stats": "狀態資訊"
   }
 }

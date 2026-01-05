@@ -126,7 +126,7 @@ export const AVLTreePage: React.FC = () => {
   
   // Sidebar/Layout States
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
-  const [sidebarWidth, setSidebarWidth] = useState(350);
+  const [sidebarWidth, setSidebarWidth] = useState(320);
   const [isResizing, setIsResizing] = useState(false);
   const [resetConfirm, setResetConfirm] = useState(false);
   const wikiBfRef = useRef<HTMLDivElement>(null);
@@ -635,13 +635,13 @@ export const AVLTreePage: React.FC = () => {
         className={`h-full flex flex-col bg-slate-900 border-r border-slate-800 shrink-0 z-[100] shadow-2xl relative ${!isSidebarOpen ? 'overflow-hidden' : ''} ${window.innerWidth <= 768 ? 'fixed left-0 top-0' : 'relative'} ${tourHighlight(1)}`}
       >
           {window.innerWidth <= 768 && isSidebarOpen && <button onClick={() => setIsSidebarOpen(false)} className="absolute top-4 right-4 text-white z-[110]"><X size={24} /></button>}
-          <div className="flex flex-col h-full min-w-[280px]">
-              <div className="flex p-2 gap-1 bg-slate-950/50 min-w-[320px]">
-                  <button onClick={() => setActiveTab('logs')} className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-2 text-[10px] font-black uppercase transition-all ${activeTab === 'logs' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}><ScrollText size={14} /> Logs</button>
-                  <button onClick={() => setActiveTab('wiki')} className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-2 text-[10px] font-black uppercase transition-all ${activeTab === 'wiki' ? 'bg-amber-500 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}><BookOpen size={14} /> Wiki</button>
-                  <button onClick={() => runLesson(0)} className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-2 text-[10px] font-black uppercase transition-all ${activeTab === 'tutorial' ? 'bg-green-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}><GraduationCap size={14} /> Course</button>
+          <div className="flex flex-col h-full w-full">
+              <div className="flex p-2 gap-1 bg-slate-950/50">
+                  <button onClick={() => setActiveTab('logs')} className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-2 text-[9px] sm:text-[10px] font-black uppercase transition-all ${activeTab === 'logs' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}><ScrollText size={14} /><span className="hidden sm:inline">Logs</span></button>
+                  <button onClick={() => setActiveTab('wiki')} className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-2 text-[9px] sm:text-[10px] font-black uppercase transition-all ${activeTab === 'wiki' ? 'bg-amber-500 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}><BookOpen size={14} /><span className="hidden sm:inline">Wiki</span></button>
+                  <button onClick={() => runLesson(0)} className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-2 text-[9px] sm:text-[10px] font-black uppercase transition-all ${activeTab === 'tutorial' ? 'bg-green-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}><GraduationCap size={14} /><span className="hidden sm:inline">Course</span></button>
               </div>
-              <div className="flex-grow overflow-y-auto p-4 font-mono text-[10px] text-slate-300 custom-scrollbar min-w-[320px]">
+              <div className="flex-grow overflow-y-auto p-4 font-mono text-[10px] text-slate-300 custom-scrollbar">
                   {activeTab === 'logs' && (<div className="space-y-2"><h3 className="text-slate-500 font-black uppercase tracking-[0.2em] mb-4">History</h3>{renderAdvice()}{history.slice(1).reverse().map((e, i) => (<button key={e.id} onClick={() => { stopPlayback(); setActiveOpSteps(e.steps); setCurrentStepIdx(e.steps.length - 1); setHistoryIndex(history.length - 1 - i); }} className={`w-full text-left p-3 rounded-xl border transition-all ${historyIndex === history.length - 1 - i ? 'bg-blue-600/20 border-blue-500/50 text-blue-100 shadow-inner' : 'bg-slate-800/30 border-slate-700/50 hover:bg-slate-800 text-slate-400'}`}><div className="flex justify-between items-center mb-1"><span className="font-black uppercase tracking-wider">{e.action}</span><span className="opacity-40 text-[8px]">{e.steps.length} steps</span></div><div className="text-[9px] opacity-60 truncate">{e.steps[e.steps.length-1]?.message}</div></button>))}
 </div>)}
                   {activeTab === 'wiki' && (
@@ -670,8 +670,18 @@ export const AVLTreePage: React.FC = () => {
       <div className="flex-grow flex flex-col min-w-0 h-full relative bg-white">
           <div className={`flex-grow relative bg-slate-50 overflow-hidden ${isResizing ? 'pointer-events-none' : ''}`}>
                 <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="absolute bottom-6 left-6 z-30 w-10 h-10 bg-slate-900 text-white rounded-2xl shadow-xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all">{isSidebarOpen ? <PanelLeftClose size={20} /> : <PanelLeft size={20} />}</button>
-                <div className="absolute top-6 left-6 flex gap-3 z-20 pointer-events-none max-w-[calc(100%-80px)]"><div className={`bg-white/80 backdrop-blur-md px-4 py-2 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3 pointer-events-auto ${tourHighlight(0)}`}><button onClick={() => setMode('auto')} className={`px-3 py-1 text-[10px] font-black rounded-lg transition-all ${mode === 'auto' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-slate-400 hover:text-slate-600'}`}>AUTO</button><button onClick={() => setMode('manual')} className={`px-3 py-1 text-[10px] font-black rounded-lg transition-all ${mode === 'manual' ? 'bg-amber-500 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>MANUAL</button></div>{currentStepMsg && (<div className="bg-blue-600/90 backdrop-blur-md px-4 py-2 rounded-2xl text-white shadow-lg border border-blue-400 flex items-center gap-2 animate-in slide-in-from-left-4 overflow-hidden"><div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse shrink-0"></div><span className="text-[10px] font-black uppercase tracking-wider truncate">{currentStepMsg}</span></div>)}
-</div>
+                <div className="absolute top-4 sm:top-6 left-4 sm:left-6 flex flex-col sm:flex-row gap-3 z-20 pointer-events-none max-w-[calc(100%-80px)]">
+                    <div className={`bg-white/80 backdrop-blur-md px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-2 sm:gap-3 pointer-events-auto w-fit ${tourHighlight(0)}`}>
+                        <button onClick={() => setMode('auto')} className={`px-2 sm:px-3 py-1 text-[8px] sm:text-[10px] font-black rounded-lg transition-all ${mode === 'auto' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-slate-400 hover:text-slate-600'}`}>AUTO</button>
+                        <button onClick={() => setMode('manual')} className={`px-2 sm:px-3 py-1 text-[8px] sm:text-[10px] font-black rounded-lg transition-all ${mode === 'manual' ? 'bg-amber-500 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>MANUAL</button>
+                    </div>
+                    {currentStepMsg && (
+                        <div className="bg-blue-600/90 backdrop-blur-md px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl text-white shadow-lg border border-blue-400 flex items-center gap-2 animate-in slide-in-from-left-4 overflow-hidden w-fit pointer-events-auto">
+                            <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-white animate-pulse shrink-0"></div>
+                            <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-wider truncate max-w-[150px] sm:max-w-none">{currentStepMsg}</span>
+                        </div>
+                    )}
+                </div>
                 <button onClick={() => setShowHelp(true)} className="absolute top-6 right-6 w-10 h-10 bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 shadow-sm z-20"><HelpCircle size={20} /></button>
                 
                 <TransformWrapper 
@@ -708,56 +718,64 @@ export const AVLTreePage: React.FC = () => {
                 </TransformWrapper>
           </div>
 
-          {/* BOTTOM BAR - Responsive with Grid Alignment */}
-          <div className="min-h-24 bg-white border-t border-slate-200 p-4 flex flex-col md:flex-row gap-6 items-center overflow-visible shadow-[0_-10px_40px_rgba(0,0,0,0.03)]">
-                <div className={`flex flex-col gap-2 shrink-0 w-full md:w-[320px] ${tourHighlight(3)}`}>
-                    <div className="grid grid-cols-[1fr_auto] gap-3 w-full">
-                        <div className="flex gap-2 items-center bg-slate-50 p-1 rounded-xl border border-slate-100 flex-grow overflow-hidden">
+          {/* BOTTOM BAR - Modular Island Design */}
+          <div className="bg-white border-t border-slate-200 p-3 sm:p-4 flex flex-col lg:flex-row gap-4 lg:gap-4 items-stretch overflow-visible shadow-[0_-10px_40px_rgba(0,0,0,0.03)] z-[100]">
+                {/* OPERATIONS ISLAND */}
+                <div className={`flex flex-col gap-2 shrink-0 w-full lg:w-[320px] bg-slate-50/50 border border-slate-100 p-2 sm:p-3 rounded-2xl ${tourHighlight(3)}`}>
+                    <div className="flex items-center justify-between mb-1 px-1">
+                        <span className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">{t('avl:bottomBar.operations')}</span>
+                    </div>
+                    <div className="grid grid-cols-[1fr_auto] gap-2 w-full">
+                        <div className="flex gap-2 items-center bg-white p-1 rounded-xl border border-slate-200 flex-grow overflow-hidden shadow-sm">
                             <input type="number" value={inputValue} onChange={(e) => setInputValue(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleInsert()} placeholder="Val" className="flex-grow min-w-0 px-2 py-1.5 bg-transparent outline-none font-bold text-xs text-center text-slate-900" />
-                            <button onClick={handleInsert} disabled={isPlaying} className={`px-4 py-1.5 rounded-lg font-black text-white text-[9px] shadow-md shrink-0 ${mode === 'manual' ? 'bg-amber-500' : 'bg-blue-600'}`}>INSERT</button>
+                            <button onClick={handleInsert} disabled={isPlaying} className={`px-4 py-1.5 rounded-lg font-black text-white text-[11px] shadow-md shrink-0 transition-all active:scale-95 ${mode === 'manual' ? 'bg-amber-500 hover:bg-amber-600' : 'bg-blue-600 hover:bg-blue-700'}`}>INSERT</button>
                         </div>
-                        <button onClick={handleDelete} disabled={isPlaying} className={`px-4 py-2.5 rounded-xl font-black text-white text-[9px] shadow-lg flex items-center gap-2 transition-all shrink-0 ${selectedNode ? 'bg-red-600' : 'bg-slate-300'}`}><Trash2 size={12} /> DELETE</button>
+                        <button onClick={handleDelete} disabled={isPlaying} className={`px-4 py-2.5 rounded-xl font-black text-white text-[11px] shadow-lg flex items-center gap-2 transition-all active:scale-95 shrink-0 ${selectedNode ? 'bg-red-600 hover:bg-red-700' : 'bg-slate-300'}`}><Trash2 size={12} /><span className="hidden sm:inline">DELETE</span></button>
                     </div>
                     <button onClick={handleClear} disabled={isPlaying} className={`w-full flex items-center justify-center gap-2 py-1.5 border border-dashed text-[9px] font-black rounded-lg transition-all uppercase tracking-widest ${resetConfirm ? 'bg-red-600 border-red-600 text-white animate-bounce' : 'border-slate-200 text-slate-400 hover:bg-red-50 hover:text-red-500'}`}><RefreshCw size={12} className={resetConfirm ? 'animate-spin' : ''} /> {resetConfirm ? 'Confirm Reset?' : 'Reset Playground'}</button>
                 </div>
                 
-                <div className="hidden md:block h-8 w-px bg-slate-100"></div>
-
-                <div className={`flex-grow flex flex-col gap-1 w-full ${tourHighlight(4)}`}>
-                    <div className="flex items-center justify-between">
+                {/* TIMELINE ISLAND */}
+                <div className={`flex-grow flex flex-col gap-2 w-full bg-slate-50/50 border border-slate-100 p-2 sm:p-3 rounded-2xl ${tourHighlight(4)}`}>
+                    <div className="flex items-center justify-between mb-1 px-1">
+                        <span className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">{t('avl:bottomBar.timeline')}</span>
+                        <span className="text-[11px] font-black text-slate-400 uppercase">Step {Math.max(0, currentStepIdx + 1)} / {activeOpSteps.length}</span>
+                    </div>
+                    <div className="flex items-center justify-between gap-4 flex-grow">
                         <div className="flex gap-1">
-                            <button onClick={handleUndo} disabled={isPlaying || historyIndex <= 0} className="w-8 h-8 rounded-lg border border-slate-100 flex items-center justify-center hover:bg-slate-50 text-slate-600 transition-all"><Undo2 size={16} /></button>
-                            <button onClick={handleRedo} disabled={isPlaying || historyIndex >= history.length - 1} className="w-8 h-8 rounded-lg border border-slate-100 flex items-center justify-center hover:bg-slate-50 text-slate-600 transition-all"><Redo2 size={16} /></button>
+                            <button onClick={handleUndo} disabled={isPlaying || historyIndex <= 0} className="w-8 h-8 rounded-lg border border-slate-200 bg-white flex items-center justify-center hover:bg-slate-50 text-slate-600 transition-all shadow-sm disabled:opacity-30"><Undo2 size={16} /></button>
+                            <button onClick={handleRedo} disabled={isPlaying || historyIndex >= history.length - 1} className="w-8 h-8 rounded-lg border border-slate-200 bg-white flex items-center justify-center hover:bg-slate-50 text-slate-600 transition-all shadow-sm disabled:opacity-30"><Redo2 size={16} /></button>
                         </div>
-                        <div className="flex items-center gap-2 bg-slate-50 p-1 rounded-xl border border-slate-100">
-                            <button onClick={() => goToStep(0)} disabled={activeOpSteps.length === 0} className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors"><SkipBack size={14} /></button>
-                            <button onClick={() => goToStep(currentStepIdx - 1)} disabled={activeOpSteps.length <= 0} className="p-1.5 text-slate-600 hover:bg-white rounded-lg shadow-sm transition-all"><ChevronLeft size={18} /></button>
+                        <div className="flex items-center gap-2 bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
+                            <button onClick={() => goToStep(0)} disabled={activeOpSteps.length === 0} className="hidden sm:block p-1.5 text-slate-400 hover:text-slate-600 transition-colors disabled:opacity-20"><SkipBack size={14} /></button>
+                            <button onClick={() => goToStep(currentStepIdx - 1)} disabled={activeOpSteps.length <= 0} className="p-1.5 text-slate-600 hover:bg-slate-50 rounded-lg transition-all disabled:opacity-20"><ChevronLeft size={18} /></button>
                             <button onClick={togglePause} className="w-8 h-8 bg-slate-900 text-white rounded-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-md">{isPlaying && !isPaused ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" />}</button>
-                            <button onClick={() => goToStep(currentStepIdx + 1)} disabled={activeOpSteps.length <= 0} className="p-1.5 text-slate-600 hover:bg-white rounded-lg shadow-sm transition-all"><ChevronRight size={18} /></button>
-                            <button onClick={() => goToStep(activeOpSteps.length - 1)} disabled={activeOpSteps.length === 0} className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors"><SkipForward size={14} /></button>
+                            <button onClick={() => goToStep(currentStepIdx + 1)} disabled={activeOpSteps.length <= 0} className="p-1.5 text-slate-600 hover:bg-slate-50 rounded-lg transition-all disabled:opacity-20"><ChevronRight size={18} /></button>
+                            <button onClick={() => goToStep(activeOpSteps.length - 1)} disabled={activeOpSteps.length === 0} className="hidden sm:block p-1.5 text-slate-400 hover:text-slate-600 transition-colors disabled:opacity-20"><SkipForward size={14} /></button>
                         </div>
                         <div className="relative">
-                            <button onClick={() => setShowSpeedMenu(!showSpeedMenu)} className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all ${showSpeedMenu ? 'bg-blue-600 text-white' : 'bg-white border-slate-100 text-slate-400'}`}><Timer size={16} /></button>
+                            <button onClick={() => setShowSpeedMenu(!showSpeedMenu)} className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all shadow-sm ${showSpeedMenu ? 'bg-blue-600 text-white border-blue-600' : 'bg-white border-slate-200 text-slate-400'}`}><Timer size={16} /></button>
                             {showSpeedMenu && (
-                                <div className="absolute bottom-full right-0 mb-2 bg-white rounded-xl shadow-2xl border border-slate-100 p-1 flex flex-col gap-0.5 z-50 animate-in slide-in-from-bottom-2">
-                                    {[0.25, 0.5, 1, 1.5, 2, 3].map(speed => (<button key={speed} onClick={() => { setPlaybackSpeed(speed); setShowSpeedMenu(false); }} className={`px-4 py-2 rounded-xl text-[9px] font-black ${playbackSpeed === speed ? 'bg-blue-600 text-white' : 'hover:bg-slate-50 text-slate-500'}`}>{speed}x</button>))}
+                                <div className="absolute bottom-full right-0 mb-2 bg-white rounded-xl shadow-2xl border border-slate-200 p-1 flex flex-col gap-0.5 z-[150] animate-in slide-in-from-bottom-2 min-w-[60px]">
+                                    {[0.5, 1, 1.5, 2, 3].map(speed => (<button key={speed} onClick={() => { setPlaybackSpeed(speed); setShowSpeedMenu(false); }} className={`px-3 py-1.5 rounded-lg text-[9px] font-black transition-colors ${playbackSpeed === speed ? 'bg-blue-600 text-white' : 'hover:bg-slate-50 text-slate-500'}`}>{speed}x</button>))}
                                 </div>
                             )}
                         </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <span className="text-[7px] font-black text-slate-400 w-8 text-center">STEP {Math.max(0, currentStepIdx + 1)}</span>
-                        <input type="range" min="0" max={Math.max(0, activeOpSteps.length - 1)} value={Math.max(0, currentStepIdx)} onChange={(e) => goToStep(parseInt(e.target.value))} className="flex-grow h-1 bg-slate-100 rounded-full accent-blue-600 cursor-pointer" />
-                        <span className="text-[7px] font-black text-slate-400 w-8 text-right">{activeOpSteps.length}</span>
+                    <div className="flex items-center gap-3 mt-1">
+                        <input type="range" min="0" max={Math.max(0, activeOpSteps.length - 1)} value={Math.max(0, currentStepIdx)} onChange={(e) => goToStep(parseInt(e.target.value))} className="flex-grow h-1 bg-slate-200 rounded-full accent-blue-600 cursor-pointer" />
                     </div>
                 </div>
 
-                <div className="hidden md:block h-8 w-px bg-slate-100"></div>
-
-                {/* STATS */}
-                <div className="hidden sm:flex w-[150px] flex-col gap-1 shrink-0 text-sm">
-                    <div className="flex justify-between items-center p-2 bg-blue-50/50 rounded-lg border border-blue-100"><span className="text-[7px] font-black text-blue-400 uppercase tracking-widest">Height</span><span className="text-xs font-black text-blue-700 font-mono">{root ? root.height : 0}</span></div>
-                    <div className={`flex justify-between items-center p-2 rounded-lg border ${unbalancedData.allIds.length > 0 ? 'bg-red-50 border-red-100 text-red-600' : 'bg-green-50 border-green-100 text-green-600'}`}><span className="text-[7px] font-black uppercase tracking-widest">Status</span><span className="text-[8px] font-black uppercase font-mono">{unbalancedData.allIds.length > 0 ? 'Error' : 'Stable'}</span></div>
+                {/* STATS ISLAND */}
+                <div className="flex w-full lg:w-[160px] flex-row lg:flex-col gap-2 bg-slate-50/50 border border-slate-100 p-2 sm:p-3 rounded-2xl shrink-0">
+                    <div className="flex-1 lg:flex-none flex flex-col gap-1">
+                        <span className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] px-1 hidden lg:block">{t('avl:bottomBar.stats')}</span>
+                        <div className="flex justify-between items-center p-2 bg-white rounded-xl border border-slate-200 shadow-sm"><span className="text-[9px] font-black text-blue-400 uppercase tracking-widest">Height</span><span className="text-xs font-black text-blue-700 font-mono">{root ? root.height : 0}</span></div>
+                    </div>
+                    <div className="flex-1 lg:flex-none flex flex-col gap-1">
+                        <div className={`flex justify-between items-center p-2 rounded-xl border shadow-sm ${unbalancedData.allIds.length > 0 ? 'bg-red-50 border-red-100 text-red-600' : 'bg-green-50 border-green-100 text-green-600'}`}><span className="text-[9px] font-black uppercase tracking-widest">Status</span><span className="text-xs font-black uppercase font-mono">{unbalancedData.allIds.length > 0 ? 'Error' : 'Stable'}</span></div>
+                    </div>
                 </div>
           </div>
       </div>

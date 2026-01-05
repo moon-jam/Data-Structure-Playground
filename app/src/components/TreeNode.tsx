@@ -180,7 +180,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
         {/* Balance Factor Indicator */}
 
         {showBF && (
-        <div className={`absolute -top-6 text-[10px] font-black px-1 rounded ${bf > 1 || bf < -1 ? 'bg-red-500 text-white' : 'bg-slate-100 text-slate-500'}`}>
+        <div className={`absolute -top-6 text-xs font-black px-1.5 py-0.5 rounded shadow-sm ${bf > 1 || bf < -1 ? 'bg-red-500 text-white' : 'bg-slate-100 text-slate-500'}`}>
 
           BF:{bf}
 
@@ -189,7 +189,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
         {/* Height Indicator */}
 
         {showHeight && (
-        <div className="absolute -bottom-6 text-[9px] text-slate-400 select-none uppercase tracking-tighter font-bold">
+        <div className="absolute -bottom-6 text-[11px] text-slate-400 select-none uppercase tracking-tighter font-bold">
 
           H:{node.height - 1}
 
