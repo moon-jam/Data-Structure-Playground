@@ -43,75 +43,29 @@ interface TreeNodeProps {
     
 
   
-
-
-
 // Basic constants for layout
 
 const NODE_RADIUS = 25;
 
 const VERTICAL_SPACING = 80;
-
-
-
 export const TreeNode: React.FC<TreeNodeProps> = ({ 
-
-
-
   node, x, y, level, parentX, parentY, unbalancedIds = [], selectedId, highlightedIds = [], onNodeClick, onNodeDrag, onMouseEnter, onMouseLeave, getBalance, pulsingId, showHeight = true, showBF = true 
-
-
-
 }) => {
-
-
-
   if (!node) return null;
 
-
-
-
-
-
-
   const isUnbalanced = unbalancedIds.includes(node.id);
-
-
-
   const isSelected = selectedId === node.id;
-
-
-
   const isHighlighted = highlightedIds.includes(node.id);
-
-
-
   const isPulsing = pulsingId === node.id;
+    const isDraggable = !!onNodeDrag;    const bf = getBalance ? getBalance(node) : 0;
 
+    const spread = Math.pow(2, Math.max(0, node.height - 2)) * 50;
 
+    const leftChildX = x - spread;
 
-  const isDraggable = !!onNodeDrag;
+    const rightChildX = x + spread;
 
-
-
-
-
-  const bf = getBalance ? getBalance(node) : 0;
-
-
-
-  // Calculate children positions
-
-  const spread = 200 / (level + 1); 
-
-  const leftChildX = x - spread;
-
-  const rightChildX = x + spread;
-
-  const childY = y + VERTICAL_SPACING;
-
-
-
+    const childY = y + VERTICAL_SPACING;
   return (
 
     <>
@@ -140,293 +94,83 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
           />
         </svg>
       )}
-
-
-
                   {/* Draw Children recursively */}
-
-
-
                   <TreeNode 
-
-
-
                     node={node.left} 
-
-
-
                     x={leftChildX} 
-
-
-
                     y={childY} 
-
-
-
                     level={level + 1} 
-
-
-
                     parentX={x} 
-
-
-
                     parentY={y}
-
-
-
                     unbalancedIds={unbalancedIds}
-
-
-
                     selectedId={selectedId}
-
-
-
                     highlightedIds={highlightedIds}
-
-
-
                     onNodeClick={onNodeClick}
-
-
-
                     onNodeDrag={onNodeDrag}
-
-
-
                     onMouseEnter={onMouseEnter}
-
-
-
                     onMouseLeave={onMouseLeave}
-
-
-
                     getBalance={getBalance}
-
-
-
                     pulsingId={pulsingId}
 
                     showHeight={showHeight}
 
                     showBF={showBF}
-
-
-
                   />
-
-
-
                   <TreeNode 
-
-
-
                     node={node.right} 
-
-
-
                     x={rightChildX} 
-
-
-
                     y={childY} 
-
-
-
                     level={level + 1} 
-
-
-
                     parentX={x} 
-
-
-
                     parentY={y}
-
-
-
                     unbalancedIds={unbalancedIds}
-
-
-
                     selectedId={selectedId}
-
-
-
                     highlightedIds={highlightedIds}
-
-
-
                     onNodeClick={onNodeClick}
-
-
-
                     onNodeDrag={onNodeDrag}
-
-
-
                     onMouseEnter={onMouseEnter}
-
-
-
                     onMouseLeave={onMouseLeave}
-
-
-
                     getBalance={getBalance}
-
-
-
                     pulsingId={pulsingId}
 
                     showHeight={showHeight}
 
                     showBF={showBF}
-
-
-
                   />
-
-
-
             
-
-
-
                   {/* Draw Node */}
-
-
-
                   <motion.div
-
-
-
                     layout // Enable automatic transition between snapshots
-
-
-
                     className={`absolute flex items-center justify-center border-2 rounded-full shadow-md z-10 transition-colors no-pan
-
-
-
                       ${isUnbalanced ? 'border-red-500 bg-red-50' : isSelected ? 'border-blue-600 ring-4 ring-blue-200 bg-white' : isHighlighted ? 'border-yellow-500 bg-yellow-100' : 'border-blue-500 bg-white'}
-
-
-
                       ${isPulsing ? 'ring-8 ring-blue-400/30 border-blue-600' : ''}
-
-
-
                       ${isDraggable ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'}
-
-
-
                     `}
-
-
-
             
-
-
-
               style={{
-
-
-
                 width: NODE_RADIUS * 2,
-
-
-
                 height: NODE_RADIUS * 2,
-
-
-
                 left: x - NODE_RADIUS,
-
-
-
                 top: y - NODE_RADIUS,
-
-
-
                 touchAction: 'none',
-
-
-
               }}
-
-
-
               initial={{ scale: 0 }}
-
-
-
               animate={{ scale: 1 }}
-
-
-
               whileHover={{ scale: 1.1 }}
-
-
-
               transition={{ type: "spring", stiffness: 260, damping: 20 }}
-
-
-
               
-
-
-
               drag={isDraggable ? "x" : false}
-
-
-
               dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-
-
-
               dragElastic={0.2}
-
-
-
               dragSnapToOrigin={true}
-
-
-
               onDragEnd={(_e, info) => {
-
-
-
                  if (!onNodeDrag) return;
-
-
-
                  if (info.offset.x > 40) onNodeDrag(node, 'right');
-
-
-
                  else if (info.offset.x < -40) onNodeDrag(node, 'left');
-
-
-
               }}
-
-
-
               onClick={(e) => { e.stopPropagation(); onNodeClick?.(node); }}
-
-
-
               onMouseEnter={onMouseEnter}
-
-
-
               onMouseLeave={onMouseLeave}
-
-
-
             >
 
         <span className={`font-bold select-none ${isUnbalanced ? 'text-red-700' : 'text-slate-700'}`}>{node.value}</span>
@@ -442,9 +186,6 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
 
         </div>
         )}
-
-
-
         {/* Height Indicator */}
 
         {showHeight && (
@@ -462,5 +203,3 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
   );
 
 };
-
-

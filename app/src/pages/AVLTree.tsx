@@ -677,11 +677,22 @@ export const AVLTreePage: React.FC = () => {
 </div>
                 <button onClick={() => setShowHelp(true)} className="absolute top-6 right-6 w-10 h-10 bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 shadow-sm z-20"><HelpCircle size={20} /></button>
                 
-                <TransformWrapper initialScale={1} panning={{ disabled: isHoveringNode, excluded: ["no-pan"] }}>
+                <TransformWrapper 
+                    initialScale={1} 
+                    minScale={0.1} 
+                    maxScale={2} 
+                    limitToBounds={false}
+                    centerOnInit={true}
+                    panning={{ disabled: isHoveringNode, excluded: ["no-pan"] }}
+                >
                     {({ zoomIn, zoomOut, resetTransform }) => (
                         <>
                             <TransformComponent wrapperStyle={{ width: "100%", height: "100%" }} contentStyle={{ width: "100%", height: "100%", overflow: "visible" }}>
-                                <div className={`w-full h-full relative cursor-grab active:cursor-grabbing bg-grid-slate-100 ${tourHighlight(2)}`} onClick={() => setSelectedNode(null)}>
+                                <div 
+                                  className={`relative cursor-grab active:cursor-grabbing bg-grid-slate-100 ${tourHighlight(2)}`} 
+                                  style={{ width: '20000px', height: '20000px' }}
+                                  onClick={() => setSelectedNode(null)}
+                                >
                                     <div className="absolute left-1/2 top-[100px] -translate-x-1/2" style={{ overflow: 'visible' }}>
                                         <TreeNode node={root} x={0} y={0} level={0} unbalancedIds={unbalancedData.allIds} selectedId={selectedNode?.id} highlightedIds={highlightedIds} pulsingId={pulsingId} onNodeClick={setSelectedNode} onNodeDrag={mode === 'manual' ? handleNodeDrag : undefined} onMouseEnter={() => setIsHoveringNode(true)} onMouseLeave={() => setIsHoveringNode(false)} getBalance={(n) => avlTree.getBalance(n)} 
                                           showHeight={!(activeTab === 'tutorial' && tutorialView === 'lesson' && lessonIndex === 0)}
