@@ -281,19 +281,16 @@ export const AVLTreePage: React.FC = () => {
   const handleInsert = () => { if (isPlaying) return; const val = parseInt(inputValue); if (!isNaN(val)) { startNewOperation(`${t('insert')} ${val}`, mode === 'manual' ? avlTree.insertManual(val) : avlTree.insert(val)); setInputValue(''); } };
   const handleDelete = () => { if (isPlaying) return; const val = selectedNode ? selectedNode.value : parseInt(inputValue); if (!isNaN(val)) { startNewOperation(`${t('delete')} ${val}`, mode === 'manual' ? avlTree.deleteManual(val) : avlTree.delete(val)); setInputValue(''); setSelectedNode(null); } };
   
-  // Heuristic: Prioritize Parent over Child if they share the same imbalance sign (fixing Double Rotation blocking loop)
+  // Heuristic: Prefer the lowest node, but stick to a target if we are in a multi-step rotation
   const getPriorityUnbalancedNode = (): { id: string, reason: 'lowest' | 'heuristic' } | null => {
       if (!unbalancedData.lowestId) return null;
-      if (lockedTargetId && unbalancedData.allIds.includes(lockedTargetId)) return { id: lockedTargetId, reason: 'heuristic' };
-      const lowestNode = avlTree.getNodeById(unbalancedData.lowestId);
-      if (lowestNode) {
-          const parent = avlTree.findParent(root, lowestNode.value);
-          if (parent && unbalancedData.allIds.includes(parent.id)) {
-              const bfLowest = avlTree.getBalance(lowestNode);
-              const bfParent = avlTree.getBalance(parent);
-              if (bfLowest * bfParent > 0) return { id: parent.id, reason: 'heuristic' };
-          }
+      
+      // If we've already started a double rotation on a specific node, don't jump away
+      if (lockedTargetId && unbalancedData.allIds.includes(lockedTargetId)) {
+          return { id: lockedTargetId, reason: 'heuristic' };
       }
+
+      // Default to standard AVL: fix the lowest unbalanced node first
       return { id: unbalancedData.lowestId, reason: 'lowest' };
   };
 
