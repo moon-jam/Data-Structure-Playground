@@ -23,6 +23,16 @@
     "recommendedTarget": "📍 Target: Node **{{val}}**",
     "lowestWarning": "💡 Hint: AVL algorithm requires rebalancing from the deepest unbalanced node upward.",
     "heuristicWarning": "💡 Hint: Prioritize completing the second step of the double rotation to fix the tree in one go.",
+    "ui": {
+      "start": "Start Interface Tour",
+      "startDesc": "Explore the timeline, actions, and canvas controls with an interactive guide.",
+      "startBtn": "Start Tour",
+      "timeline": "Timeline: Pause, play, or scrub to review history.",
+      "action": "Actions: Insert, Delete nodes, or Reset the canvas.",
+      "mode": "Mode Switch: Auto (Demo) / Manual (Interactive).",
+      "canvas": "Canvas: Drag to pan, Scroll to zoom.",
+      "sidebar": "Sidebar: View Logs, Wiki, or Course."
+    },
     "helpTitle": "Rotation Controls",
     "helpDesc": "AVL trees use rotations to stay balanced. You can trigger them by dragging nodes:",
     "helpRight": "Drag Right (Right Rotate)",
@@ -58,19 +68,25 @@
   "tutorial": {
     "title": "AVL Masterclass",
     "welcome": "Welcome to the AVL Masterclass! Learn self-balancing step-by-step.",
-    "lesson1Title": "Lesson 1: Simple Right Rotate (LL)",
-    "lesson1Desc": "Left side is too heavy (BF=2). We pull the pivot to the right.\n\n👉 **Task:** Pull **Node 30** to the **RIGHT**.",
-    "lesson2Title": "Lesson 2: Simple Left Rotate (RR)",
-    "lesson2Desc": "Right side is too heavy (BF=-2). We pull the pivot to the left.\n\n👉 **Task:** Pull **Node 10** to the **LEFT**.",
-    "lesson3Title": "Lesson 3: The LR Zig-Zag",
-    "lesson3Desc": "Look at Node 50. It's left-heavy, but it bends inward. We must straighten it first.\n\n👉 **Step 1:** Pull **Node 20** to the **LEFT**.\n👉 **Step 2:** Pull **Node 50** to the **RIGHT**.",
-    "lesson4Title": "Lesson 4: The RL Zig-Zag",
-    "lesson4Desc": "Now the right side is heavy and bent. Fix the branch first.\n\n👉 **Step 1:** Pull **Node 80** to the **RIGHT**.\n👉 **Step 2:** Pull **Node 50** to the **LEFT**.",
-    "lesson5Title": "Lesson 5: Deletion Mastery",
-    "lesson5Desc": "Deleting 80 will trigger an LR imbalance. Use everything you've learned!\n\n👉 **Task:** Delete **Node 80** and rebalance.",
+    "levels": {
+        "l1": { "title": "Concept: Tree Height", "desc": "Height is defined as the number of edges on the longest path to a leaf (Leaf Height = 0).\n\n👉 **Task:** Click on any node with **Height = 2**." },
+        "l2": { "title": "Concept: Balance Factor (BF)", "desc": "AVL trees use **Balance Factor** to detect imbalance.\nFormula: `BF = Height(Left) - Height(Right)`.\n\n👉 **Task:** Calculate the BF of the **highlighted node**." },
+        "l3": { "title": "Practice: LL Case (Guided)", "desc": "When the left side is heavy and straight (BF=2, Child BF=1), it's an LL Case.\nThis time, watch where **Node 40 (inner subtree)** moves after rotation!" },
+        "l4": { "title": "Challenge: Basic Rotation", "desc": "No more hints!\nObserve the RR shape and fix it. Pay attention to the movement of **Node 30**." },
+        "l5": { "title": "Practice: Double Rotation (Guided)", "desc": "Zig-Zag shapes (LR or RL) need two steps: Straighten the child first, then rotate the parent.\n\n👉 **Task:** Follow instructions to fix this tree." },
+        "l6": { "title": "Challenge: Double Rotation", "desc": "The final test. System won't tell you if it's LR or RL.\n\n👉 **Task:** Identify the shape and fix the tree!" },
+        "l7": { "title": "Final: Deletion & Rebalance", "desc": "Deletion can also cause imbalance.\n\n👉 **Task:** Select **Node 10**, DELETE it, and then fix the tree." }
+    },
+    "quiz": {
+        "bfQuestion": "What is the BF of Node {{val}}?",
+        "submit": "Check",
+        "correct": "Correct!",
+        "wrong": "Try again. Hint: Left H {{lh}} - Right H {{rh}} = {{ans}}"
+    },
     "finish": "Excellent! You've mastered AVL basics. Enjoy the playground!",
-    "next": "Next Lesson",
-    "start": "Start Learning",
-    "reset": "Retry Lesson"
+    "next": "Next Level",
+    "start": "Start Course",
+    "reset": "Retry Level",
+    "locked": "Locked"
   }
 }

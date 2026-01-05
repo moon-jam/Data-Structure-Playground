@@ -48,6 +48,50 @@ const SimpleMarkdown = ({ text, className = '', onLinkClick }: { text: string | 
 
 interface HistoryEntry { id: string; action: string; steps: VisualizationStep[]; finalSnapshot: string; } 
 
+type LessonType = 'concept' | 'quiz' | 'guided' | 'challenge';
+interface Lesson {
+    id: string;
+    type: LessonType;
+    setup: (tree: AVLTree) => void;
+    targetVal?: number; // For Quiz/Concept to identify the target node
+    answer?: number;    // For Quiz answer
+}
+
+const LESSONS: Lesson[] = [
+    {   // L1: Height - Click Height 2
+        id: 'l1', type: 'concept', 
+        setup: (tree) => { [20, 10, 30, 5].forEach(v => tree.insertManual(v)); }, // Root 20 has Internal H=3 (Display H=2)
+        targetVal: 20 // The root has height 2 (Display)
+    },
+    {   // L2: BF Quiz
+        id: 'l2', type: 'quiz',
+        setup: (tree) => { [30, 20, 10].forEach(v => tree.insertManual(v)); }, // 30->20->10. BF(30) = 2 - 0 = 2.
+        targetVal: 30,
+        answer: 2
+    },
+    {   // L3: LL Guided
+        id: 'l3', type: 'guided',
+        setup: (tree) => { [50, 30, 60, 20, 40, 10].forEach(v => tree.insertManual(v)); } // 50 LL. Observe Node 40.
+    },
+    {   // L4: Challenge (RR)
+        id: 'l4', type: 'challenge',
+        setup: (tree) => { [20, 10, 50, 30, 60, 70].forEach(v => tree.insertManual(v)); } // 20 RR. Observe Node 30.
+    },
+    {   // L5: LR Guided
+        id: 'l5', type: 'guided',
+        setup: (tree) => { [50, 20, 80, 10, 30].forEach(v => tree.insertManual(v)); tree.insertManual(25); }
+    },
+    {   // L6: Challenge (RL)
+        id: 'l6', type: 'challenge',
+        setup: (tree) => { [50, 20, 80, 70, 90].forEach(v => tree.insertManual(v)); tree.insertManual(75); }
+    },
+    {   // L7: Deletion Guided
+        id: 'l7', type: 'guided',
+        setup: (tree) => { [20, 10, 30, 25, 40].forEach(v => tree.insertManual(v)); },
+        targetVal: 10
+    }
+];
+
 export const AVLTreePage: React.FC = () => {
   const { t } = useTranslation(['common', 'avl'], { useSuspense: false });
   const [avlTree] = useState(() => new AVLTree());
@@ -62,6 +106,7 @@ export const AVLTreePage: React.FC = () => {
   
   // UI States
   const [showHelp, setShowHelp] = useState(false);
+  const [helpTab, setHelpTab] = useState<'concept' | 'ui'>('concept');
   const [errorToast, setErrorToast] = useState<string | null>(null);
   const [warningToast, setWarningToast] = useState<string | null>(null);
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
@@ -72,7 +117,7 @@ export const AVLTreePage: React.FC = () => {
   
   // Sidebar/Layout States
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
-  const [sidebarWidth, setSidebarWidth] = useState(320);
+  const [sidebarWidth, setSidebarWidth] = useState(350);
   const [isResizing, setIsResizing] = useState(false);
   const [resetConfirm, setResetConfirm] = useState(false);
   const wikiBfRef = useRef<HTMLDivElement>(null);
@@ -89,6 +134,16 @@ export const AVLTreePage: React.FC = () => {
   const [currentStepMsg, setCurrentStepMsg] = useState<string | null>(null);
   const [lessonIndex, setLessonIndex] = useState(0);
   
+  // Tutorial States
+  const [tutorialView, setTutorialView] = useState<'menu' | 'lesson'>('menu');
+  const [maxUnlocked, setMaxUnlocked] = useState(0); 
+  const [quizInput, setQuizInput] = useState('');
+  const [showQuizFeedback, setShowQuizFeedback] = useState<'correct'|'wrong'|null>(null);
+  
+  // Tour State
+  const [tourStep, setTourStep] = useState(-1);
+  const tourHighlight = (step: number) => tourStep === step ? 'z-[10001] relative ring-4 ring-yellow-400 shadow-[0_0_0_9999px_rgba(0,0,0,0.7)]' : '';
+  
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pauseRef = useRef(false);
 
@@ -98,7 +153,7 @@ export const AVLTreePage: React.FC = () => {
   const resize = useCallback((e: MouseEvent) => {
     if (isResizing) {
         const newWidth = e.clientX;
-        if (newWidth >= 280 && newWidth < 600) setSidebarWidth(newWidth);
+        if (newWidth >= 320 && newWidth < 600) setSidebarWidth(newWidth);
     }
   }, [isResizing]);
 
@@ -110,10 +165,35 @@ export const AVLTreePage: React.FC = () => {
     if (historyIndex === -1) {
       setHistory([{ id: 'init', action: 'Initial', steps: [], finalSnapshot: 'null' }]);
       setHistoryIndex(0);
+      const savedMax = localStorage.getItem('ds-playground-avl-max-level');
+      if (savedMax) setMaxUnlocked(parseInt(savedMax));
+      else if (localStorage.getItem('ds-playground-avl-tree-completed') === 'true') setMaxUnlocked(LESSONS.length);
+      
       const isCompleted = localStorage.getItem('ds-playground-avl-tree-completed') === 'true';
-      if (!isCompleted) { setShowHelp(true); setActiveTab('tutorial'); }
+      if (!isCompleted && !savedMax) { setShowHelp(true); setActiveTab('tutorial'); }
     }
   }, []);
+
+  // Level Completion Monitor
+  useEffect(() => {
+      if (tutorialView === 'lesson' && lessonIndex < LESSONS.length) {
+          const lesson = LESSONS[lessonIndex];
+          let done = false;
+          
+          if (lesson.type === 'concept') {
+              if (selectedNode && lesson.targetVal && selectedNode.value === lesson.targetVal) done = true;
+          } else if (lesson.type === 'guided' || lesson.type === 'challenge') {
+              if (unbalancedData.allIds.length === 0 && historyIndex > 0) done = true;
+          }
+          
+          if (done && lessonIndex >= maxUnlocked) {
+              const next = lessonIndex + 1;
+              setMaxUnlocked(next);
+              localStorage.setItem('ds-playground-avl-max-level', next.toString());
+              if (next === LESSONS.length) localStorage.setItem('ds-playground-avl-tree-completed', 'true');
+          }
+      }
+  }, [tutorialView, lessonIndex, selectedNode, unbalancedData, historyIndex, maxUnlocked]);
 
   useEffect(() => {
     if (activeOpSteps.length > 0 && currentStepIdx >= 0) {
@@ -221,15 +301,32 @@ export const AVLTreePage: React.FC = () => {
 
   const runLesson = async (index: number) => {
       setLessonIndex(index);
+      setTutorialView('lesson');
+      setQuizInput('');
+      setShowQuizFeedback(null);
+      
       avlTree.root = null; setRoot(null); setUnbalancedData({ allIds: [], lowestId: null }); setSelectedNode(null);
       setHistory([{ id: 'init', action: 'Lesson Start', steps: [], finalSnapshot: 'null' }]);
       setHistoryIndex(0); setActiveOpSteps([]); setCurrentStepIdx(-1);
       setActiveTab('tutorial'); setMode('manual');
-      if (index === 1) { avlTree.insertManual(30); avlTree.insertManual(20); const steps = avlTree.insertManual(10); updateViewDirectly(avlTree.root); setActiveOpSteps(steps); setCurrentStepIdx(steps.length-1); }
-      else if (index === 2) { avlTree.insertManual(10); avlTree.insertManual(20); const steps = avlTree.insertManual(30); updateViewDirectly(avlTree.root); setActiveOpSteps(steps); setCurrentStepIdx(steps.length-1); }
-      else if (index === 3) { [50, 20, 80, 10, 30].forEach(v => avlTree.insertManual(v)); const steps = avlTree.insertManual(25); updateViewDirectly(avlTree.root); setActiveOpSteps(steps); setCurrentStepIdx(steps.length-1); }
-      else if (index === 4) { [50, 20, 80, 70, 90].forEach(v => avlTree.insertManual(v)); const steps = avlTree.insertManual(75); updateViewDirectly(avlTree.root); setActiveOpSteps(steps); setCurrentStepIdx(steps.length-1); }
-      else if (index === 5) { [50, 30, 70, 20, 40, 80, 45].forEach(v => avlTree.insertManual(v)); updateViewDirectly(avlTree.root); setActiveOpSteps([{type: 'message', message: 'Delete 80 to start challenge'}] as any); setCurrentStepIdx(0); }
+      
+      if (index < LESSONS.length) {
+          LESSONS[index].setup(avlTree);
+          updateViewDirectly(avlTree.root);
+          
+          if (LESSONS[index].targetVal) {
+              const findId = (n: AVLNode | null, v: number): string | null => {
+                  if (!n) return null;
+                  if (n.value === v) return n.id;
+                  return findId(n.left, v) || findId(n.right, v);
+              };
+              const targetId = findId(avlTree.root, LESSONS[index].targetVal);
+              if (targetId) setPulsingId(targetId);
+          }
+
+          // Auto-show hint for Guided lessons
+          setShowHint(LESSONS[index].type === 'guided');
+      }
   };
 
   const updateViewDirectly = (node: AVLNode | null) => { setRoot(node ? node.clone() : null); setUnbalancedData(avlTree.checkBalance(node)); };
@@ -247,17 +344,124 @@ export const AVLTreePage: React.FC = () => {
 
   const renderTutorial = () => {
       if (activeTab !== 'tutorial') return null;
-      if (lessonIndex === 6) {
-          localStorage.setItem('ds-playground-avl-tree-completed', 'true');
-          return <div className="text-center py-8 space-y-4 animate-in zoom-in-95"><div className="p-4 bg-green-500/20 rounded-full text-green-400 inline-block shadow-2xl shadow-green-500/20"><Trophy size={48} /></div><h3 className="text-2xl font-bold text-white">Course Done!</h3><p className="text-slate-400 text-sm">{t('avl:tutorial.finish')}</p><button onClick={() => {setActiveTab('logs');}} className="w-full bg-slate-800 text-white py-3 rounded-xl font-bold hover:bg-slate-700 transition-all border border-slate-700 shadow-xl text-xs">Explore Sandbox</button></div>;
+
+      if (tutorialView === 'menu') {
+          return (
+              <div className="space-y-4 animate-in fade-in">
+                  <div className="p-4 bg-slate-800 rounded-xl border border-slate-700">
+                      <h3 className="text-white font-bold mb-1">{t('avl:tutorial.title')}</h3>
+                      <p className="text-xs text-slate-400">{t('avl:tutorial.welcome')}</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                      {LESSONS.map((l, idx) => {
+                          const isLocked = idx > maxUnlocked;
+                          const isCompleted = idx < maxUnlocked;
+                          return (
+                              <button 
+                                  key={l.id} 
+                                  onClick={() => !isLocked && runLesson(idx)}
+                                  disabled={isLocked}
+                                  className={`p-3 rounded-xl border text-left transition-all relative overflow-hidden ${
+                                      isLocked 
+                                        ? 'bg-slate-900 border-slate-800 opacity-50 cursor-not-allowed' 
+                                        : 'bg-slate-800 border-slate-700 hover:bg-slate-700 hover:border-blue-500/50'
+                                  }`}
+                              >
+                                  <div className="flex justify-between items-start mb-2 relative z-10">
+                                      <span className={`text-[10px] font-black uppercase px-1.5 py-0.5 rounded ${
+                                          isLocked ? 'bg-slate-800 text-slate-600' : 
+                                          isCompleted ? 'bg-green-500/20 text-green-400' : 'bg-blue-600 text-white'
+                                      }`}>
+                                          L{idx + 1}
+                                      </span>
+                                      {isCompleted && <Trophy size={14} className="text-green-500" />}
+                                      {isLocked && <div className="text-slate-600">🔒</div>}
+                                  </div>
+                                  <div className={`text-xs font-bold leading-tight relative z-10 ${isLocked ? 'text-slate-600' : 'text-slate-300'}`}>
+                                      {t(`avl:tutorial.levels.${l.id}.title`)}
+                                  </div>
+                              </button>
+                          );
+                      })}
+                  </div>
+                  
+                  {maxUnlocked > 0 && (
+                      <button 
+                          onClick={() => {
+                              if (window.confirm('Reset all course progress?')) {
+                                  localStorage.removeItem('ds-playground-avl-max-level');
+                                  localStorage.removeItem('ds-playground-avl-tree-completed');
+                                  setMaxUnlocked(0);
+                              }
+                          }}
+                          className="w-full py-3 mt-2 text-[10px] font-bold text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-xl transition-colors uppercase tracking-widest flex items-center justify-center gap-2 border border-transparent hover:border-red-900/30"
+                      >
+                          <Trash2 size={12} /> Reset Progress
+                      </button>
+                  )}
+              </div>
+          );
       }
-      const isDone = unbalancedData.allIds.length === 0 && historyIndex > 0;
-      return (<div className="space-y-6">
-          <div className="space-y-4 animate-in fade-in"><div className="flex items-center gap-2 text-blue-400 font-black text-xs uppercase tracking-widest"><GraduationCap size={16} /> Lesson {lessonIndex}</div><h3 className="text-xl font-bold text-white leading-tight">{t(`avl:tutorial.lesson${Math.max(1,lessonIndex)}Title`)}</h3><SimpleMarkdown text={t(`avl:tutorial.lesson${Math.max(1,lessonIndex)}Desc`)} className="text-slate-400" onLinkClick={handleLinkClick} /></div>
-          {lessonIndex === 0 ? <button onClick={() => runLesson(1)} className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 text-[10px] uppercase tracking-widest">{t('avl:tutorial.start')}</button> :
-          <div className="flex gap-2"><button onClick={() => runLesson(lessonIndex)} className="flex-1 py-2 bg-slate-800 text-slate-400 rounded-lg text-[10px] font-bold uppercase">{t('avl:tutorial.reset')}</button>{isDone && (<button onClick={() => runLesson(lessonIndex + 1)} className="flex-[2] py-2 bg-green-600 text-white rounded-lg text-[10px] font-bold uppercase flex items-center justify-center gap-2">{t('avl:tutorial.next')} <Sparkles size={14} /></button>)}
-          </div>}
-      </div>);
+
+      const lesson = LESSONS[lessonIndex];
+      const isDone = maxUnlocked > lessonIndex; 
+
+      return (
+          <div className="space-y-6 animate-in slide-in-from-right-4">
+              <div className="flex items-center gap-2 mb-4">
+                  <button onClick={() => setTutorialView('menu')} className="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition-colors"><ChevronLeft size={16} /></button>
+                  <span className="text-xs font-black text-slate-500 uppercase tracking-widest">LEVEL {lessonIndex + 1}</span>
+              </div>
+              
+              <div className="space-y-4">
+                  <h3 className="text-xl font-bold text-white leading-tight">{t(`avl:tutorial.levels.${lesson.id}.title`)}</h3>
+                  <SimpleMarkdown text={t(`avl:tutorial.levels.${lesson.id}.desc`)} className="text-slate-400" onLinkClick={handleLinkClick} />
+                  
+                  {lesson.type === 'quiz' && !isDone && (
+                      <div className="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+                          <p className="text-sm font-bold text-slate-300">{t('avl:tutorial.quiz.bfQuestion', {val: lesson.targetVal})}</p>
+                          <div className="flex gap-2">
+                              <input 
+                                  type="number" 
+                                  value={quizInput}
+                                  onChange={(e) => setQuizInput(e.target.value)}
+                                  className="flex-1 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white font-mono text-center outline-none focus:border-blue-500"
+                                  placeholder="?"
+                              />
+                              <button 
+                                  onClick={() => {
+                                      if (parseInt(quizInput) === lesson.answer) {
+                                          setShowQuizFeedback('correct');
+                                          const next = lessonIndex + 1;
+                                          if (next > maxUnlocked) {
+                                              setMaxUnlocked(next);
+                                              localStorage.setItem('ds-playground-avl-max-level', next.toString());
+                                          }
+                                      } else {
+                                          setShowQuizFeedback('wrong');
+                                      }
+                                  }}
+                                  className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-blue-500"
+                              >
+                                  {t('avl:tutorial.quiz.submit')}
+                              </button>
+                          </div>
+                          {showQuizFeedback === 'correct' && <div className="text-green-400 text-xs font-bold flex items-center gap-1"><Sparkles size={12}/> {t('avl:tutorial.quiz.correct')}</div>}
+                          {showQuizFeedback === 'wrong' && <div className="text-red-400 text-xs font-bold">{t('avl:tutorial.quiz.wrong', {lh: '?', rh: '?', ans: '?'})}</div>} 
+                      </div>
+                  )}
+              </div>
+
+              <div className="flex gap-2 pt-4 border-t border-slate-800">
+                  <button onClick={() => runLesson(lessonIndex)} className="flex-1 py-3 bg-slate-800 text-slate-400 rounded-xl text-[10px] font-bold uppercase hover:bg-slate-700 transition-colors">{t('avl:tutorial.reset')}</button>
+                  {isDone && lessonIndex < LESSONS.length - 1 && (
+                      <button onClick={() => runLesson(lessonIndex + 1)} className="flex-[2] py-3 bg-green-600 text-white rounded-xl text-[10px] font-bold uppercase flex items-center justify-center gap-2 hover:bg-green-500 shadow-lg shadow-green-900/20">
+                          {t('avl:tutorial.next')} <Sparkles size={14} />
+                      </button>
+                  )}
+              </div>
+          </div>
+      );
   };
 
   const renderAdvice = () => {
@@ -308,6 +512,29 @@ export const AVLTreePage: React.FC = () => {
       );
   };
 
+  const renderTourTooltip = () => {
+      if (tourStep === -1) return null;
+      const steps = [
+          { title: t('avl:guide.ui.mode'), pos: 'top-34 left-88' },
+          { title: t('avl:guide.ui.sidebar'), pos: 'top-1/2 left-80' },
+          { title: t('avl:guide.ui.canvas'), pos: 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' },
+          { title: t('avl:guide.ui.action'), pos: 'bottom-26 left-88' },
+          { title: t('avl:guide.ui.timeline'), pos: 'bottom-26 right-80' },
+      ];
+      const step = steps[tourStep];
+      if (!step) return null;
+      return (
+          <div className={`fixed ${step.pos} z-[10002] bg-slate-900 text-white p-4 rounded-xl shadow-2xl max-w-xs animate-in zoom-in-95 border border-slate-700`}>
+              <h4 className="font-bold mb-3 text-sm leading-relaxed">{step.title}</h4>
+              <div className="flex gap-2 justify-end">
+                  <button onClick={() => setTourStep(-1)} className="text-slate-400 hover:text-white text-[10px] font-bold px-2 uppercase tracking-wider">Exit</button>
+                  {tourStep > 0 && <button onClick={() => setTourStep(tourStep - 1)} className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider">Prev</button>}
+                  <button onClick={() => setTourStep(tourStep < steps.length - 1 ? tourStep + 1 : -1)} className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider">{tourStep < steps.length - 1 ? 'Next' : 'Finish'}</button>
+              </div>
+          </div>
+      );
+  };
+
   return (
     <div className={`h-full w-full flex bg-slate-100 overflow-hidden relative font-sans text-slate-900 ${isResizing ? 'cursor-col-resize select-none' : ''}`}>
       {/* FORCE DISABLE TRANSITION DURING RESIZE */}
@@ -334,7 +561,7 @@ export const AVLTreePage: React.FC = () => {
             width: isSidebarOpen ? (window.innerWidth > 768 ? `${sidebarWidth}px` : '100%') : '0px',
             transition: isResizing ? 'none' : 'width 300ms ease-in-out'
         }}
-        className={`h-full flex flex-col bg-slate-900 border-r border-slate-800 shrink-0 z-[100] shadow-2xl relative ${!isSidebarOpen ? 'overflow-hidden' : ''} ${window.innerWidth <= 768 ? 'fixed left-0 top-0' : 'relative'}`}
+        className={`h-full flex flex-col bg-slate-900 border-r border-slate-800 shrink-0 z-[100] shadow-2xl relative ${!isSidebarOpen ? 'overflow-hidden' : ''} ${window.innerWidth <= 768 ? 'fixed left-0 top-0' : 'relative'} ${tourHighlight(1)}`}
       >
           {window.innerWidth <= 768 && isSidebarOpen && <button onClick={() => setIsSidebarOpen(false)} className="absolute top-4 right-4 text-white z-[110]"><X size={24} /></button>}
           <div className="flex flex-col h-full min-w-[280px]">
@@ -372,7 +599,7 @@ export const AVLTreePage: React.FC = () => {
       <div className="flex-grow flex flex-col min-w-0 h-full relative bg-white">
           <div className={`flex-grow relative bg-slate-50 overflow-hidden ${isResizing ? 'pointer-events-none' : ''}`}>
                 <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="absolute bottom-6 left-6 z-30 w-10 h-10 bg-slate-900 text-white rounded-2xl shadow-xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all">{isSidebarOpen ? <PanelLeftClose size={20} /> : <PanelLeft size={20} />}</button>
-                <div className="absolute top-6 left-6 flex gap-3 z-20 pointer-events-none max-w-[calc(100%-80px)]"><div className="bg-white/80 backdrop-blur-md px-4 py-2 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3 pointer-events-auto"><button onClick={() => setMode('auto')} className={`px-3 py-1 text-[10px] font-black rounded-lg transition-all ${mode === 'auto' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-slate-400 hover:text-slate-600'}`}>AUTO</button><button onClick={() => setMode('manual')} className={`px-3 py-1 text-[10px] font-black rounded-lg transition-all ${mode === 'manual' ? 'bg-amber-500 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>MANUAL</button></div>{currentStepMsg && (<div className="bg-blue-600/90 backdrop-blur-md px-4 py-2 rounded-2xl text-white shadow-lg border border-blue-400 flex items-center gap-2 animate-in slide-in-from-left-4 overflow-hidden"><div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse shrink-0"></div><span className="text-[10px] font-black uppercase tracking-wider truncate">{currentStepMsg}</span></div>)}
+                <div className="absolute top-6 left-6 flex gap-3 z-20 pointer-events-none max-w-[calc(100%-80px)]"><div className={`bg-white/80 backdrop-blur-md px-4 py-2 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3 pointer-events-auto ${tourHighlight(0)}`}><button onClick={() => setMode('auto')} className={`px-3 py-1 text-[10px] font-black rounded-lg transition-all ${mode === 'auto' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-slate-400 hover:text-slate-600'}`}>AUTO</button><button onClick={() => setMode('manual')} className={`px-3 py-1 text-[10px] font-black rounded-lg transition-all ${mode === 'manual' ? 'bg-amber-500 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>MANUAL</button></div>{currentStepMsg && (<div className="bg-blue-600/90 backdrop-blur-md px-4 py-2 rounded-2xl text-white shadow-lg border border-blue-400 flex items-center gap-2 animate-in slide-in-from-left-4 overflow-hidden"><div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse shrink-0"></div><span className="text-[10px] font-black uppercase tracking-wider truncate">{currentStepMsg}</span></div>)}
 </div>
                 <button onClick={() => setShowHelp(true)} className="absolute top-6 right-6 w-10 h-10 bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 shadow-sm z-20"><HelpCircle size={20} /></button>
                 
@@ -380,9 +607,12 @@ export const AVLTreePage: React.FC = () => {
                     {({ zoomIn, zoomOut, resetTransform }) => (
                         <>
                             <TransformComponent wrapperStyle={{ width: "100%", height: "100%" }} contentStyle={{ width: "100%", height: "100%", overflow: "visible" }}>
-                                <div className="w-full h-full relative cursor-grab active:cursor-grabbing bg-grid-slate-100" onClick={() => setSelectedNode(null)}>
+                                <div className={`w-full h-full relative cursor-grab active:cursor-grabbing bg-grid-slate-100 ${tourHighlight(2)}`} onClick={() => setSelectedNode(null)}>
                                     <div className="absolute left-1/2 top-[100px] -translate-x-1/2" style={{ overflow: 'visible' }}>
-                                        <TreeNode node={root} x={0} y={0} level={0} unbalancedIds={unbalancedData.allIds} selectedId={selectedNode?.id} highlightedIds={highlightedIds} pulsingId={pulsingId} onNodeClick={setSelectedNode} onNodeDrag={mode === 'manual' ? handleNodeDrag : undefined} onMouseEnter={() => setIsHoveringNode(true)} onMouseLeave={() => setIsHoveringNode(false)} getBalance={(n) => avlTree.getBalance(n)} />
+                                        <TreeNode node={root} x={0} y={0} level={0} unbalancedIds={unbalancedData.allIds} selectedId={selectedNode?.id} highlightedIds={highlightedIds} pulsingId={pulsingId} onNodeClick={setSelectedNode} onNodeDrag={mode === 'manual' ? handleNodeDrag : undefined} onMouseEnter={() => setIsHoveringNode(true)} onMouseLeave={() => setIsHoveringNode(false)} getBalance={(n) => avlTree.getBalance(n)} 
+                                          showHeight={!(activeTab === 'tutorial' && tutorialView === 'lesson' && lessonIndex === 0)}
+                                          showBF={!(activeTab === 'tutorial' && tutorialView === 'lesson' && lessonIndex <= 1)}
+                                        />
                                     </div>
                                 </div>
                             </TransformComponent>
@@ -398,7 +628,7 @@ export const AVLTreePage: React.FC = () => {
 
           {/* BOTTOM BAR - Responsive with Grid Alignment */}
           <div className="min-h-24 bg-white border-t border-slate-200 p-4 flex flex-col md:flex-row gap-6 items-center overflow-visible shadow-[0_-10px_40px_rgba(0,0,0,0.03)]">
-                <div className="flex flex-col gap-2 shrink-0 w-full md:w-[320px]">
+                <div className={`flex flex-col gap-2 shrink-0 w-full md:w-[320px] ${tourHighlight(3)}`}>
                     <div className="grid grid-cols-[1fr_auto] gap-3 w-full">
                         <div className="flex gap-2 items-center bg-slate-50 p-1 rounded-xl border border-slate-100 flex-grow overflow-hidden">
                             <input type="number" value={inputValue} onChange={(e) => setInputValue(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleInsert()} placeholder="Val" className="flex-grow min-w-0 px-2 py-1.5 bg-transparent outline-none font-bold text-xs text-center text-slate-900" />
@@ -411,7 +641,7 @@ export const AVLTreePage: React.FC = () => {
                 
                 <div className="hidden md:block h-8 w-px bg-slate-100"></div>
 
-                <div className="flex-grow flex flex-col gap-1 w-full">
+                <div className={`flex-grow flex flex-col gap-1 w-full ${tourHighlight(4)}`}>
                     <div className="flex items-center justify-between">
                         <div className="flex gap-1">
                             <button onClick={handleUndo} disabled={isPlaying || historyIndex <= 0} className="w-8 h-8 rounded-lg border border-slate-100 flex items-center justify-center hover:bg-slate-50 text-slate-600 transition-all"><Undo2 size={16} /></button>
@@ -450,7 +680,46 @@ export const AVLTreePage: React.FC = () => {
           </div>
       </div>
 
-      {showHelp && (<div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in"><div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden relative animate-in zoom-in-95 duration-200"><X onClick={() => setShowHelp(false)} className="absolute top-6 right-6 cursor-pointer text-slate-400 hover:text-slate-600 transition-colors" /><div className="bg-blue-600 p-6 text-white flex justify-between items-center"><h3 className="text-2xl font-bold flex items-center gap-2"><HelpCircle /> {t('avl:guide.helpTitle')}</h3></div><div className="p-8 space-y-6"><p className="text-slate-600 font-medium text-sm leading-relaxed">{t('avl:guide.helpDesc')}</p><div className="grid grid-cols-1 gap-4"><div className="group flex gap-4 p-4 rounded-2xl bg-blue-50 border border-blue-100 transition-colors hover:bg-blue-100"><div className="bg-white p-3 rounded-xl shadow-sm h-fit"><Undo2 className="text-blue-600 rotate-180" /></div><div><h4 className="font-bold text-blue-900 text-sm">{t('avl:guide.helpRight')}</h4><SimpleMarkdown text={t('avl:guide.helpRightDesc')} className="text-blue-700" /></div></div><div className="group flex gap-4 p-4 rounded-2xl bg-indigo-50 border border-indigo-100 transition-colors hover:bg-indigo-100"><div className="bg-white p-3 rounded-xl shadow-sm h-fit"><Undo2 className="text-indigo-600" /></div><div><h4 className="font-bold text-indigo-900 text-sm">{t('avl:guide.helpLeft')}</h4><SimpleMarkdown text={t('avl:guide.helpLeftDesc')} className="text-sm text-indigo-700" /></div></div></div><button onClick={() => setShowHelp(false)} className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-slate-800 active:scale-95 transition-all mt-6">Got it!</button></div></div></div>)}
+      {showHelp && (<div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in"><div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden relative animate-in zoom-in-95 duration-200">
+          <X onClick={() => setShowHelp(false)} className="absolute top-6 right-6 cursor-pointer text-slate-400 hover:text-slate-600 transition-colors z-10" />
+          
+          <div className="bg-blue-600 p-6 text-white">
+              <h3 className="text-2xl font-bold flex items-center gap-2"><HelpCircle /> {t('avl:guide.helpTitle')}</h3>
+              
+              <div className="flex gap-2 mt-4">
+                  <button onClick={() => setHelpTab('concept')} className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${helpTab === 'concept' ? 'bg-white text-blue-600' : 'bg-blue-700 text-blue-200 hover:bg-blue-500'}`}>Operation</button>
+                  <button onClick={() => setHelpTab('ui')} className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${helpTab === 'ui' ? 'bg-white text-blue-600' : 'bg-blue-700 text-blue-200 hover:bg-blue-500'}`}>Interface</button>
+              </div>
+          </div>
+
+          <div className="p-8 space-y-6">
+              {helpTab === 'concept' ? (
+                  <>
+                      <p className="text-slate-600 font-medium text-sm leading-relaxed">{t('avl:guide.helpDesc')}</p>
+                      <div className="grid grid-cols-1 gap-4">
+                          <div className="group flex gap-4 p-4 rounded-2xl bg-blue-50 border border-blue-100 transition-colors hover:bg-blue-100"><div className="bg-white p-3 rounded-xl shadow-sm h-fit"><Undo2 className="text-blue-600 rotate-180" /></div><div><h4 className="font-bold text-blue-900 text-sm">{t('avl:guide.helpRight')}</h4><SimpleMarkdown text={t('avl:guide.helpRightDesc')} className="text-blue-700" /></div></div>
+                          <div className="group flex gap-4 p-4 rounded-2xl bg-indigo-50 border border-indigo-100 transition-colors hover:bg-indigo-100"><div className="bg-white p-3 rounded-xl shadow-sm h-fit"><Undo2 className="text-indigo-600" /></div><div><h4 className="font-bold text-indigo-900 text-sm">{t('avl:guide.helpLeft')}</h4><SimpleMarkdown text={t('avl:guide.helpLeftDesc')} className="text-sm text-indigo-700" /></div></div>
+                      </div>
+                      <button onClick={() => setHelpTab('ui')} className="w-full bg-slate-100 text-slate-500 py-4 rounded-2xl font-bold hover:bg-slate-200 active:scale-95 transition-all mt-6 text-xs uppercase tracking-widest">Next: Interface Guide</button>
+                  </>
+              ) : (
+                  <div className="flex flex-col items-center gap-6 py-4">
+                      <div className="relative">
+                          <div className="absolute inset-0 bg-blue-500 rounded-full blur-xl opacity-20 animate-pulse"></div>
+                          <Sparkles size={48} className="text-blue-500 relative z-10" />
+                      </div>
+                      <div className="text-center space-y-2">
+                          <h4 className="font-bold text-slate-900 text-lg">{t('avl:guide.ui.start')}</h4>
+                          <p className="text-sm text-slate-500 max-w-xs mx-auto">{t('avl:guide.ui.startDesc')}</p>
+                      </div>
+                      <button onClick={() => { setShowHelp(false); setTourStep(0); }} className="px-8 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-xl shadow-blue-500/20 hover:scale-105 active:scale-95 transition-all text-xs uppercase tracking-widest flex items-center gap-2">
+                          {t('avl:guide.ui.startBtn')} <ChevronRight size={14} />
+                      </button>
+                  </div>
+              )}
+          </div>
+      </div></div>)}
+      {renderTourTooltip()}
     </div>
   );
 };

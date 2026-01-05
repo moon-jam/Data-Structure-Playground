@@ -34,6 +34,10 @@ interface TreeNodeProps {
 
       pulsingId?: string | null;
 
+      showHeight?: boolean;
+
+      showBF?: boolean;
+
     }
 
     
@@ -54,7 +58,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
 
 
 
-  node, x, y, level, parentX, parentY, unbalancedIds = [], selectedId, highlightedIds = [], onNodeClick, onNodeDrag, onMouseEnter, onMouseLeave, getBalance, pulsingId 
+  node, x, y, level, parentX, parentY, unbalancedIds = [], selectedId, highlightedIds = [], onNodeClick, onNodeDrag, onMouseEnter, onMouseLeave, getBalance, pulsingId, showHeight = true, showBF = true 
 
 
 
@@ -205,6 +209,10 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
 
                     pulsingId={pulsingId}
 
+                    showHeight={showHeight}
+
+                    showBF={showBF}
+
 
 
                   />
@@ -272,6 +280,10 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
 
 
                     pulsingId={pulsingId}
+
+                    showHeight={showHeight}
+
+                    showBF={showBF}
 
 
 
@@ -423,21 +435,25 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
 
         {/* Balance Factor Indicator */}
 
+        {showBF && (
         <div className={`absolute -top-6 text-[10px] font-black px-1 rounded ${bf > 1 || bf < -1 ? 'bg-red-500 text-white' : 'bg-slate-100 text-slate-500'}`}>
 
           BF:{bf}
 
         </div>
+        )}
 
 
 
         {/* Height Indicator */}
 
+        {showHeight && (
         <div className="absolute -bottom-6 text-[9px] text-slate-400 select-none uppercase tracking-tighter font-bold">
 
-          H:{node.height}
+          H:{node.height - 1}
 
         </div>
+        )}
 
       </motion.div>
 
