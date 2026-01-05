@@ -29,7 +29,7 @@
       "startBtn": "Start Tour",
       "timeline": "Timeline: Pause, play, or scrub to review history.",
       "action": "Actions: Insert, Delete nodes, or Reset the canvas.",
-      "mode": "Mode Switch: Auto (Demo) / Manual (Interactive).",
+      "mode": "Mode Switch: Auto plays animations; Manual lets you drag nodes to rotate.",
       "canvas": "Canvas: Drag to pan, Scroll to zoom.",
       "sidebar": "Sidebar: View Logs, Wiki, or Course."
     },
@@ -85,6 +85,10 @@
     },
     "finish": "Excellent! You've mastered AVL basics. Enjoy the playground!",
     "next": "Next Level",
+    "finishBtn": "Complete Course",
+    "congratsTitle": "🎉 Congratulations!",
+    "congratsDesc": "You have mastered all AVL Tree challenges! You are now a Balance Master.\nFeel free to explore the playground or revisit any lesson.",
+    "backToMenu": "Back to Menu",
     "start": "Start Course",
     "reset": "Retry Level",
     "locked": "Locked"

@@ -55,6 +55,7 @@ interface Lesson {
     setup: (tree: AVLTree) => void;
     targetVal?: number; // For Quiz/Concept to identify the target node
     answer?: number;    // For Quiz answer
+    check?: (tree: AVLTree) => boolean;
 }
 
 const LESSONS: Lesson[] = [
@@ -88,7 +89,15 @@ const LESSONS: Lesson[] = [
     {   // L7: Deletion Guided
         id: 'l7', type: 'guided',
         setup: (tree) => { [20, 10, 30, 25, 40].forEach(v => tree.insertManual(v)); },
-        targetVal: 10
+        targetVal: 10,
+        check: (tree) => {
+             const find = (n: AVLNode | null, v: number): boolean => {
+                 if (!n) return false;
+                 if (n.value === v) return true;
+                 return find(n.left, v) || find(n.right, v);
+             };
+             return !find(tree.root, 10);
+        }
     }
 ];
 
@@ -139,6 +148,7 @@ export const AVLTreePage: React.FC = () => {
   const [maxUnlocked, setMaxUnlocked] = useState(0); 
   const [quizInput, setQuizInput] = useState('');
   const [showQuizFeedback, setShowQuizFeedback] = useState<'correct'|'wrong'|null>(null);
+  const [showCongrats, setShowCongrats] = useState(false);
   
   // Tour State
   const [tourStep, setTourStep] = useState(-1);
@@ -174,26 +184,53 @@ export const AVLTreePage: React.FC = () => {
     }
   }, []);
 
-  // Level Completion Monitor
-  useEffect(() => {
-      if (tutorialView === 'lesson' && lessonIndex < LESSONS.length) {
-          const lesson = LESSONS[lessonIndex];
-          let done = false;
-          
-          if (lesson.type === 'concept') {
-              if (selectedNode && lesson.targetVal && selectedNode.value === lesson.targetVal) done = true;
-          } else if (lesson.type === 'guided' || lesson.type === 'challenge') {
-              if (unbalancedData.allIds.length === 0 && historyIndex > 0) done = true;
-          }
-          
-          if (done && lessonIndex >= maxUnlocked) {
-              const next = lessonIndex + 1;
-              setMaxUnlocked(next);
-              localStorage.setItem('ds-playground-avl-max-level', next.toString());
-              if (next === LESSONS.length) localStorage.setItem('ds-playground-avl-tree-completed', 'true');
-          }
-      }
-  }, [tutorialView, lessonIndex, selectedNode, unbalancedData, historyIndex, maxUnlocked]);
+    // Level Completion Monitor
+
+    useEffect(() => {
+
+        if (tutorialView === 'lesson' && !isPlaying && lessonIndex < LESSONS.length) {
+
+            const lesson = LESSONS[lessonIndex];
+
+            let done = false;
+
+            
+
+            if (lesson.type === 'concept') {
+
+                if (selectedNode && lesson.targetVal && selectedNode.value === lesson.targetVal) done = true;
+
+            } else if (lesson.type === 'guided' || lesson.type === 'challenge') {
+
+                const isBalanced = unbalancedData.allIds.length === 0;
+
+                const hasAction = historyIndex > 0;
+
+                const customCheck = lesson.check ? lesson.check(avlTree) : true;
+
+                
+
+                if (isBalanced && hasAction && customCheck) done = true;
+
+            }
+
+            
+
+            if (done && lessonIndex >= maxUnlocked) {
+
+                const next = lessonIndex + 1;
+
+                setMaxUnlocked(next);
+
+                localStorage.setItem('ds-playground-avl-max-level', next.toString());
+
+                if (next === LESSONS.length) localStorage.setItem('ds-playground-avl-tree-completed', 'true');
+
+            }
+
+        }
+
+    }, [tutorialView, lessonIndex, selectedNode, unbalancedData, historyIndex, maxUnlocked, isPlaying]);
 
   useEffect(() => {
     if (activeOpSteps.length > 0 && currentStepIdx >= 0) {
@@ -454,11 +491,48 @@ export const AVLTreePage: React.FC = () => {
 
               <div className="flex gap-2 pt-4 border-t border-slate-800">
                   <button onClick={() => runLesson(lessonIndex)} className="flex-1 py-3 bg-slate-800 text-slate-400 rounded-xl text-[10px] font-bold uppercase hover:bg-slate-700 transition-colors">{t('avl:tutorial.reset')}</button>
-                  {isDone && lessonIndex < LESSONS.length - 1 && (
-                      <button onClick={() => runLesson(lessonIndex + 1)} className="flex-[2] py-3 bg-green-600 text-white rounded-xl text-[10px] font-bold uppercase flex items-center justify-center gap-2 hover:bg-green-500 shadow-lg shadow-green-900/20">
-                          {t('avl:tutorial.next')} <Sparkles size={14} />
-                      </button>
+                  {isDone && (
+                      lessonIndex < LESSONS.length - 1 ? (
+                        <button onClick={() => runLesson(lessonIndex + 1)} className="flex-[2] py-3 bg-green-600 text-white rounded-xl text-[10px] font-bold uppercase flex items-center justify-center gap-2 hover:bg-green-500 shadow-lg shadow-green-900/20">
+                            {t('avl:tutorial.next')} <Sparkles size={14} />
+                        </button>
+                      ) : (
+                        <button onClick={() => setShowCongrats(true)} className="flex-[2] py-3 bg-blue-600 text-white rounded-xl text-[10px] font-bold uppercase flex items-center justify-center gap-2 hover:bg-blue-500 shadow-lg shadow-blue-900/20 animate-bounce">
+                            {t('avl:tutorial.finishBtn')} <Trophy size={14} />
+                        </button>
+                      )
                   )}
+              </div>
+          </div>
+      );
+  };
+
+  const renderCongrats = () => {
+      if (!showCongrats) return null;
+      return (
+          <div className="fixed inset-0 z-[20000] flex items-center justify-center bg-slate-900/80 backdrop-blur-md p-4 animate-in fade-in">
+              <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 text-center space-y-6 animate-in zoom-in-95 duration-300">
+                  <div className="w-20 h-20 bg-yellow-100 text-yellow-500 rounded-full flex items-center justify-center mx-auto ring-8 ring-yellow-50">
+                      <Trophy size={40} />
+                  </div>
+                  <div className="space-y-2">
+                      <h2 className="text-3xl font-black text-slate-900">{t('avl:tutorial.congratsTitle')}</h2>
+                      <p className="text-slate-500 text-sm leading-relaxed whitespace-pre-line">{t('avl:tutorial.congratsDesc')}</p>
+                  </div>
+                  <div className="pt-4 space-y-3">
+                      <button 
+                          onClick={() => { setShowCongrats(false); setTutorialView('menu'); }}
+                          className="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-500 hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-blue-500/20"
+                      >
+                          {t('avl:tutorial.backToMenu')}
+                      </button>
+                      <button 
+                          onClick={() => setShowCongrats(false)}
+                          className="w-full py-3 text-slate-400 font-bold hover:text-slate-600 transition-colors text-xs uppercase tracking-widest"
+                      >
+                          Close
+                      </button>
+                  </div>
               </div>
           </div>
       );
@@ -720,6 +794,7 @@ export const AVLTreePage: React.FC = () => {
           </div>
       </div></div>)}
       {renderTourTooltip()}
+      {renderCongrats()}
     </div>
   );
 };
