@@ -28,6 +28,7 @@ export const RedBlackTreePage: React.FC = () => {
   const [highlightedIds, setHighlightedIds] = useState<string[]>([]);
   const [currentMsg, setCurrentStepMsg] = useState<string | null>(null);
   const [resetConfirm, setResetConfirm] = useState(false);
+  const [selectedNode, setSelectedNode] = useState<RBNode | null>(null);
 
   // Input
   const [inputValue, setInputValue] = useState('');
@@ -212,10 +213,11 @@ export const RedBlackTreePage: React.FC = () => {
   };
 
   const handleDelete = () => {
-      const val = parseInt(inputValue);
+      const val = selectedNode ? selectedNode.value : parseInt(inputValue);
       if (!isNaN(val)) {
           startOperation(`Delete ${val}`, tree.delete(val));
           setInputValue('');
+          setSelectedNode(null);
       }
   };
 
@@ -231,6 +233,7 @@ export const RedBlackTreePage: React.FC = () => {
       setCurrentStepIdx(-1);
       setHighlightedIds([]);
       setCurrentStepMsg(null);
+      setSelectedNode(null);
   };
 
   const renderTutorial = () => {
@@ -293,6 +296,7 @@ export const RedBlackTreePage: React.FC = () => {
                       <section><h4 className="text-blue-400 font-bold text-sm mb-2 uppercase">{t('rbtree:wiki.concept')}</h4><SimpleMarkdown text={t('rbtree:wiki.conceptDesc')} /></section>
                       <section><h4 className="text-green-400 font-bold text-sm mb-2 uppercase">{t('rbtree:wiki.properties')}</h4><SimpleMarkdown text={t('rbtree:wiki.propertiesDesc')} /></section>
                       <section><h4 className="text-amber-400 font-bold text-sm mb-2 uppercase">{t('rbtree:wiki.insertion')}</h4><SimpleMarkdown text={t('rbtree:wiki.insertionDesc')} /></section>
+                      <section><h4 className="text-rose-400 font-bold text-sm mb-2 uppercase">{t('rbtree:wiki.deletion')}</h4><SimpleMarkdown text={t('rbtree:wiki.deletionDesc')} /></section>
                       <section><h4 className="text-purple-400 font-bold text-sm mb-2 uppercase">{t('rbtree:wiki.complexity')}</h4><SimpleMarkdown text={t('rbtree:wiki.complexityDesc')} /></section>
                     </div>
                   )}
@@ -322,7 +326,7 @@ export const RedBlackTreePage: React.FC = () => {
                         <TransformComponent wrapperStyle={{ width: "100%", height: "100%" }}>
                             <div className="w-[4000px] h-[4000px] relative cursor-grab active:cursor-grabbing">
                                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" style={{ overflow: 'visible' }}>
-                                    {snapshot && <RedBlackNode node={snapshot} x={snapshot.x} y={snapshot.y} level={0} highlightedIds={highlightedIds} />}
+                                    {snapshot && <RedBlackNode node={snapshot} x={snapshot.x} y={snapshot.y} level={0} highlightedIds={highlightedIds} selectedId={selectedNode?.id} onNodeClick={setSelectedNode} />}
                                 </div>
                             </div>
                         </TransformComponent>

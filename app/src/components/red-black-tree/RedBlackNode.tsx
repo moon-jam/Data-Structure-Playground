@@ -8,14 +8,17 @@ interface RedBlackNodeProps {
   y: number;
   level: number;
   highlightedIds?: string[];
+  selectedId?: string | null;
+  onNodeClick?: (node: RBNode) => void;
 }
 
 const NODE_RADIUS = 25;
 
 export const RedBlackNode: React.FC<RedBlackNodeProps> = ({ 
-  node, x, y, level, highlightedIds = [] 
+  node, x, y, level, highlightedIds = [], selectedId, onNodeClick 
 }) => {
   const isHighlighted = highlightedIds.includes(node.id);
+  const isSelected = selectedId === node.id;
   const isRed = node.color === 'red';
 
   return (
@@ -26,8 +29,9 @@ export const RedBlackNode: React.FC<RedBlackNodeProps> = ({
         initial={{ left: x - NODE_RADIUS, top: y - NODE_RADIUS }}
         animate={{ left: x - NODE_RADIUS, top: y - NODE_RADIUS }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className={`absolute flex items-center justify-center border-2 rounded-full shadow-md z-20 font-bold select-none text-white
-          ${isHighlighted ? 'ring-4 ring-amber-400 border-amber-500' : isRed ? 'border-red-600' : 'border-slate-800'}
+        onClick={(e) => { e.stopPropagation(); onNodeClick?.(node); }}
+        className={`absolute flex items-center justify-center border-2 rounded-full shadow-md z-20 font-bold select-none text-white cursor-pointer hover:scale-110 transition-transform
+          ${isSelected ? 'ring-4 ring-blue-400 border-blue-500' : isHighlighted ? 'ring-4 ring-amber-400 border-amber-500' : isRed ? 'border-red-600' : 'border-slate-800'}
           ${isRed ? 'bg-red-500' : 'bg-slate-900'}
         `}
         style={{
@@ -45,13 +49,13 @@ export const RedBlackNode: React.FC<RedBlackNodeProps> = ({
       {node.left && (
         <>
           <Edge parentX={x} parentY={y} childX={node.left.x} childY={node.left.y} childColor={node.left.color} />
-          <RedBlackNode node={node.left} x={node.left.x} y={node.left.y} level={level + 1} highlightedIds={highlightedIds} />
+          <RedBlackNode node={node.left} x={node.left.x} y={node.left.y} level={level + 1} highlightedIds={highlightedIds} selectedId={selectedId} onNodeClick={onNodeClick} />
         </>
       )}
       {node.right && (
         <>
           <Edge parentX={x} parentY={y} childX={node.right.x} childY={node.right.y} childColor={node.right.color} />
-          <RedBlackNode node={node.right} x={node.right.x} y={node.right.y} level={level + 1} highlightedIds={highlightedIds} />
+          <RedBlackNode node={node.right} x={node.right.x} y={node.right.y} level={level + 1} highlightedIds={highlightedIds} selectedId={selectedId} onNodeClick={onNodeClick} />
         </>
       )}
     </>
