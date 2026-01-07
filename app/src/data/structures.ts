@@ -22,6 +22,13 @@ export const structures: StructureDef[] = [
     implemented: true,
   },
   {
+    id: 'fibonacci-heap',
+    name: 'Fibonacci Heap',
+    description: 'A data structure for priority queue operations, consisting of a collection of heap-ordered trees.',
+    path: '/fibonacci-heap',
+    implemented: true,
+  },
+  {
     id: 'min-max-heap',
     name: 'Min-Max Heap',
     description: 'A complete binary tree that provides constant time access to both minimum and maximum elements.',
@@ -33,13 +40,6 @@ export const structures: StructureDef[] = [
     name: 'Binomial Heap',
     description: 'A heap similar to a binary heap but also supports quick merging of two heaps.',
     path: '/binomial-heap',
-    implemented: false,
-  },
-  {
-    id: 'fibonacci-heap',
-    name: 'Fibonacci Heap',
-    description: 'A data structure for priority queue operations, consisting of a collection of heap-ordered trees.',
-    path: '/fibonacci-heap',
     implemented: false,
   },
   {

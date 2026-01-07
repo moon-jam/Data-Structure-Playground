@@ -1,0 +1,19 @@
+{
+  "name": "Fibonacci Heap",
+  "wiki": {
+    "concept": "1. Definition",
+    "conceptDesc": "A Fibonacci Heap is a priority queue data structure consisting of a collection of heap-ordered trees. It utilizes a **Lazy Strategy**, delaying expensive structural consolidation until the `Extract Min` operation is performed.",
+    "performance": "2. Amortized Complexity",
+    "perfTable": "| Operation | Amortized | Notes |\n| :--- | :--- | :--- |\n| Insert | O(1) | Just add to root list |\n| Find Min | O(1) | Maintained via pointer |\n| Extract Min | O(log n) | Triggers Consolidation |\n| Decrease Key | O(1) | The core efficiency |\n| Delete | O(log n) | DecrKey + ExtractMin |",
+    "lazyStrategy": "3. Consolidation Process",
+    "lazyStrategyDesc": "Insertions are lazy. During `Extract Min`, we traverse the entire root list and use a **Degree Table** to link trees of the same degree until each degree has at most one tree.",
+    "cascadingCut": "4. Cascading Cut",
+    "cascadingCutDesc": "To maintain structural balance, a non-root node is cut and promoted to the root list if it loses its second child. This cascading effect is crucial for amortized performance."
+  },
+  "guide": {
+    "title": "Interactive Tutorial",
+    "insert": "Insertion: O(1) Lazy approach",
+    "extractMin": "Extract Min: Merging trees",
+    "decreaseKey": "Decrease Key: Triggering cuts"
+  }
+}

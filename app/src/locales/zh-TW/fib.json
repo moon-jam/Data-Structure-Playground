@@ -1,0 +1,19 @@
+{
+  "name": "Fibonacci Heap",
+  "wiki": {
+    "concept": "1. 費氏堆積定義",
+    "conceptDesc": "費氏堆積（Fibonacci Heap）是一種優先佇列資料結構，由一組具有堆積性質（Heap-ordered）的樹組成。它最顯著的特點是採用了**懶惰（Lazy）策略**，將昂貴的結構整理工作推遲到執行 `Extract Min` 時才進行。",
+    "performance": "2. 複雜度分析（平攤）",
+    "perfTable": "| 操作 | 平攤複雜度 | 備註 |\n| :--- | :--- | :--- |\n| Insert | O(1) | 直接加入根節點清單 |\n| Find Min | O(1) | 透過 Min 指標維護 |\n| Extract Min | O(log n) | 包含 Consolidation 整理過程 |\n| Decrease Key | O(1) | 費氏堆積的精髓 |\n| Delete | O(log n) | Decrease Key + Extract Min |",
+    "lazyStrategy": "3. 懶惰策略與 Consolidation",
+    "lazyStrategyDesc": "當插入節點時，我們不急著調整樹的形狀，只是簡單地將其掛在根清單（Root List）中。只有在刪除最小值時，我們才會遍歷整個根清單，並使用 **Degree Table（度數表）** 將度數相同的樹合併，直到每個度數最多只有一棵樹為止。",
+    "cascadingCut": "4. 連鎖切斷（Cascading Cut）",
+    "cascadingCutDesc": "為了保持樹的度數與節點數的對數關係，費氏堆積規定：如果一個非根節點失去了第二個孩子，它就會被「切斷（Cut）」並晉升為根。這種連鎖反應確保了操作的高效率。"
+  },
+  "guide": {
+    "title": "費氏堆積教學",
+    "insert": "插入節點：O(1) 的懶惰操作",
+    "extractMin": "取出最小值：觸發 Consolidation 整理",
+    "decreaseKey": "降低數值：可能觸發連鎖切斷"
+  }
+}

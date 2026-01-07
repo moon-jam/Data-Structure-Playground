@@ -6,6 +6,8 @@ import enCommon from './locales/en/common.json';
 import zhTWCommon from './locales/zh-TW/common.json';
 import enAvl from './locales/en/avl.json';
 import zhTWAvl from './locales/zh-TW/avl.json';
+import enFib from './locales/en/fib.json';
+import zhTWFib from './locales/zh-TW/fib.json';
 
 i18n
   .use(LanguageDetector)
@@ -15,10 +17,12 @@ i18n
       en: {
         common: enCommon,
         avl: enAvl,
+        fib: enFib,
       },
       'zh-TW': {
         common: zhTWCommon,
         avl: zhTWAvl,
+        fib: zhTWFib,
       },
     },
     fallbackLng: 'zh-TW', // Default to Traditional Chinese as requested
