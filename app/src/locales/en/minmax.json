@@ -1,0 +1,13 @@
+{
+  "name": "Min-Max Heap",
+  "wiki": {
+    "concept": "1. Definition",
+    "conceptDesc": "A Min-Max Heap is a complete binary tree data structure which combines the properties of both a min-heap and a max-heap.",
+    "levels": "2. Min/Max Levels",
+    "levelsDesc": "Levels are alternatingly Min and Max levels. Even levels (0, 2, 4...) are Min levels where the node is smaller than all descendants. Odd levels (1, 3, 5...) are Max levels where the node is larger than all descendants.",
+    "insert": "3. Insertion (Push Up)",
+    "insertDesc": "To insert a new key `x` at index `i`:\n1. Compare `x` with its parent `p`.\n2. If `i` is on a **Min** level:\n   - If `x > p`, `x` violates the Min property locally but might belong in a Max level. Swap `x` with `p` and perform `PushUpMax` from `p`.\n   - Otherwise, perform `PushUpMin` from `i` (check grandparents).\n3. Symmetric logic applies if `i` is on a **Max** level.",
+    "extract": "4. Extraction (Push Down)",
+    "extractDesc": "**Extract Min:** The minimum is always at the root (index 0). Remove it, replace with the last element, and perform `PushDownMin`.\n\n**PushDownMin Algorithm:**\n1. Find the smallest node `m` among all children and grandchildren.\n2. If `m` is a grandchild:\n   - If `heap[m] < heap[i]`, swap them.\n   - If `heap[m] > heap[parent(m)]`, swap `m` with its parent (to fix Max level violation).\n   - Continue `PushDownMin` from `m`.\n3. If `m` is a child, just swap if needed (no further recursion needed usually)."
+  }
+}

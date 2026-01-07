@@ -33,7 +33,7 @@ export const structures: StructureDef[] = [
     name: 'Min-Max Heap',
     description: 'A complete binary tree that provides constant time access to both minimum and maximum elements.',
     path: '/min-max-heap',
-    implemented: false,
+    implemented: true,
   },
   {
     id: 'binomial-heap',

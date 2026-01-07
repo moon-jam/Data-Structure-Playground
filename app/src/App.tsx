@@ -7,6 +7,7 @@ const HomePage = lazy(() => import('./pages/Home').then(module => ({ default: mo
 const AVLTreePage = lazy(() => import('./pages/AVLTree').then(m => ({ default: m.AVLTreePage })));
 const BloomFilterPage = lazy(() => import('./pages/BloomFilter').then(m => ({ default: m.BloomFilterPage })));
 const FibonacciHeapPage = lazy(() => import('./pages/FibonacciHeap').then(m => ({ default: m.FibonacciHeapPage })));
+const MinMaxHeapPage = lazy(() => import('./pages/MinMaxHeap').then(m => ({ default: m.MinMaxHeapPage })));
 
 const Loading = () => (
   <div className="flex items-center justify-center h-full w-full bg-slate-50 text-slate-400 font-mono text-sm animate-pulse">
@@ -37,6 +38,11 @@ function App() {
           <Route path="fibonacci-heap" element={
             <Suspense fallback={<Loading />}>
               <FibonacciHeapPage />
+            </Suspense>
+          } />
+          <Route path="min-max-heap" element={
+            <Suspense fallback={<Loading />}>
+              <MinMaxHeapPage />
             </Suspense>
           } />
           <Route path="*" element={<Navigate to="/" replace />} />
