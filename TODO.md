@@ -1,6 +1,7 @@
 - [ ] bloom filter
 - [x] min-max heap
-- [ ] Double-Ended Heap (DEAP)
+- [x] Double-Ended Heap (DEAP)
+- [ ] Symmetric Min-Max Heap (SMMH)
 - [ ] Binomial Heap
 - [x] Fibonacci Heap
 - [x] AVL Tree

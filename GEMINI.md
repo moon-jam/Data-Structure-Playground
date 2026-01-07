@@ -32,7 +32,8 @@ A highly interactive data structure learning platform. The current focus is on T
 - [x] AVL Tree (Playback, Tutorial, Drag interaction, Heuristics)
 - [x] Fibonacci Heap (Consolidation Visualization, Degree Table, Decrease Key)
 - [x] Min-Max Heap (Min/Max Levels, Array View)
-- [ ] Double-Ended Heap (DEAP)
+- [x] Double-Ended Heap (DEAP)
+- [ ] Symmetric Min-Max Heap (SMMH)
 - [ ] Bloom Filter
 - [ ] B tree / B+ tree
 - [ ] Red black tree
@@ -82,6 +83,7 @@ Follow this checklist to implement a new structure efficiently:
 2.  **Routing**:
     -   Register lazy route in `App.tsx`.
     -   Add card entry in `data/structures.ts`.
-3.  **Localization**:
+3.  **Localization (CRITICAL)**:
     -   Create `locales/{en,zh-TW}/<name>.json`.
     -   Register in `i18n.ts`.
+    -   **UPDATE HOME PAGE**: Add the structure name and description to `locales/{en,zh-TW}/common.json` under `home.structures` to ensure the home page card displays localized content correctly. (Do not skip this!)

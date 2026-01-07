@@ -1,0 +1,13 @@
+{
+  "name": "Symmetric Min-Max Heap (SMMH)",
+  "wiki": {
+    "concept": "1. Definition",
+    "conceptDesc": "SMMH is a complete binary tree where the root is empty. It provides efficient access to both minimum and maximum elements by maintaining symmetric properties between siblings and descendants.",
+    "properties": "2. Properties",
+    "propertiesDesc": "- **P1**: For every node `i` that has a right sibling `i+1`, `key(i) <= key(i+1)`.\n- **P2**: If `i` has a parent `p`, then `key(left_child(p)) <= key(i) <= key(right_child(p))`.",
+    "insert": "3. Insertion Algorithm",
+    "insertDesc": "1. Place the new element at the end of the heap.\n2. **Bubble Up**: Compare with grandparents' children (P2) and its own sibling (P1). Swap and move up until all properties are satisfied.",
+    "extract": "4. Extraction",
+    "extractDesc": "- **Extract Min**: Remove index 2, replace with the last element, and perform `PushDown` starting from index 2.\n- **Extract Max**: Remove the largest root-level node (index 3 or 2), replace with last, and `PushDown`."
+  }
+}

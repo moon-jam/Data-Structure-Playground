@@ -9,6 +9,7 @@ const BloomFilterPage = lazy(() => import('./pages/BloomFilter').then(m => ({ de
 const FibonacciHeapPage = lazy(() => import('./pages/FibonacciHeap').then(m => ({ default: m.FibonacciHeapPage })));
 const MinMaxHeapPage = lazy(() => import('./pages/MinMaxHeap').then(m => ({ default: m.MinMaxHeapPage })));
 const DeapPage = lazy(() => import('./pages/DeapPage').then(m => ({ default: m.DeapPage })));
+const SmmhPage = lazy(() => import('./pages/SmmhPage').then(m => ({ default: m.SmmhPage })));
 
 const Loading = () => (
   <div className="flex items-center justify-center h-full w-full bg-slate-50 text-slate-400 font-mono text-sm animate-pulse">
@@ -49,6 +50,11 @@ function App() {
           <Route path="deap" element={
             <Suspense fallback={<Loading />}>
               <DeapPage />
+            </Suspense>
+          } />
+          <Route path="smmh" element={
+            <Suspense fallback={<Loading />}>
+              <SmmhPage />
             </Suspense>
           } />
           <Route path="*" element={<Navigate to="/" replace />} />

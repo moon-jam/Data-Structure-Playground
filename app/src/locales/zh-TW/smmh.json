@@ -1,0 +1,13 @@
+{
+  "name": "Symmetric Min-Max Heap (SMMH)",
+  "wiki": {
+    "concept": "1. 基本定義",
+    "conceptDesc": "SMMH (Symmetric Min-Max Heap) 是一種完全二元樹，其根節點為空。它透過維護兄弟節點與後代之間的對稱性質，來提供高效的雙端優先佇列操作。",
+    "properties": "2. 核心性質",
+    "propertiesDesc": "- **P1**：對於任何具有右兄弟 `i+1` 的節點 `i`，滿足 `key(i) <= key(i+1)`。\n- **P2**：若節點 `i` 有父節點 `p`，則 `key(left_child(p)) <= key(i) <= key(right_child(p))`。",
+    "insert": "3. 插入演算法",
+    "insertDesc": "1. 將新元素放置在堆積末尾。\n2. **Bubble Up (上浮)**：與祖父節點的孩子 (P2) 以及自身的兄弟節點 (P1) 進行比較並交換，直到滿足所有性質。",
+    "extract": "4. 取出操作",
+    "extractDesc": "- **取出最小**：移除 index 2，用末尾元素替換並執行 `PushDown`。\n- **取出最大**：移除 index 3 (或唯一的 index 2)，用末尾元素替換並執行 `PushDown`。"
+  }
+}

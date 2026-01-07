@@ -8,13 +8,6 @@ export interface StructureDef {
 
 export const structures: StructureDef[] = [
   {
-    id: 'avl-tree',
-    name: 'AVL Tree',
-    description: 'A self-balancing binary search tree where the difference between heights of left and right subtrees cannot be more than one for all nodes.',
-    path: '/avl-tree',
-    implemented: true,
-  },
-  {
     id: 'bloom-filter',
     name: 'Bloom Filter',
     description: 'A space-efficient probabilistic data structure used to test whether an element is a member of a set.',
@@ -40,6 +33,20 @@ export const structures: StructureDef[] = [
     name: 'DEAP',
     description: 'A double-ended heap structure that supports efficient insertion and deletion of both minimum and maximum elements.',
     path: '/deap',
+    implemented: true,
+  },
+  {
+    id: 'smmh',
+    name: 'SMMH',
+    description: 'Symmetric Min-Max Heap is a double-ended priority queue that maintains symmetric relationships between siblings.',
+    path: '/smmh',
+    implemented: true,
+  },
+  {
+    id: 'avl-tree',
+    name: 'AVL Tree',
+    description: 'A self-balancing binary search tree where the difference between heights of left and right subtrees cannot be more than one for all nodes.',
+    path: '/avl-tree',
     implemented: true,
   },
   {

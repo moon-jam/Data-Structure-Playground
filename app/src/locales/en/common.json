@@ -30,6 +30,7 @@
       "bloom-filter": { "name": "Bloom Filter", "description": "A space-efficient probabilistic structure used to test whether an element is a member of a set with zero false negatives." },
       "min-max-heap": { "name": "Min-Max Heap", "description": "A complete binary tree providing constant-time access to both the minimum and maximum elements, ideal for double-ended priority queues." },
       "deap": { "name": "Double-Ended Heap (DEAP)", "description": "A complete binary tree with an empty root, where the left subtree is a Min-Heap and the right is a Max-Heap, supporting efficient double-ended operations." },
+      "smmh": { "name": "Symmetric Min-Max Heap (SMMH)", "description": "SMMH implements a highly efficient double-ended priority queue by maintaining symmetric order properties between sibling nodes." },
       "binomial-heap": { "name": "Binomial Heap", "description": "A collection of binomial trees that supports standard heap operations plus ultra-fast merging of two heaps in logarithmic time." },
       "fibonacci-heap": { "name": "Fibonacci Heap", "description": "A priority queue data structure with superior amortized time complexity, key to optimizing Dijkstra's shortest path algorithm." },
       "b-tree": { "name": "B-Tree", "description": "A multi-way self-balancing tree optimized for storage systems, minimizing disk I/O for large-scale data reading and writing." },
