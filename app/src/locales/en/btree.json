@@ -1,0 +1,15 @@
+{
+  "name": "B-Tree",
+  "wiki": {
+    "concept": "1. Definition",
+    "conceptDesc": "A B-Tree is a self-balancing tree data structure that maintains sorted data. Unlike binary trees, nodes can have more than two children.",
+    "properties": "2. Properties (Order m)",
+    "propertiesDesc": "- **Max Children**: Every node has at most `m` children.\n- **Min Keys**: Every non-root node has at least `⌈m/2⌉-1` keys.\n- **Balance**: All leaves appear at the same level.\n- **Sorted**: Keys within each node are sorted in ascending order.",
+    "insertion": "3. Insertion",
+    "insertionDesc": "**Bottom-up approach:**\n1. Find the appropriate leaf node\n2. Insert key into the leaf (maintaining sort order)\n3. **If overflow** (keys = m): Split the node\n   - Promote middle key to parent\n   - Create left and right nodes\n   - Recursively split parent if needed\n4. If root splits, tree height increases by 1",
+    "deletion": "4. Deletion",
+    "deletionDesc": "**Two-phase approach:**\n\n**Phase 1: Transform to Leaf Deletion**\n- If key is in internal node → swap with predecessor (largest in left subtree)\n- Now key is guaranteed to be in a leaf\n\n**Phase 2: Delete from Leaf**\n- **Case 1**: Node has ≥ ⌈m/2⌉ keys → directly delete\n- **Case 2**: Node has ⌈m/2⌉-1 keys, sibling has > ⌈m/2⌉-1\n  → **Rotation**: borrow from sibling\n- **Case 3**: Both have ⌈m/2⌉-1 keys\n  → **Combine**: merge with sibling + parent key\n  → Check parent for underflow (recursive)\n\n**Priority**: Always try Rotation before Combine",
+    "complexity": "5. Time Complexity",
+    "complexityDesc": "- **Search**: O(log n)\n- **Insert**: O(log n)\n- **Delete**: O(log n)\n- **Space**: O(n)\n\nwhere n is the number of keys in the tree."
+  }
+}

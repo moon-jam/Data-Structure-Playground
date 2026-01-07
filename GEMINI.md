@@ -51,6 +51,50 @@ A highly interactive data structure learning platform. The current focus is on T
 - **Legibility**: Ensure text sizes are at least 11px-12px for labels and buttons. Use uppercase + tracking for section headers.
 - **Context Awareness**: Show auxiliary data (like Array View or Degree Table) in floating panels or dedicated islands to provide full context without cluttering the main tree view.
 
+### B-Tree Specific Lessons
+
+#### Rendering & Animation
+- **Layering (z-index)**: For multi-way trees, render child nodes and lines *before* the parent node in the JSX, and use a `depth`-based `zIndex` calculation (`100 - depth`) to ensure parent nodes always appear on top of their connector lines.
+- **Explicit Positioning**: Use explicit `left` and `top` properties in Framer Motion `animate` props rather than `marginLeft` or `transform` for the main node containers to ensure smoother layout transitions during rebalancing.
+- **Avoid Layout Animation Conflicts**: Use `key={node.id}` instead of `layoutId` for node reconciliation. Combining `layoutId` with explicit `left/top` animations can cause Framer Motion to auto-manage opacity/transform, resulting in nodes becoming invisible (`opacity: 0`) during transitions.
+- **Layout Precision**: Remove ghost padding/margins from layout calculations. The `nodeBoxWidth` should exactly match the rendered width (`keys.length * KEY_WIDTH`), not include extra padding that causes positioning offsets.
+- **Key Stability**: Use the actual data values as React `key` props when mapping through node keys. This allows Framer Motion to animate keys sliding left or right when a new value is inserted into the middle of a node.
+
+#### Deletion Algorithm (Following Textbook Pattern)
+The B-tree deletion implementation follows the classic two-phase approach from academic literature:
+
+**Phase 1: Transform Internal to Leaf Deletion**
+- If the key to delete is in an **internal node**, immediately swap it with its **predecessor** (largest key in left subtree).
+- Display: `Swapped {key} with predecessor {pred}`
+- This transforms all deletions into leaf deletions, simplifying the algorithm.
+
+**Phase 2: Delete from Leaf with Rebalancing**
+After Phase 1, the key is guaranteed to be in a leaf. Apply these cases:
+
+1. **Case 1: Sufficient Keys** (`keys.length > ⌈m/2⌉ - 1`)
+   - Directly remove the key without rebalancing
+   - Display: `Removed {key} from leaf`
+
+2. **Case 2: Underflow + Sibling Has Extra** (current node has `⌈m/2⌉-1`, sibling has `> ⌈m/2⌉-1`)
+   - **Rotation (Borrow)**: Pull parent's separator key down, push sibling's key up
+   - Display: `Rotation: borrowed from left/right sibling [{keys}] to [{keys}]`
+   - No underflow propagates to parent
+
+3. **Case 3: Both at Minimum** (both have exactly `⌈m/2⌉-1`)
+   - **Combine (Merge)**: Merge child + parent separator + sibling
+   - Display: `Combine: merged [{child}] with sibling [{sibling}] into [{result}]`
+   - Parent loses one key → check parent for underflow recursively
+
+**Underflow Propagation**
+- After `Combine`, parent may underflow → recursively apply Cases 2/3 upward
+- Priority: Always try Rotation before Combine (preserves tree structure)
+- Root special case: If root becomes empty after child merge, promote the merged child as new root (tree height decreases)
+
+**Snapshot Timing**
+- Never call `addStep` while a node is temporarily detached from the tree (e.g., during a split before the parent links the new child)
+- Always complete the structural modification first, then capture the state
+- For swap operations: mutate both nodes first, then call `addStep` to show the swapped state
+
 ## SOP: Adding a New Data Structure
 
 Follow this checklist to implement a new structure efficiently:

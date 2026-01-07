@@ -54,7 +54,7 @@ export const structures: StructureDef[] = [
     name: 'B-Tree',
     description: 'A self-balancing tree data structure that maintains sorted data and allows searches, sequential access, insertions, and deletions in logarithmic time.',
     path: '/b-tree',
-    implemented: false,
+    implemented: true,
   },
   {
     id: 'b-plus-tree',
