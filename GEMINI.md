@@ -32,6 +32,7 @@ A highly interactive data structure learning platform. The current focus is on T
 - [x] AVL Tree (Playback, Tutorial, Drag interaction, Heuristics)
 - [x] Fibonacci Heap (Consolidation Visualization, Degree Table, Decrease Key)
 - [x] Min-Max Heap (Min/Max Levels, Array View)
+- [ ] Double-Ended Heap (DEAP)
 - [ ] Bloom Filter
 - [ ] B tree / B+ tree
 - [ ] Red black tree

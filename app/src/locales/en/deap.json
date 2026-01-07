@@ -1,0 +1,13 @@
+{
+  "name": "Double-Ended Heap (DEAP)",
+  "wiki": {
+    "concept": "1. Definition",
+    "conceptDesc": "A DEAP is a complete binary tree where the root (index 1) is empty:\n- **Left Subtree**: A standard Min-Heap.\n- **Right Subtree**: A standard Max-Heap.",
+    "structure": "2. Indexing & Correspondence",
+    "structureDesc": "**Intuitive Understanding**:\nA DEAP is symmetric. Every position in the Min-Heap maps to the same relative position in the Max-Heap.\n\n**Mathematical Definition (1-based)**:\nFor a node `i` in the Min-Heap at level `L`, its corresponding node `j` in the Max-Heap is:\n`j = i + 2^(L-1)`\n\n**Missing Partner Rule**:\nIf node `j` does not exist, the corresponding node of `i` is defined as **the corresponding node of its parent**.",
+    "insert": "3. Insertion Algorithm",
+    "insertDesc": "1. Place the new element at the end of the heap.\n2. Compare it with its **corresponding node** in the other subtree.\n3. If it violates the correspondence property (e.g., Min-node > Max-partner), swap them.\n4. Perform `PushUp` in the subtree where the node currently resides.",
+    "extract": "4. Extraction",
+    "extractDesc": "- **Extract Min**: Remove index 2, replace with last element, `PushDownMin`.\n- **Extract Max**: Remove index 3, replace with last element, `PushDownMax`."
+  }
+}

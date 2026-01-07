@@ -10,6 +10,8 @@ import enFib from './locales/en/fib.json';
 import zhTWFib from './locales/zh-TW/fib.json';
 import enMinMax from './locales/en/minmax.json';
 import zhTWMinMax from './locales/zh-TW/minmax.json';
+import enDeap from './locales/en/deap.json';
+import zhTWDeap from './locales/zh-TW/deap.json';
 
 i18n
   .use(LanguageDetector)
@@ -21,12 +23,14 @@ i18n
         avl: enAvl,
         fib: enFib,
         minmax: enMinMax,
+        deap: enDeap,
       },
       'zh-TW': {
         common: zhTWCommon,
         avl: zhTWAvl,
         fib: zhTWFib,
         minmax: zhTWMinMax,
+        deap: zhTWDeap,
       },
     },
     fallbackLng: 'zh-TW', // Default to Traditional Chinese as requested

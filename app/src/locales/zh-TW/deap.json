@@ -1,0 +1,13 @@
+{
+  "name": "Doubly Ended Heap (DEAP)",
+  "wiki": {
+    "concept": "1. 基本定義",
+    "conceptDesc": "DEAP 是一種完全二元樹，其根節點 (index 1) 為空：\n- **左子樹**：一個標準的最小堆積 (Min-Heap)。\n- **右子樹**：一個標準的最大堆積 (Max-Heap)。",
+    "structure": "2. 對應關係與索引",
+    "structureDesc": "**直觀理解**：\nDEAP 左右對稱。Min-Heap 中的位置對應到 Max-Heap 中相同位置。\n\n**數學定義 (基於索引 1)**：\n設 `i` 為 Min-Heap 索引，其在 Max-Heap 的對應節點 `j` 為：\n`j = i + 2^(L-1)` (其中 `L` 為該節點所在層數，根節點為第 0 層)\n\n**夥伴缺失規則**：\n若 `j` 不存在，則 `i` 的對應節點定義為 `i`** 之父節點的對應節點**。這確保了每個 Min 節點都有一個 Max 邊界來比較。",
+    "insert": "3. 插入演算法",
+    "insertDesc": "1. 將新元素放至堆積末尾。\n2. 與另一個子樹的**對應節點**比較。\n3. 若違反對應性質 (例如：Min 節點 > Max 對應節點)，則與其交換。\n4. 在節點最終所在的子堆積中執行 `PushUp` (上浮) 操作。",
+    "extract": "4. 取出操作",
+    "extractDesc": "- **取出最小**：移除 index 2，用末尾元素替換並執行 `PushDownMin`。\n- **取出最大**：移除 index 3，用末尾元素替換並執行 `PushDownMax`。"
+  }
+}

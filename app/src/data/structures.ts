@@ -36,6 +36,13 @@ export const structures: StructureDef[] = [
     implemented: true,
   },
   {
+    id: 'deap',
+    name: 'DEAP',
+    description: 'A double-ended heap structure that supports efficient insertion and deletion of both minimum and maximum elements.',
+    path: '/deap',
+    implemented: true,
+  },
+  {
     id: 'binomial-heap',
     name: 'Binomial Heap',
     description: 'A heap similar to a binary heap but also supports quick merging of two heaps.',

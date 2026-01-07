@@ -1,10 +1,8 @@
 - [ ] bloom filter
-- [ ] min-max heap
-    - [ ] Double-Ended Priority Queues 
-    - [ ] Doubly Ended Heap 
-    - [ ] Symmetric min-max heap
+- [x] min-max heap
+- [ ] Double-Ended Heap (DEAP)
 - [ ] Binomial Heap
-- [ ] Fibonacci Heap
+- [x] Fibonacci Heap
 - [x] AVL Tree
 - [ ] B tree
 - [ ] B+ tree
