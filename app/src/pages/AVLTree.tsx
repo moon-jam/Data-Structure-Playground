@@ -3,48 +3,19 @@ import { AVLTree, AVLNode } from '../structures/avl-tree/AVLTree';
 import { TreeNode } from '../components/TreeNode';
 import type { VisualizationStep } from '../structures/common/types';
 import { 
-  Info, Undo2, Redo2, HelpCircle, X, AlertCircle, 
-  BookOpen, ScrollText, Trash2, Pause, Play, 
-  ChevronLeft, ChevronRight, SkipBack, SkipForward, Timer, RefreshCw,
+  Info, Undo2, HelpCircle, X, AlertCircle, 
+  BookOpen, ScrollText, Trash2, 
+  ChevronLeft, ChevronRight, RefreshCw,
   Plus, Minus, LocateFixed, PanelLeftClose, PanelLeft, GraduationCap, Trophy, Sparkles
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
-// --- ULTIMATE STABLE MINI MARKDOWN ENGINE ---
-const SimpleMarkdown = ({ text, className = '', onLinkClick }: { text: string | null | undefined, className?: string, onLinkClick?: (target: string) => void }) => {
-  if (!text) return null;
-  const renderInline = (input: string) => {
-    const parts = input.split(/(\$\*[\s\S]+?\$|\*\*[\s\S]+?\*\*|\`[\s\S]+?\`|\*[\s\S]+?\*|\[\[[\s\S]+?\]\])/g);
-    
-    return parts.map((part, i) => {
-      if (!part) return null;
-      if (part.startsWith('**') && part.endsWith('**')) return <strong key={i} className="font-extrabold text-amber-400 mx-0.5">{part.slice(2, -2)}</strong>;
-      if (part.startsWith('`') && part.endsWith('`')) return <code key={i} className="bg-slate-950 px-1.5 py-0.5 rounded text-blue-300 font-mono text-[11px] border border-slate-700/50 mx-0.5 inline-block leading-none shadow-inner">{part.slice(1, -1)}</code>;
-      if (part.startsWith('*') && part.endsWith('*')) return <em key={i} className="italic text-slate-300 opacity-80 mx-0.5">{part.slice(1, -1)}</em>;
-      if (part.startsWith('[[') && part.endsWith(']]')) {
-          const [label, target] = part.slice(2, -2).split('|');
-          return (<button key={i} onClick={() => onLinkClick?.(target)} className="text-blue-400 font-black border-b border-blue-400/30 hover:text-blue-300 transition-all cursor-pointer mx-0.5">{label}</button>);
-      }
-      return part;
-    });
-  };
-
-  const lines = text.split('\n');
-  return (<div className={`${className} space-y-2 text-[13px]`}>{lines.map((line, lineIdx) => {
-    const trimmed = line.trim();
-    if (!trimmed) return <div key={lineIdx} className="h-2" />;
-    if (trimmed.startsWith('|')) {
-        if (trimmed.includes('---')) return null;
-        const cells = trimmed.split('|').filter((_, i, arr) => i > 0 && i < arr.length - 1);
-        const isHeader = (lineIdx === 0) || (lines[lineIdx+1] && lines[lineIdx+1].includes('---'));
-        return (<div key={lineIdx} className={`flex border-b border-slate-800 py-2 gap-4 transition-colors ${isHeader ? 'bg-white/5 font-bold border-b-2 border-slate-700' : 'hover:bg-white/5'}`}>{cells.map((cell, cIdx) => (<div key={cIdx} className={`flex-1 px-2 text-sm ${isHeader ? 'text-slate-100' : 'text-slate-400'} break-words`}>{renderInline(cell.trim())}</div>))}
-</div>);
-    }
-    if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) { return (<div key={lineIdx} className="flex gap-3 pl-2 py-0.5"><span className="text-blue-500 font-black text-xs">•</span><div className="flex-grow leading-relaxed">{renderInline(line.trim().substring(2))}</div></div>); } 
-    return (<div key={lineIdx} className="leading-relaxed py-0.5">{renderInline(line)}</div>);
-  })}</div>);
-};
+// Playground Components
+import { SimpleMarkdown } from '../components/playground/SimpleMarkdown';
+import { ControlIsland } from '../components/playground/ControlIsland';
+import { PlaybackControls } from '../components/playground/PlaybackControls';
+import { CongratsModal } from '../components/playground/CongratsModal';
 
 interface HistoryEntry { id: string; action: string; steps: VisualizationStep[]; finalSnapshot: string; } 
 
@@ -118,7 +89,6 @@ export const AVLTreePage: React.FC = () => {
   const [helpTab, setHelpTab] = useState<'concept' | 'ui'>('concept');
   const [errorToast, setErrorToast] = useState<string | null>(null);
   const [warningToast, setWarningToast] = useState<string | null>(null);
-  const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [isHoveringNode, setIsHoveringNode] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [pulsingId, setPulsingId] = useState<string | null>(null);
@@ -236,8 +206,11 @@ export const AVLTreePage: React.FC = () => {
     if (activeOpSteps.length > 0 && currentStepIdx >= 0) {
         const step = activeOpSteps[currentStepIdx];
         if (step.payload?.rootSnapshot !== undefined) {
-            setRoot(step.payload.rootSnapshot);
-            if (mode === 'manual') setUnbalancedData(avlTree.checkBalance(step.payload.rootSnapshot));
+            const snapshot = step.payload.rootSnapshot;
+            if (snapshot) avlTree.updateAllHeights(snapshot);
+            
+            setRoot(snapshot);
+            if (mode === 'manual') setUnbalancedData(avlTree.checkBalance(snapshot));
             else setUnbalancedData({ allIds: [], lowestId: null });
         }
         setHighlightedIds(step.targetIds || []);
@@ -290,6 +263,21 @@ export const AVLTreePage: React.FC = () => {
           return { id: lockedTargetId, reason: 'heuristic' };
       }
 
+      const lowestNode = avlTree.getNodeById(unbalancedData.lowestId);
+      if (lowestNode) {
+          const parent = avlTree.findParent(root, lowestNode.value);
+          if (parent && unbalancedData.allIds.includes(parent.id)) {
+              const bfLowest = avlTree.getBalance(lowestNode);
+              const bfParent = avlTree.getBalance(parent);
+              // If both are unbalanced in the same direction (e.g. LL or RR structure),
+              // prioritize the Parent (Root of the imbalance) to avoid redundant rotations on the child.
+              // This is crucial for the second step of Double Rotations.
+              if (bfLowest * bfParent > 0) {
+                  return { id: parent.id, reason: 'heuristic' };
+              }
+          }
+      }
+
       // Default to standard AVL: fix the lowest unbalanced node first
       return { id: unbalancedData.lowestId, reason: 'lowest' };
   };
@@ -297,13 +285,17 @@ export const AVLTreePage: React.FC = () => {
   const handleNodeDrag = (node: AVLNode, direction: 'left' | 'right') => {
       if (isPlaying) return;
       if (mode === 'manual' && unbalancedData.allIds.length > 0) {
-          const target = getPriorityUnbalancedNode();
-          if (unbalancedData.allIds.includes(node.id)) {
-             if (target && node.id !== target.id) {
-                 const targetNode = avlTree.getNodeById(target.id);
-                 const msg = target.reason === 'heuristic' ? t('avl:guide.heuristicWarning') : t('avl:guide.lowestWarning');
-                 setWarningToast(msg + ` (${t('avl:guide.recommendedTarget', {val: targetNode?.value})})`);
-             }
+          if (pulsingId && node.id === pulsingId) {
+              // User is following advice, allow it
+          } else {
+              const target = getPriorityUnbalancedNode();
+              if (unbalancedData.allIds.includes(node.id)) {
+                 if (target && node.id !== target.id) {
+                     const targetNode = avlTree.getNodeById(target.id);
+                     const msg = target.reason === 'heuristic' ? t('avl:guide.heuristicWarning') : t('avl:guide.lowestWarning');
+                     setWarningToast(msg + ` (${t('avl:guide.recommendedTarget', {val: targetNode?.value})})`);
+                 }
+              }
           }
       }
       startNewOperation(`${direction === 'left' ? t('avl:left') : t('avl:right')} @ ${node.value}`, avlTree.rotateNode(node.value, direction));
@@ -363,7 +355,11 @@ export const AVLTreePage: React.FC = () => {
       }
   };
 
-  const updateViewDirectly = (node: AVLNode | null) => { setRoot(node ? node.clone() : null); setUnbalancedData(avlTree.checkBalance(node)); };
+  const updateViewDirectly = (node: AVLNode | null) => { 
+      if (node) avlTree.updateAllHeights(node);
+      setRoot(node ? node.clone() : null); 
+      setUnbalancedData(avlTree.checkBalance(node)); 
+  };
 
   const handleLinkClick = (target: string) => {
       if (target === 'bf') {
@@ -504,39 +500,16 @@ export const AVLTreePage: React.FC = () => {
       );
   };
 
-  const renderCongrats = () => {
-      if (!showCongrats) return null;
-      return (
-          <div className="fixed inset-0 z-[20000] flex items-center justify-center bg-slate-900/80 backdrop-blur-md p-4 animate-in fade-in">
-              <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 text-center space-y-6 animate-in zoom-in-95 duration-300">
-                  <div className="w-20 h-20 bg-yellow-100 text-yellow-500 rounded-full flex items-center justify-center mx-auto ring-8 ring-yellow-50">
-                      <Trophy size={40} />
-                  </div>
-                  <div className="space-y-2">
-                      <h2 className="text-3xl font-black text-slate-900">{t('avl:tutorial.congratsTitle')}</h2>
-                      <p className="text-slate-500 text-sm leading-relaxed whitespace-pre-line">{t('avl:tutorial.congratsDesc')}</p>
-                  </div>
-                  <div className="pt-4 space-y-3">
-                      <button 
-                          onClick={() => { setShowCongrats(false); setTutorialView('menu'); }}
-                          className="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-500 hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-blue-500/20"
-                      >
-                          {t('avl:tutorial.backToMenu')}
-                      </button>
-                      <button 
-                          onClick={() => setShowCongrats(false)}
-                          className="w-full py-3 text-slate-400 font-bold hover:text-slate-600 transition-colors text-xs uppercase tracking-widest"
-                      >
-                          Close
-                      </button>
-                  </div>
-              </div>
-          </div>
-      );
-  };
-
   const renderAdvice = () => {
-      if (mode !== 'manual' || unbalancedData.allIds.length === 0 || isPlaying) { if (pulsingId) setPulsingId(null); if (lockedTargetId) setLockedTargetId(null); return null; }
+      if (mode !== 'manual' || unbalancedData.allIds.length === 0) { 
+          if (pulsingId) setPulsingId(null); 
+          if (lockedTargetId) setLockedTargetId(null); 
+          return null; 
+      }
+      if (isPlaying) {
+          if (pulsingId) setPulsingId(null);
+          return null;
+      }
       if (!showHint) { if (pulsingId) setPulsingId(null); return (<button onClick={() => setShowHint(true)} className="w-full py-3 mb-6 bg-amber-500/10 border-2 border-dashed border-amber-500/30 rounded-2xl text-amber-500 font-black text-[10px] uppercase tracking-widest animate-pulse">{t('avl:guide.showHint')}</button>); }
       const target = getPriorityUnbalancedNode();
       if (!target) return null;
@@ -721,10 +694,7 @@ export const AVLTreePage: React.FC = () => {
           {/* BOTTOM BAR - Modular Island Design */}
           <div className="bg-white border-t border-slate-200 p-3 sm:p-4 flex flex-col lg:flex-row gap-4 lg:gap-4 items-stretch overflow-visible shadow-[0_-10px_40px_rgba(0,0,0,0.03)] z-[100]">
                 {/* OPERATIONS ISLAND */}
-                <div className={`flex flex-col gap-2 shrink-0 w-full lg:w-[320px] bg-slate-50/50 border border-slate-100 p-2 sm:p-3 rounded-2xl ${tourHighlight(3)}`}>
-                    <div className="flex items-center justify-between mb-1 px-1">
-                        <span className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">{t('avl:bottomBar.operations')}</span>
-                    </div>
+                <ControlIsland label={t('avl:bottomBar.operations')} tourId={tourHighlight(3)} className="w-full lg:w-[320px]">
                     <div className="grid grid-cols-[1fr_auto] gap-2 w-full">
                         <div className="flex gap-2 items-center bg-white p-1 rounded-xl border border-slate-200 flex-grow overflow-hidden shadow-sm">
                             <input type="number" value={inputValue} onChange={(e) => setInputValue(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleInsert()} placeholder="Val" className="flex-grow min-w-0 px-2 py-1.5 bg-transparent outline-none font-bold text-xs text-center text-slate-900" />
@@ -732,40 +702,31 @@ export const AVLTreePage: React.FC = () => {
                         </div>
                         <button onClick={handleDelete} disabled={isPlaying} className={`px-4 py-2.5 rounded-xl font-black text-white text-[11px] shadow-lg flex items-center gap-2 transition-all active:scale-95 shrink-0 ${selectedNode ? 'bg-red-600 hover:bg-red-700' : 'bg-slate-300'}`}><Trash2 size={12} /><span className="hidden sm:inline">DELETE</span></button>
                     </div>
-                    <button onClick={handleClear} disabled={isPlaying} className={`w-full flex items-center justify-center gap-2 py-1.5 border border-dashed text-[9px] font-black rounded-lg transition-all uppercase tracking-widest ${resetConfirm ? 'bg-red-600 border-red-600 text-white animate-bounce' : 'border-slate-200 text-slate-400 hover:bg-red-50 hover:text-red-500'}`}><RefreshCw size={12} className={resetConfirm ? 'animate-spin' : ''} /> {resetConfirm ? 'Confirm Reset?' : 'Reset Playground'}</button>
-                </div>
+                    <button onClick={handleClear} disabled={isPlaying} className={`w-full flex items-center justify-center gap-2 py-1.5 border border-dashed text-[10px] font-black rounded-lg transition-all uppercase tracking-widest ${resetConfirm ? 'bg-red-600 border-red-600 text-white animate-bounce' : 'border-slate-200 text-slate-400 hover:bg-red-50 hover:text-red-500'}`}><RefreshCw size={12} className={resetConfirm ? 'animate-spin' : ''} /> {resetConfirm ? 'Confirm Reset?' : 'Reset Playground'}</button>
+                </ControlIsland>
                 
                 {/* TIMELINE ISLAND */}
-                <div className={`flex-grow flex flex-col gap-2 w-full bg-slate-50/50 border border-slate-100 p-2 sm:p-3 rounded-2xl ${tourHighlight(4)}`}>
-                    <div className="flex items-center justify-between mb-1 px-1">
-                        <span className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">{t('avl:bottomBar.timeline')}</span>
-                        <span className="text-[11px] font-black text-slate-400 uppercase">Step {Math.max(0, currentStepIdx + 1)} / {activeOpSteps.length}</span>
-                    </div>
-                    <div className="flex items-center justify-between gap-4 flex-grow">
-                        <div className="flex gap-1">
-                            <button onClick={handleUndo} disabled={isPlaying || historyIndex <= 0} className="w-8 h-8 rounded-lg border border-slate-200 bg-white flex items-center justify-center hover:bg-slate-50 text-slate-600 transition-all shadow-sm disabled:opacity-30"><Undo2 size={16} /></button>
-                            <button onClick={handleRedo} disabled={isPlaying || historyIndex >= history.length - 1} className="w-8 h-8 rounded-lg border border-slate-200 bg-white flex items-center justify-center hover:bg-slate-50 text-slate-600 transition-all shadow-sm disabled:opacity-30"><Redo2 size={16} /></button>
-                        </div>
-                        <div className="flex items-center gap-2 bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
-                            <button onClick={() => goToStep(0)} disabled={activeOpSteps.length === 0} className="hidden sm:block p-1.5 text-slate-400 hover:text-slate-600 transition-colors disabled:opacity-20"><SkipBack size={14} /></button>
-                            <button onClick={() => goToStep(currentStepIdx - 1)} disabled={activeOpSteps.length <= 0} className="p-1.5 text-slate-600 hover:bg-slate-50 rounded-lg transition-all disabled:opacity-20"><ChevronLeft size={18} /></button>
-                            <button onClick={togglePause} className="w-8 h-8 bg-slate-900 text-white rounded-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-md">{isPlaying && !isPaused ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" />}</button>
-                            <button onClick={() => goToStep(currentStepIdx + 1)} disabled={activeOpSteps.length <= 0} className="p-1.5 text-slate-600 hover:bg-slate-50 rounded-lg transition-all disabled:opacity-20"><ChevronRight size={18} /></button>
-                            <button onClick={() => goToStep(activeOpSteps.length - 1)} disabled={activeOpSteps.length === 0} className="hidden sm:block p-1.5 text-slate-400 hover:text-slate-600 transition-colors disabled:opacity-20"><SkipForward size={14} /></button>
-                        </div>
-                        <div className="relative">
-                            <button onClick={() => setShowSpeedMenu(!showSpeedMenu)} className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all shadow-sm ${showSpeedMenu ? 'bg-blue-600 text-white border-blue-600' : 'bg-white border-slate-200 text-slate-400'}`}><Timer size={16} /></button>
-                            {showSpeedMenu && (
-                                <div className="absolute bottom-full right-0 mb-2 bg-white rounded-xl shadow-2xl border border-slate-200 p-1 flex flex-col gap-0.5 z-[150] animate-in slide-in-from-bottom-2 min-w-[60px]">
-                                    {[0.5, 1, 1.5, 2, 3].map(speed => (<button key={speed} onClick={() => { setPlaybackSpeed(speed); setShowSpeedMenu(false); }} className={`px-3 py-1.5 rounded-lg text-[9px] font-black transition-colors ${playbackSpeed === speed ? 'bg-blue-600 text-white' : 'hover:bg-slate-50 text-slate-500'}`}>{speed}x</button>))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-3 mt-1">
-                        <input type="range" min="0" max={Math.max(0, activeOpSteps.length - 1)} value={Math.max(0, currentStepIdx)} onChange={(e) => goToStep(parseInt(e.target.value))} className="flex-grow h-1 bg-slate-200 rounded-full accent-blue-600 cursor-pointer" />
-                    </div>
-                </div>
+                <ControlIsland 
+                  label={t('avl:bottomBar.timeline')} 
+                  tourId={tourHighlight(4)} 
+                  className="flex-grow"
+                  metadata={`Step ${Math.max(0, currentStepIdx + 1)} / ${activeOpSteps.length}`}
+                >
+                    <PlaybackControls 
+                      isPlaying={isPlaying}
+                      isPaused={isPaused}
+                      onTogglePause={togglePause}
+                      onGoToStep={goToStep}
+                      currentStep={currentStepIdx}
+                      totalSteps={activeOpSteps.length}
+                      onUndo={handleUndo}
+                      onRedo={handleRedo}
+                      canUndo={historyIndex > 0}
+                      canRedo={historyIndex < history.length - 1}
+                      playbackSpeed={playbackSpeed}
+                      setPlaybackSpeed={setPlaybackSpeed}
+                    />
+                </ControlIsland>
 
                 {/* STATS ISLAND */}
                 <div className="flex w-full lg:w-[160px] flex-row lg:flex-col gap-2 bg-slate-50/50 border border-slate-100 p-2 sm:p-3 rounded-2xl shrink-0">
@@ -820,7 +781,14 @@ export const AVLTreePage: React.FC = () => {
           </div>
       </div></div>)}
       {renderTourTooltip()}
-      {renderCongrats()}
+      <CongratsModal 
+        show={showCongrats}
+        title={t('avl:tutorial.congratsTitle')}
+        description={t('avl:tutorial.congratsDesc')}
+        onClose={() => setShowCongrats(false)}
+        onBackToMenu={() => { setShowCongrats(false); setTutorialView('menu'); }}
+        backToMenuText={t('avl:tutorial.backToMenu')}
+      />
     </div>
   );
 };

@@ -178,7 +178,7 @@ export class AVLTree {
     return this.steps;
   }
 
-  private updateAllHeights(node: AVLNode | null): number {
+  public updateAllHeights(node: AVLNode | null): number {
     if (!node) return 0;
     node.height = Math.max(this.updateAllHeights(node.left), this.updateAllHeights(node.right)) + 1;
     return node.height;
