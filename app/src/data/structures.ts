@@ -8,6 +8,13 @@ export interface StructureDef {
 
 export const structures: StructureDef[] = [
   {
+    id: 'avl-tree',
+    name: 'AVL Tree',
+    description: 'A self-balancing binary search tree where the difference between heights of left and right subtrees cannot be more than one for all nodes.',
+    path: '/avl-tree',
+    implemented: true,
+  },
+  {
     id: 'bloom-filter',
     name: 'Bloom Filter',
     description: 'A space-efficient probabilistic data structure used to test whether an element is a member of a set.',
@@ -43,20 +50,6 @@ export const structures: StructureDef[] = [
     implemented: true,
   },
   {
-    id: 'avl-tree',
-    name: 'AVL Tree',
-    description: 'A self-balancing binary search tree where the difference between heights of left and right subtrees cannot be more than one for all nodes.',
-    path: '/avl-tree',
-    implemented: true,
-  },
-  {
-    id: 'binomial-heap',
-    name: 'Binomial Heap',
-    description: 'A heap similar to a binary heap but also supports quick merging of two heaps.',
-    path: '/binomial-heap',
-    implemented: false,
-  },
-  {
     id: 'b-tree',
     name: 'B-Tree',
     description: 'A self-balancing tree data structure that maintains sorted data and allows searches, sequential access, insertions, and deletions in logarithmic time.',
@@ -89,6 +82,13 @@ export const structures: StructureDef[] = [
     name: 'Patricia Trie',
     description: 'A space-optimized variation of a trie.',
     path: '/patricia-trie',
+    implemented: false,
+  },
+  {
+    id: 'binomial-heap',
+    name: 'Binomial Heap',
+    description: 'A heap similar to a binary heap but also supports quick merging of two heaps.',
+    path: '/binomial-heap',
     implemented: false,
   },
 ];
