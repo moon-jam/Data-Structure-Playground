@@ -1,0 +1,17 @@
+{
+  "title": "Red-Black Tree",
+  "description": "A self-balancing binary search tree with color-based balancing properties",
+  "wiki": {
+    "concept": "1. What is a Red-Black Tree?",
+    "conceptDesc": "A **Red-Black Tree** is a self-balancing binary search tree where each node has an extra bit for color (red or black). These colors ensure the tree remains approximately balanced during insertions and deletions, guaranteeing O(log n) operations.\n\nKey characteristics:\n- Every node is either **red** or **black**\n- Simpler balancing than AVL trees (fewer rotations)\n- Widely used in standard libraries (e.g., C++ STL map/set, Java TreeMap)",
+    
+    "properties": "2. Red-Black Tree Properties",
+    "propertiesDesc": "A valid Red-Black Tree must satisfy these five properties:\n\n1. **Root Property**: The root is always **black**\n2. **External Property**: All NULL leaves (external nodes) are considered **black**\n3. **Red Property**: If a node is **red**, both children must be **black** (no two consecutive red nodes)\n4. **Black Height Property**: All paths from a node to its descendant NULL nodes contain the same number of **black** nodes\n5. **Binary Search Tree Property**: For any node, all values in left subtree < node value < all values in right subtree\n\nThese properties ensure the tree height is at most **2 log(n+1)**, guaranteeing balanced operations.",
+    
+    "insertion": "3. Insertion Algorithm",
+    "insertionDesc": "Insert as a **red** node using standard BST insertion, then fix violations:\n\n**Case 1: New node is root**\n- Color it **black**\n\n**Case 2: Parent is black**\n- No violations, done\n\n**Case 3: Parent and uncle are both red**\n- Recolor: parent → **black**, uncle → **black**, grandparent → **red**\n- Continue fixing from grandparent\n\n**Case 4: Parent is red, uncle is black (Triangle)**\n- If node is **right child** and parent is **left child** (or vice versa)\n- Rotate on parent to convert to Case 5\n\n**Case 5: Parent is red, uncle is black (Line)**\n- Recolor: parent → **black**, grandparent → **red**\n- Rotate on grandparent\n\n**Maximum 2 rotations** needed per insertion (simpler than AVL's potential rotation chains).",
+    
+    "complexity": "4. Time Complexity",
+    "complexityDesc": "| Operation | Average | Worst Case |\n|-----------|---------|------------|\n| Search    | O(log n) | O(log n)   |\n| Insert    | O(log n) | O(log n)   |\n| Delete    | O(log n) | O(log n)   |\n\n**Space Complexity**: O(n) for storing n nodes\n\n**Advantages over AVL Trees**:\n- Fewer rotations during insertion/deletion (faster updates)\n- Simpler implementation\n- Better for insert/delete-heavy workloads\n\n**Comparison with AVL**:\n- AVL is more strictly balanced (better for search-heavy)\n- RB-Tree is better for mixed operations (real-world databases)"
+  }
+}

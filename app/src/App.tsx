@@ -11,6 +11,7 @@ const MinMaxHeapPage = lazy(() => import('./pages/MinMaxHeap').then(m => ({ defa
 const DeapPage = lazy(() => import('./pages/DeapPage').then(m => ({ default: m.DeapPage })));
 const SmmhPage = lazy(() => import('./pages/SmmhPage').then(m => ({ default: m.SmmhPage })));
 const BTreePage = lazy(() => import('./pages/BTreePage').then(m => ({ default: m.BTreePage })));
+const RedBlackTree = lazy(() => import('./pages/RedBlackTreePage').then(m => ({ default: m.RedBlackTreePage })));
 
 const Loading = () => (
   <div className="flex items-center justify-center h-full w-full bg-slate-50 text-slate-400 font-mono text-sm animate-pulse">
@@ -61,6 +62,11 @@ function App() {
           <Route path="b-tree" element={
             <Suspense fallback={<Loading />}>
               <BTreePage />
+            </Suspense>
+          } />
+          <Route path="red-black-tree" element={
+            <Suspense fallback={<Loading />}>
+              <RedBlackTree />
             </Suspense>
           } />
           <Route path="*" element={<Navigate to="/" replace />} />

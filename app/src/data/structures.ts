@@ -57,17 +57,17 @@ export const structures: StructureDef[] = [
     implemented: true,
   },
   {
-    id: 'b-plus-tree',
-    name: 'B+ Tree',
-    description: 'An N-ary tree with a variable number of children per node, often used for database indexing.',
-    path: '/b-plus-tree',
-    implemented: false,
-  },
-  {
     id: 'red-black-tree',
     name: 'Red-Black Tree',
     description: 'A kind of self-balancing binary search tree where each node has an extra bit for denoting the color of the node, either red or black.',
     path: '/red-black-tree',
+    implemented: true,
+  },
+  {
+    id: 'b-plus-tree',
+    name: 'B+ Tree',
+    description: 'An N-ary tree with a variable number of children per node, often used for database indexing.',
+    path: '/b-plus-tree',
     implemented: false,
   },
   {

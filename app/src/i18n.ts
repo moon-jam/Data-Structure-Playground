@@ -16,6 +16,8 @@ import enSmmh from './locales/en/smmh.json';
 import zhTWSmmh from './locales/zh-TW/smmh.json';
 import enBTree from './locales/en/btree.json';
 import zhTWBTree from './locales/zh-TW/btree.json';
+import enRBTree from './locales/en/rbtree.json';
+import zhTWRBTree from './locales/zh-TW/rbtree.json';
 
 i18n
   .use(LanguageDetector)
@@ -30,6 +32,7 @@ i18n
         deap: enDeap,
         smmh: enSmmh,
         btree: enBTree,
+        rbtree: enRBTree,
       },
       'zh-TW': {
         common: zhTWCommon,
@@ -39,6 +42,7 @@ i18n
         deap: zhTWDeap,
         smmh: zhTWSmmh,
         btree: zhTWBTree,
+        rbtree: zhTWRBTree,
       },
     },
     fallbackLng: 'zh-TW', // Default to Traditional Chinese as requested
