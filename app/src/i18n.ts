@@ -16,6 +16,8 @@ import enSmmh from './locales/en/smmh.json';
 import zhTWSmmh from './locales/zh-TW/smmh.json';
 import enBTree from './locales/en/btree.json';
 import zhTWBTree from './locales/zh-TW/btree.json';
+import enBPlusTree from './locales/en/bplustree.json';
+import zhTWBPlusTree from './locales/zh-TW/bplustree.json';
 import enRBTree from './locales/en/rbtree.json';
 import zhTWRBTree from './locales/zh-TW/rbtree.json';
 
@@ -32,6 +34,7 @@ i18n
         deap: enDeap,
         smmh: enSmmh,
         btree: enBTree,
+        bplustree: enBPlusTree,
         rbtree: enRBTree,
       },
       'zh-TW': {
@@ -42,6 +45,7 @@ i18n
         deap: zhTWDeap,
         smmh: zhTWSmmh,
         btree: zhTWBTree,
+        bplustree: zhTWBPlusTree,
         rbtree: zhTWRBTree,
       },
     },

@@ -68,7 +68,7 @@ export const structures: StructureDef[] = [
     name: 'B+ Tree',
     description: 'An N-ary tree with a variable number of children per node, often used for database indexing.',
     path: '/b-plus-tree',
-    implemented: false,
+    implemented: true,
   },
   {
     id: 'trie',
