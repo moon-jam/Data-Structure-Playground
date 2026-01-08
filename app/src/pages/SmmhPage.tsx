@@ -216,7 +216,19 @@ export const SmmhPage: React.FC = () => {
                     <div className="space-y-2">
                       <h3 className="text-slate-500 font-black uppercase tracking-[0.2em] mb-4">History</h3>
                       {history.slice(1).reverse().map((e, i) => (
-                        <button key={e.id} onClick={() => { stopPlayback(); setActiveSteps(e.steps); setCurrentStepIdx(e.steps.length - 1); setHistoryIndex(history.length - 1 - i); }} className={`w-full text-left p-3 rounded-xl border transition-all ${historyIndex === history.length - 1 - i ? 'bg-blue-600/20 border-blue-500/50 text-blue-100 shadow-inner' : 'bg-slate-800/30 border-slate-700/50 hover:bg-slate-800 text-slate-400'}`}>
+                        <button 
+                          key={e.id} 
+                          onClick={() => { 
+                            stopPlayback(); 
+                            const targetIdx = history.length - 1 - i;
+                            heap.heap = [...e.finalSnapshot];
+                            setSnapshot(e.finalSnapshot);
+                            setActiveSteps(e.steps); 
+                            setCurrentStepIdx(e.steps.length - 1); 
+                            setHistoryIndex(targetIdx); 
+                          }} 
+                          className={`w-full text-left p-3 rounded-xl border transition-all ${historyIndex === history.length - 1 - i ? 'bg-blue-600/20 border-blue-500/50 text-blue-100 shadow-inner' : 'bg-slate-800/30 border-slate-700/50 hover:bg-slate-800 text-slate-400'}`}
+                        >
                           <div className="flex justify-between items-center mb-1">
                             <span className="font-black uppercase tracking-wider">{e.action}</span>
                             <span className="opacity-40 text-[8px]">{e.steps.length} steps</span>

@@ -232,7 +232,15 @@ export const BTreePage: React.FC = () => {
                       {history.slice(1).reverse().map((e, i) => (
                         <button 
                           key={e.id} 
-                          onClick={() => { stopPlayback(); setActiveSteps(e.steps); setCurrentStepIdx(e.steps.length - 1); setHistoryIndex(history.length - 1 - i); }} 
+                          onClick={() => { 
+                            stopPlayback(); 
+                            const targetIdx = history.length - 1 - i;
+                            tree.root = e.finalSnapshot ? e.finalSnapshot.clone() : null;
+                            setSnapshot(e.finalSnapshot);
+                            setActiveSteps(e.steps); 
+                            setCurrentStepIdx(e.steps.length - 1); 
+                            setHistoryIndex(targetIdx); 
+                          }} 
                           className={`w-full text-left p-3 rounded-xl border transition-all ${historyIndex === history.length - 1 - i ? 'bg-blue-600/20 border-blue-500/50 text-blue-100 shadow-inner' : 'bg-slate-800/30 border-slate-700/50 hover:bg-slate-800 text-slate-400'}`}
                         >
                           <div className="flex justify-between items-center mb-1">
