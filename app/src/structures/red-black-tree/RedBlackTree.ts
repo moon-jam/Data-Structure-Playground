@@ -44,10 +44,12 @@ export type RBSnapshot = RBNode | null;
 export class RedBlackTree {
   root: RBNode | null;
   steps: VisualizationStep[];
+  deletionStrategy: 'predecessor' | 'successor';
 
-  constructor() {
+  constructor(deletionStrategy: 'predecessor' | 'successor' = 'successor') {
     this.root = null;
     this.steps = [];
+    this.deletionStrategy = deletionStrategy;
   }
 
   getSnapshot(): RBSnapshot {
@@ -251,23 +253,45 @@ export class RedBlackTree {
         xParent = z.parent;
         this.transplant(z, z.left);
     } else {
-        y = this.minimum(z.right);
-        yOriginalColor = y.color;
-        x = y.right;
-        
-        if (y.parent === z) {
-            xParent = y; 
+        // Use strategy to choose replacement node
+        if (this.deletionStrategy === 'predecessor') {
+            y = this.maximum(z.left);
+            this.addStep('highlight', `Replace with predecessor (max of left subtree): ${y.value}`, [y.id, z.id]);
         } else {
-            xParent = y.parent;
-            this.transplant(y, y.right);
+            y = this.minimum(z.right);
+            this.addStep('highlight', `Replace with successor (min of right subtree): ${y.value}`, [y.id, z.id]);
+        }
+        yOriginalColor = y.color;
+        
+        if (this.deletionStrategy === 'predecessor') {
+            x = y.left;
+            if (y.parent === z) {
+                xParent = y;
+            } else {
+                xParent = y.parent;
+                this.transplant(y, y.left);
+                y.left = z.left;
+                if (y.left) y.left.parent = y;
+            }
+            this.transplant(z, y);
             y.right = z.right;
             if (y.right) y.right.parent = y;
+            y.color = z.color;
+        } else {
+            x = y.right;
+            if (y.parent === z) {
+                xParent = y; 
+            } else {
+                xParent = y.parent;
+                this.transplant(y, y.right);
+                y.right = z.right;
+                if (y.right) y.right.parent = y;
+            }
+            this.transplant(z, y);
+            y.left = z.left;
+            if (y.left) y.left.parent = y;
+            y.color = z.color;
         }
-        
-        this.transplant(z, y);
-        y.left = z.left;
-        if (y.left) y.left.parent = y;
-        y.color = z.color;
     }
 
     if (yOriginalColor === 'black') {
@@ -291,6 +315,11 @@ export class RedBlackTree {
 
   private minimum(node: RBNode): RBNode {
       while (node.left) node = node.left;
+      return node;
+  }
+
+  private maximum(node: RBNode): RBNode {
+      while (node.right) node = node.right;
       return node;
   }
 

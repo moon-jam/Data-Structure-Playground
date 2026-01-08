@@ -29,10 +29,16 @@ export const RedBlackTreePage: React.FC = () => {
   const [currentMsg, setCurrentStepMsg] = useState<string | null>(null);
   const [resetConfirm, setResetConfirm] = useState(false);
   const [selectedNode, setSelectedNode] = useState<RBNode | null>(null);
+  const [deletionStrategy, setDeletionStrategy] = useState<'predecessor' | 'successor'>('successor');
 
   // Input
   const [inputValue, setInputValue] = useState('');
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Sync deletion strategy to tree
+  useEffect(() => {
+    tree.deletionStrategy = deletionStrategy;
+  }, [deletionStrategy, tree]);
 
   // Sidebar
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
@@ -351,6 +357,15 @@ export const RedBlackTreePage: React.FC = () => {
                     </div>
                     <button onClick={handleDelete} disabled={isPlaying} className="px-4 py-2.5 bg-red-600 text-white rounded-xl text-[11px] font-black shadow-lg flex items-center gap-2 active:scale-95 transition-all shrink-0">
                         <Trash2 size={14} /> DELETE
+                    </button>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                    <span className="text-slate-500 font-bold">Delete Strategy:</span>
+                    <button 
+                        onClick={() => setDeletionStrategy(deletionStrategy === 'successor' ? 'predecessor' : 'successor')}
+                        className="flex-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg font-bold transition-all text-[10px] uppercase tracking-wider"
+                    >
+                        {deletionStrategy === 'successor' ? '📍 Inorder Successor' : '📍 Inorder Predecessor'}
                     </button>
                 </div>
                 <button onClick={handleClear} disabled={isPlaying} className={`w-full flex items-center justify-center gap-2 py-1.5 border border-dashed text-[10px] font-black rounded-lg transition-all uppercase tracking-widest ${resetConfirm ? 'bg-red-600 border-red-600 text-white animate-bounce' : 'border-slate-200 text-slate-400 hover:bg-red-50 hover:text-red-500'}`}><RefreshCw size={12} className={resetConfirm ? 'animate-spin' : ''} /> {resetConfirm ? 'Confirm Reset?' : 'Reset Playground'}</button>
