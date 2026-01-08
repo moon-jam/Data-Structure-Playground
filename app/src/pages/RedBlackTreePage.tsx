@@ -19,7 +19,7 @@ export const RedBlackTreePage: React.FC = () => {
   const [snapshot, setSnapshot] = useState<RBSnapshot>(null);
   
   // Playback State
-  const [history, setHistory] = useState<{id: string, action: string, steps: VisualizationStep[]}[]>([]);
+  const [history, setHistory] = useState<{id: string, action: string, steps: VisualizationStep[], finalSnapshot: RBSnapshot}[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [activeSteps, setActiveSteps] = useState<VisualizationStep[]>([]);
   const [currentStepIdx, setCurrentStepIdx] = useState(-1);
@@ -64,13 +64,15 @@ export const RedBlackTreePage: React.FC = () => {
       window.removeEventListener('mousemove', resize);
       window.removeEventListener('mouseup', stopResizing);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isResizing]);
 
   useEffect(() => {
     if (historyIndex === -1) {
-      setHistory([{ id: 'init', action: 'Initial', steps: [] }]);
+      setHistory([{ id: 'init', action: 'Initial', steps: [], finalSnapshot: null }]);
       setHistoryIndex(0);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => { 
@@ -102,40 +104,7 @@ export const RedBlackTreePage: React.FC = () => {
       
       getWidth(root);
 
-      // Second pass: set coordinates
-      const setCoords = (node: RBNode | null, x: number, y: number) => {
-          if (!node) return;
-          node.x = x;
-          node.y = y;
-          
-          const leftW = node.left ? widths.get(node.left.id)! : 0;
-          const rightW = node.right ? widths.get(node.right.id)! : 0;
-          
-          if (node.left) {
-              setCoords(node.left, x - rightW / 2 - 20, y + 80);
-          }
-          if (node.right) {
-              setCoords(node.right, x + leftW / 2 + 20, y + 80);
-          }
-          
-          // Better logic:
-          // If we have both children, we center parent above them.
-          // Left child at x - offset. Right at x + offset.
-          // Total width is leftW + rightW.
-          // Center is (leftW - rightW) / 2?
-          
-          // Actually, let's use a simpler recursive approach that ensures no overlap.
-          // If we know subtree widths, we can just pack them.
-      };
-      
-      // Let's retry layout logic. Simple one.
-      // Traverse inorder. X = counter++. Y = depth.
-      // But that's not balanced.
-      
-      // Better:
-      // Parent X is average of children X.
-      // If leaf, X is based on previous leaf + spacing.
-      
+      // Layout using inorder traversal for X positions
       let nextX = 0;
       const assignX = (node: RBNode | null, depth: number) => {
           if (!node) return;
@@ -145,11 +114,6 @@ export const RedBlackTreePage: React.FC = () => {
           nextX++;
           assignX(node.right, depth + 1);
       };
-      
-      // This produces a "skewed" tree if unbalanced, but RB tree is balanced.
-      // However, parent should be centered over children.
-      // The "Inorder X" approach places parent strictly between children.
-      // This is geometrically correct for binary trees.
       
       assignX(root, 0);
       
@@ -171,8 +135,14 @@ export const RedBlackTreePage: React.FC = () => {
       stopPlayback();
       setActiveSteps(steps);
       setCurrentStepIdx(0);
-      setHistory([...history.slice(0, historyIndex + 1), { id: Math.random().toString(36), action, steps }]);
-      setHistoryIndex(prev => prev + 1);
+      // Get final snapshot from last step or current tree state
+      const finalSnapshot = steps.length > 0 && steps[steps.length - 1].payload?.snapshot 
+          ? steps[steps.length - 1].payload.snapshot 
+          : tree.getSnapshot();
+      const newHistory = history.slice(0, historyIndex + 1);
+      newHistory.push({ id: Math.random().toString(36), action, steps, finalSnapshot });
+      setHistory(newHistory);
+      setHistoryIndex(newHistory.length - 1);
       startPlayback(steps.length);
   };
 
@@ -227,13 +197,37 @@ export const RedBlackTreePage: React.FC = () => {
       }
   };
 
+  const handleUndo = () => {
+      if (historyIndex <= 0 || isPlaying) return;
+      stopPlayback();
+      const targetIdx = historyIndex - 1;
+      const entry = history[targetIdx];
+      // Restore tree state from snapshot
+      tree.root = entry.finalSnapshot ? entry.finalSnapshot.clone() : null;
+      setSnapshot(calculateLayout(tree.root));
+      setActiveSteps(entry.steps);
+      setCurrentStepIdx(entry.steps.length > 0 ? entry.steps.length - 1 : -1);
+      setHistoryIndex(targetIdx);
+  };
+
+  const handleRedo = () => {
+      if (historyIndex >= history.length - 1 || isPlaying) return;
+      stopPlayback();
+      const targetIdx = historyIndex + 1;
+      const entry = history[targetIdx];
+      setHistoryIndex(targetIdx);
+      setActiveSteps(entry.steps);
+      setCurrentStepIdx(0);
+      startPlayback(entry.steps.length);
+  };
+
   const handleClear = () => {
       if (!resetConfirm) { setResetConfirm(true); return; }
       setResetConfirm(false);
       if (isPlaying) stopPlayback();
       tree.root = null;
       setSnapshot(null);
-      setHistory([{ id: 'init', action: 'Cleared', steps: [] }]);
+      setHistory([{ id: 'init', action: 'Cleared', steps: [], finalSnapshot: null }]);
       setHistoryIndex(0);
       setActiveSteps([]);
       setCurrentStepIdx(-1);
@@ -379,10 +373,10 @@ export const RedBlackTreePage: React.FC = () => {
                     onGoToStep={goToStep}
                     currentStep={currentStepIdx}
                     totalSteps={activeSteps.length}
-                    onUndo={() => goToStep(Math.max(0, currentStepIdx - 1))}
-                    onRedo={() => goToStep(Math.min(activeSteps.length - 1, currentStepIdx + 1))}
-                    canUndo={currentStepIdx > 0}
-                    canRedo={currentStepIdx < activeSteps.length - 1}
+                    onUndo={handleUndo}
+                    onRedo={handleRedo}
+                    canUndo={historyIndex > 0}
+                    canRedo={historyIndex < history.length - 1}
                     playbackSpeed={playbackSpeed}
                     setPlaybackSpeed={setPlaybackSpeed}
                 />
