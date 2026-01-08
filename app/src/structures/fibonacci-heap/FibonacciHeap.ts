@@ -82,6 +82,78 @@ export class FibonacciHeap {
     };
   }
 
+  // Restore heap from snapshot
+  public fromSnapshot(snapshot: FibHeapSnapshot): void {
+    this.minNode = null;
+    this.nodeCount = snapshot.nodeCount;
+    this.visStart = null;
+
+    if (snapshot.roots.length === 0) return;
+
+    const nodeMap = new Map<string, FibNode>();
+    const rootNodes: FibNode[] = [];
+
+    // Deserialize all nodes recursively
+    snapshot.roots.forEach(rootSnap => {
+      const node = this.deserializeNode(rootSnap, nodeMap);
+      rootNodes.push(node);
+    });
+
+    // Link root nodes in a circular doubly linked list
+    if (rootNodes.length > 0) {
+      for (let i = 0; i < rootNodes.length; i++) {
+        const curr = rootNodes[i];
+        const next = rootNodes[(i + 1) % rootNodes.length];
+        const prev = rootNodes[(i - 1 + rootNodes.length) % rootNodes.length];
+        curr.right = next;
+        curr.left = prev;
+      }
+      this.visStart = rootNodes[0];
+
+      // Set minNode
+      if (snapshot.minNodeId && nodeMap.has(snapshot.minNodeId)) {
+        this.minNode = nodeMap.get(snapshot.minNodeId)!;
+      } else {
+        // Fallback: find minimum manually
+        this.minNode = rootNodes[0];
+        for (const node of rootNodes) {
+          if (node.key < this.minNode.key) {
+            this.minNode = node;
+          }
+        }
+      }
+    }
+  }
+
+  private deserializeNode(snap: FibNodeSnapshot, nodeMap: Map<string, FibNode>): FibNode {
+    const node = new FibNode(snap.key);
+    node.id = snap.id;
+    node.degree = snap.degree;
+    node.mark = snap.mark;
+    nodeMap.set(node.id, node);
+
+    if (snap.children.length > 0) {
+      const children: FibNode[] = [];
+      snap.children.forEach(childSnap => {
+        const childNode = this.deserializeNode(childSnap, nodeMap);
+        childNode.parent = node;
+        children.push(childNode);
+      });
+
+      // Link children in circular doubly linked list
+      for (let i = 0; i < children.length; i++) {
+        const curr = children[i];
+        const next = children[(i + 1) % children.length];
+        const prev = children[(i - 1 + children.length) % children.length];
+        curr.right = next;
+        curr.left = prev;
+      }
+      node.child = children[0];
+    }
+
+    return node;
+  }
+
   private serializeNode(node: FibNode, depth = 0): FibNodeSnapshot {
     if (depth > 50) {
         // Prevent infinite recursion if tree is corrupted
@@ -423,7 +495,7 @@ export class FibonacciHeap {
   private findNode(id: string): FibNode | null {
     if (!this.minNode) return null;
     
-    let roots = this.getStableRoots();
+    const roots = this.getStableRoots();
     for (const root of roots) {
        const found = this._findInTree(root, id);
        if (found) return found;

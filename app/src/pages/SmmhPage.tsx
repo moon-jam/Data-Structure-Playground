@@ -18,7 +18,7 @@ export const SmmhPage: React.FC = () => {
   const [heap] = useState(() => new SMMH());
   const [snapshot, setSnapshot] = useState<SmmhSnapshot>([null, null]);
   
-  const [history, setHistory] = useState<{id: string, action: string, steps: VisualizationStep[]}[]>([]);
+  const [history, setHistory] = useState<{id: string, action: string, steps: VisualizationStep[], finalSnapshot: SmmhSnapshot}[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [activeSteps, setActiveSteps] = useState<VisualizationStep[]>([]);
   const [currentStepIdx, setCurrentStepIdx] = useState(-1);
@@ -57,7 +57,7 @@ export const SmmhPage: React.FC = () => {
 
   useEffect(() => {
     if (historyIndex === -1) {
-      setHistory([{ id: 'init', action: 'Initial', steps: [] }]);
+      setHistory([{ id: 'init', action: 'Initial', steps: [], finalSnapshot: [null, null] }]);
       setHistoryIndex(0);
     }
   }, []);
@@ -73,8 +73,13 @@ export const SmmhPage: React.FC = () => {
       stopPlayback();
       setActiveSteps(steps);
       setCurrentStepIdx(0);
-      setHistory([...history.slice(0, historyIndex + 1), { id: Math.random().toString(36), action, steps }]);
-      setHistoryIndex(prev => prev + 1);
+      const finalSnapshot = steps.length > 0 && steps[steps.length - 1].payload?.snapshot 
+          ? steps[steps.length - 1].payload.snapshot 
+          : heap.getSnapshot();
+      const newHistory = history.slice(0, historyIndex + 1);
+      newHistory.push({ id: Math.random().toString(36), action, steps, finalSnapshot });
+      setHistory(newHistory);
+      setHistoryIndex(newHistory.length - 1);
       startPlayback(steps.length);
   };
 
@@ -98,6 +103,33 @@ export const SmmhPage: React.FC = () => {
   const goToStep = (idx: number) => {
       stopPlayback();
       if (idx >= 0 && idx < activeSteps.length) setCurrentStepIdx(idx);
+  };
+
+  const handleUndo = () => {
+      if (historyIndex <= 0 || isPlaying) return;
+      stopPlayback();
+      const targetIdx = historyIndex - 1;
+      const entry = history[targetIdx];
+      heap.heap = [...entry.finalSnapshot];
+      setSnapshot(entry.finalSnapshot);
+      setActiveSteps(entry.steps);
+      setCurrentStepIdx(entry.steps.length > 0 ? entry.steps.length - 1 : -1);
+      setHistoryIndex(targetIdx);
+  };
+
+  const handleRedo = () => {
+      if (historyIndex >= history.length - 1 || isPlaying) return;
+      stopPlayback();
+      const targetIdx = historyIndex + 1;
+      const entry = history[targetIdx];
+      setActiveSteps(entry.steps);
+      setCurrentStepIdx(0);
+      setHistoryIndex(targetIdx);
+      if (entry.steps.length > 0) startPlayback(entry.steps.length);
+      else {
+          heap.heap = [...entry.finalSnapshot];
+          setSnapshot(entry.finalSnapshot);
+      }
   };
 
   useEffect(() => {
@@ -132,8 +164,16 @@ export const SmmhPage: React.FC = () => {
 
   const handleClear = () => {
       if (!resetConfirm) { setResetConfirm(true); return; }
-      setResetConfirm(false); 
-      window.location.reload(); 
+      setResetConfirm(false);
+      if (isPlaying) stopPlayback();
+      heap.heap = [null, null];
+      setSnapshot([null, null]);
+      setHistory([{ id: 'init', action: 'Cleared', steps: [], finalSnapshot: [null, null] }]);
+      setHistoryIndex(0);
+      setActiveSteps([]);
+      setCurrentStepIdx(-1);
+      setHighlightedIndices([]);
+      setCurrentStepMsg(null);
   };
 
   const renderTutorial = () => {
@@ -268,10 +308,10 @@ export const SmmhPage: React.FC = () => {
                     onGoToStep={goToStep}
                     currentStep={currentStepIdx}
                     totalSteps={activeSteps.length}
-                    onUndo={() => goToStep(Math.max(0, currentStepIdx - 1))}
-                    onRedo={() => goToStep(Math.min(activeSteps.length - 1, currentStepIdx + 1))}
-                    canUndo={currentStepIdx > 0}
-                    canRedo={currentStepIdx < activeSteps.length - 1}
+                    onUndo={handleUndo}
+                    onRedo={handleRedo}
+                    canUndo={historyIndex > 0}
+                    canRedo={historyIndex < history.length - 1}
                     playbackSpeed={playbackSpeed}
                     setPlaybackSpeed={setPlaybackSpeed}
                 />
