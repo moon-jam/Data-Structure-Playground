@@ -131,3 +131,240 @@ Follow this checklist to implement a new structure efficiently:
     -   Create `locales/{en,zh-TW}/<name>.json`.
     -   Register in `i18n.ts`.
     -   **UPDATE HOME PAGE**: Add the structure name and description to `locales/{en,zh-TW}/common.json` under `home.structures` to ensure the home page card displays localized content correctly. (Do not skip this!)
+
+## Critical Fix: State Restoration for Undo/Redo & History Navigation
+
+### Problem Discovery
+All data structures (except AVL Tree initially) had a critical bug where the **history** system only stored visualization steps but **not the actual data structure state**. This caused:
+- **Undo/Redo**: Only rewound the UI animation but didn't restore the tree/heap internal state
+- **History Logs Click**: Jumped to the visual state but kept the data structure at the latest state
+- **Result**: New operations after undo/navigation executed on the wrong state, producing incorrect results
+
+### Root Cause
+```typescript
+// ❌ WRONG - Only stores visualization steps
+const [history, setHistory] = useState<{id: string, action: string, steps: VisualizationStep[]}[]>([]);
+
+// When undoing:
+setActiveSteps(entry.steps);  // ✓ Visual updates
+setCurrentStepIdx(entry.steps.length - 1);  // ✓ Timeline updates
+setHistoryIndex(targetIdx);  // ✓ History position updates
+// ❌ BUT: tree.root / heap.heap / heap.minNode still at latest state!
+```
+
+### Solution Pattern
+
+#### 1. Add `finalSnapshot` to History Type
+Every history entry must store the **final state** of the data structure after the operation completes:
+
+```typescript
+// ✓ CORRECT - Includes final state snapshot
+const [history, setHistory] = useState<{
+  id: string, 
+  action: string, 
+  steps: VisualizationStep[], 
+  finalSnapshot: SnapshotType  // <-- Add this field
+}[]>([]);
+```
+
+**Snapshot Types by Structure:**
+- **Trees** (AVL, RBTree, B-Tree): `TreeNode | null` (cloneable via `.clone()`)
+- **Array-based Heaps** (MinMax, DEAP, SMMH): `number[]` or `(number | null)[]`
+- **Complex Structures** (Fibonacci Heap): Custom object with `{ roots: [], minNodeId: string, nodeCount: number }`
+
+#### 2. Update `startOperation` to Capture State
+When starting a new operation, save the final snapshot from the last step or from the current data structure:
+
+```typescript
+const startOperation = (action: string, steps: VisualizationStep[]) => {
+    stopPlayback();
+    setActiveSteps(steps);
+    setCurrentStepIdx(0);
+    
+    // ✓ Capture final state
+    const finalSnapshot = steps.length > 0 && steps[steps.length - 1].payload?.snapshot 
+        ? steps[steps.length - 1].payload.snapshot 
+        : dataStructure.getSnapshot();  // Fallback to current state
+    
+    // ✓ Truncate history and append with snapshot
+    const newHistory = history.slice(0, historyIndex + 1);
+    newHistory.push({ id: Math.random().toString(36), action, steps, finalSnapshot });
+    setHistory(newHistory);
+    setHistoryIndex(newHistory.length - 1);
+    
+    startPlayback(steps.length);
+};
+```
+
+#### 3. Implement `handleUndo` with State Restoration
+
+```typescript
+const handleUndo = () => {
+    if (historyIndex <= 0 || isPlaying) return;
+    stopPlayback();
+    
+    const targetIdx = historyIndex - 1;
+    const entry = history[targetIdx];
+    
+    // ✓ CRITICAL: Restore data structure state
+    // For trees with .clone():
+    tree.root = entry.finalSnapshot ? entry.finalSnapshot.clone() : null;
+    
+    // For array-based heaps:
+    heap.heap = [...entry.finalSnapshot];
+    
+    // For complex structures (Fibonacci Heap):
+    heap.fromSnapshot(entry.finalSnapshot);
+    
+    // ✓ Update visual state
+    setSnapshot(entry.finalSnapshot);
+    setActiveSteps(entry.steps);
+    setCurrentStepIdx(entry.steps.length > 0 ? entry.steps.length - 1 : -1);
+    setHistoryIndex(targetIdx);
+};
+```
+
+#### 4. Implement `handleRedo` with State Restoration
+
+```typescript
+const handleRedo = () => {
+    if (historyIndex >= history.length - 1 || isPlaying) return;
+    stopPlayback();
+    
+    const targetIdx = historyIndex + 1;
+    const entry = history[targetIdx];
+    
+    setActiveSteps(entry.steps);
+    setCurrentStepIdx(0);
+    setHistoryIndex(targetIdx);
+    
+    if (entry.steps.length > 0) {
+        startPlayback(entry.steps.length);
+    } else {
+        // ✓ For operations with no animation, restore directly
+        tree.root = entry.finalSnapshot ? entry.finalSnapshot.clone() : null;
+        setSnapshot(entry.finalSnapshot);
+    }
+};
+```
+
+#### 5. Update History Logs Click Handler
+When clicking a history entry in the sidebar, restore both visual AND internal state:
+
+```typescript
+// In the Logs tab rendering:
+{history.slice(1).reverse().map((e, i) => (
+  <button 
+    key={e.id} 
+    onClick={() => { 
+      stopPlayback(); 
+      const targetIdx = history.length - 1 - i;
+      
+      // ✓ Restore data structure state
+      tree.root = e.finalSnapshot ? e.finalSnapshot.clone() : null;
+      // OR: heap.heap = [...e.finalSnapshot];
+      // OR: heap.fromSnapshot(e.finalSnapshot);
+      
+      setSnapshot(e.finalSnapshot);
+      setActiveSteps(e.steps); 
+      setCurrentStepIdx(e.steps.length - 1); 
+      setHistoryIndex(targetIdx); 
+    }} 
+    className={`...`}
+  >
+```
+
+#### 6. Update Initialization & Clear Operations
+Include `finalSnapshot` in all history-modifying operations:
+
+```typescript
+// Initialization
+useEffect(() => {
+  if (historyIndex === -1) {
+    setHistory([{ 
+      id: 'init', 
+      action: 'Initial', 
+      steps: [], 
+      finalSnapshot: null  // ✓ Include empty snapshot
+    }]);
+    setHistoryIndex(0);
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
+
+// Clear operation
+const handleClear = () => {
+    if (!resetConfirm) { setResetConfirm(true); return; }
+    setResetConfirm(false);
+    if (isPlaying) stopPlayback();
+    
+    tree.root = null;
+    setSnapshot(null);
+    setHistory([{ 
+      id: 'init', 
+      action: 'Cleared', 
+      steps: [], 
+      finalSnapshot: null  // ✓ Include empty snapshot
+    }]);
+    setHistoryIndex(0);
+    // ... clear other state
+};
+```
+
+### Implementation Requirements by Structure Type
+
+#### Array-Based Heaps (MinMaxHeap, DEAP, SMMH)
+- **Snapshot Type**: `number[]` or `(number | null)[]`
+- **Restoration**: `heap.heap = [...entry.finalSnapshot]` (shallow copy sufficient)
+- **getSnapshot()**: Already exists, returns `[...this.heap]`
+
+#### Tree Structures (RB-Tree, B-Tree)
+- **Snapshot Type**: `TreeNode | null`
+- **Restoration**: `tree.root = entry.finalSnapshot ? entry.finalSnapshot.clone() : null`
+- **Requirements**: Ensure `.clone()` method does **deep clone** with proper parent pointer updates
+
+#### Fibonacci Heap (Complex Circular Structure)
+- **Snapshot Type**: `FibHeapSnapshot` object
+- **Restoration**: Requires `fromSnapshot()` method to rebuild circular doubly-linked lists
+- **Implementation**: 
+  ```typescript
+  public fromSnapshot(snapshot: FibHeapSnapshot): void {
+      this.minNode = null;
+      this.nodeCount = snapshot.nodeCount;
+      
+      // Deserialize node tree
+      const nodeMap = new Map<string, FibNode>();
+      const rootNodes = snapshot.roots.map(r => this.deserializeNode(r, nodeMap));
+      
+      // Rebuild circular links
+      for (let i = 0; i < rootNodes.length; i++) {
+          const curr = rootNodes[i];
+          curr.right = rootNodes[(i + 1) % rootNodes.length];
+          curr.left = rootNodes[(i - 1 + rootNodes.length) % rootNodes.length];
+      }
+      
+      // Restore min pointer
+      this.minNode = snapshot.minNodeId ? nodeMap.get(snapshot.minNodeId)! : rootNodes[0];
+  }
+  ```
+
+### Verification Checklist
+After implementing state restoration for a data structure, verify:
+
+- [ ] History includes `finalSnapshot` field
+- [ ] `startOperation` captures and stores final snapshot
+- [ ] `handleUndo` restores data structure internal state (not just UI)
+- [ ] `handleRedo` restores state when needed
+- [ ] History logs click handler restores state
+- [ ] `handleClear` and initialization include empty snapshots
+- [ ] PlaybackControls uses correct `canUndo`/`canRedo` logic (`historyIndex > 0` / `historyIndex < history.length - 1`)
+- [ ] Test: Insert 1,2,3 → Undo → Insert 4 → Result should be [1,2,4], not [1,2,3,4]
+- [ ] Test: Insert 1,2,3 → Click "Insert 2" in logs → Insert 4 → Result should be [1,2,4]
+
+### Common Pitfalls to Avoid
+
+1. **Forgetting to Restore State**: Only updating `setActiveSteps()` without touching `tree.root` or `heap.heap`
+2. **Shallow Copy Issues**: Using `=` assignment for complex objects instead of `.clone()` or spread operator
+3. **Missing fromSnapshot**: For complex structures like Fibonacci Heap, direct assignment breaks circular references
+4. **Inconsistent PlaybackControls**: Using `currentStepIdx` instead of `historyIndex` for undo/redo enable state
+5. **Missing Snapshot in Init/Clear**: Forgetting to include `finalSnapshot: null` in initial or cleared history entries
