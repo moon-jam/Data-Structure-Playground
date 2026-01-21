@@ -6,6 +6,12 @@
   "balanced": "Balanced",
   "unbalanced": "Unbalanced",
   "unbalancedNodes": "Unbalanced nodes: {{count}}",
+  "prerequisite": {
+    "title": "📚 Before You Start: BST Basics",
+    "description": "AVL Tree is a self-balancing Binary Search Tree (BST). The key BST property: for every node, all values in the left subtree are smaller, and all values in the right subtree are larger.",
+    "learnBST": "Learn BST First",
+    "gotIt": "I understand, let's go!"
+  },
   "guide": {
     "title": "Tactical Guide",
     "showHint": "💡 Get Advice",
@@ -47,7 +53,7 @@
   "wiki": {
     "title": "AVL Encyclopedia",
     "concept": "1. Mathematical Definition",
-    "conceptDesc": "The core of an AVL tree is maintaining a strict **Balance Factor (BF)**. For any node `n`:\n\n- `H(L)`: Height of the left subtree\n- `H(R)`: Height of the right subtree\n- **Formula:** `BF(n) = H(L) - H(R)`\n\n**Rule:** A node is balanced if `|BF(n)| ≤ 1`. If `|BF| > 1`, a rotation is mandatory.",
+    "conceptDesc": "The core of an AVL tree is maintaining a strict **Balance Factor (BF)**. For any node `n`:\n\n- `H(L)`: Height of the left subtree\n- `H(R)`: Height of the right subtree\n- **Note:** If a child is `null`, its height is considered **-1**.\n- **Formula:** `BF(n) = H(L) - H(R)`\n\n**Rule:** A node is balanced if `|BF(n)| ≤ 1`. If `|BF| > 1`, a rotation is mandatory.",
     "bf": "2. Balance Factor (BF)",
     "bfFormula": "BF = H(Left) - H(Right)",
     "bfRule": "When `|BF| > 1`, the tree is skewed:\n- **BF > 1**: Left-heavy.\n- **BF < -1**: Right-heavy.",
@@ -69,19 +75,44 @@
     "title": "AVL Masterclass",
     "welcome": "Welcome to the AVL Masterclass! Learn self-balancing step-by-step.",
     "levels": {
-        "l1": { "title": "Concept: Tree Height", "desc": "Height is defined as the number of edges on the longest path to a leaf (Leaf Height = 0).\n\n👉 **Task:** Click on any node with **Height = 2**." },
-        "l2": { "title": "Concept: Balance Factor (BF)", "desc": "AVL trees use **Balance Factor** to detect imbalance.\nFormula: `BF = Height(Left) - Height(Right)`.\n\n👉 **Task:** Calculate the BF of the **highlighted node**." },
-        "l3": { "title": "Practice: LL Case (Guided)", "desc": "When the left side is heavy and straight (BF=2, Child BF=1), it's an LL Case.\nThis time, watch where **Node 40 (inner subtree)** moves after rotation!" },
-        "l4": { "title": "Challenge: Basic Rotation", "desc": "No more hints!\nObserve the RR shape and fix it. Pay attention to the movement of **Node 30**." },
-        "l5": { "title": "Practice: Double Rotation (Guided)", "desc": "Zig-Zag shapes (LR or RL) need two steps: Straighten the child first, then rotate the parent.\n\n👉 **Task:** Follow instructions to fix this tree." },
-        "l6": { "title": "Challenge: Double Rotation", "desc": "The final test. System won't tell you if it's LR or RL.\n\n👉 **Task:** Identify the shape and fix the tree!" },
-        "l7": { "title": "Final: Deletion & Rebalance", "desc": "Deletion can also cause imbalance.\n\n👉 **Task:** Select **Node 10**, DELETE it, and then fix the tree." }
+      "l0": {
+        "title": "Prerequisite: BST Basics",
+        "desc": "AVL Tree is built on **Binary Search Tree (BST)**. The golden rule: **Left < Parent < Right**.\n\n👉 **Task:** Insert values **30**, then **20**, then **40**. Watch how smaller values go left and larger values go right!"
+      },
+      "l1": {
+        "title": "Concept: Tree Height",
+        "desc": "**How is height calculated?**\n\n`Height = max(Left Child, Right Child) + 1`\n\n**Key Rules:**\n- A `null` child has height = **-1**\n- A leaf (no children) = max(-1, -1) + 1 = **0**\n\n👉 **Task:** Click on the node with **Height = 2**."
+      },
+      "l2": {
+        "title": "Concept: Balance Factor (BF)",
+        "desc": "AVL trees use **Balance Factor** to detect imbalance.\n\n**Formula:** `BF = Height(Left) - Height(Right)`\n**Remember:** null child = height **-1**\n\n👉 **Task:** Calculate the BF of the **highlighted node**."
+      },
+      "l3": {
+        "title": "Practice: LL Case (Guided)",
+        "desc": "When the left side is heavy and straight (BF=2, Child BF=1), it's an LL Case.\nThis time, watch where **Node 40 (inner subtree)** moves after rotation!"
+      },
+      "l4": {
+        "title": "Challenge: Basic Rotation",
+        "desc": "No more hints!\nObserve the RR shape and fix it. Pay attention to the movement of **Node 30**."
+      },
+      "l5": {
+        "title": "Practice: Double Rotation (Guided)",
+        "desc": "Zig-Zag shapes (LR or RL) need two steps: Straighten the child first, then rotate the parent.\n\n👉 **Task:** Follow instructions to fix this tree."
+      },
+      "l6": {
+        "title": "Challenge: Double Rotation",
+        "desc": "The final test. System won't tell you if it's LR or RL.\n\n👉 **Task:** Identify the shape and fix the tree!"
+      },
+      "l7": {
+        "title": "Final: Deletion & Rebalance",
+        "desc": "Deletion can also cause imbalance.\n\n👉 **Task:** Select **Node 10**, DELETE it, and then fix the tree."
+      }
     },
     "quiz": {
-        "bfQuestion": "What is the BF of Node {{val}}?",
-        "submit": "Check",
-        "correct": "Correct!",
-        "wrong": "Try again. Hint: Left H {{lh}} - Right H {{rh}} = {{ans}}"
+      "bfQuestion": "What is the BF of Node {{val}}?",
+      "submit": "Check",
+      "correct": "Correct!",
+      "wrong": "Try again. Hint: Left H {{lh}} - Right H {{rh}} = {{ans}}"
     },
     "finish": "Excellent! You've mastered AVL basics. Enjoy the playground!",
     "next": "Next Level",
