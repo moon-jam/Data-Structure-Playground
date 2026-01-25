@@ -1,20 +1,190 @@
 {
-  "title": "Red-Black Tree",
-  "description": "A self-balancing binary search tree with color-based balancing properties",
+  "tutorial": {
+    "title": "Red-Black Tree Interactive Course",
+    "welcome": "Learn Red-Black Trees from scratch! This course will guide you step by step through all concepts and operations.",
+    "menuTitle": "COURSE CURRICULUM",
+    "phases": {
+      "phase1": "📚 Foundations",
+      "phase2": "➕ Insert Operations",
+      "phase3": "➖ Delete Operations",
+      "phase4": "🎓 Mastery Challenge"
+    },
+    "levels": {
+      "basics": {
+        "title": "What is a Red-Black Tree?",
+        "desc": "Welcome! Let's start with the basics.\n\n**A Red-Black Tree** is a special type of \"Binary Search Tree\" (BST) that **automatically stays balanced**.\n\n💡 **What is a Binary Search Tree?**\nEach node has at most two children. Left child values are smaller, right child values are larger.\n\n💡 **Why do we need balance?**\nIf a tree grows lopsided (like a straight line), searching becomes slow. A balanced tree guarantees fast searches!\n\n**The Five Red-Black Tree Properties:**\n1. Every node is **red** or **black**\n2. The **root** is always **black**\n3. Every **NULL leaf** (empty child) is considered **black**\n4. **Red nodes' children** must be **black** (no Red-Red adjacency)\n5. All paths from any node to leaves have the **same number of black nodes**\n\n💡 **Important Concept: NIL Nodes**\nWhen a node has no left or right child, that position is considered an **invisible black NIL node**.\nThis matters because NIL nodes count when calculating \"black height\"!\n\n**Observe the example tree on the right, then click \"I Understand\" to continue.**"
+      },
+      "colors": {
+        "title": "The Meaning of Colors",
+        "desc": "Now you know Red-Black Trees have two colors. But **why do we need colors**?\n\n**What colors do:**\n- **Black** nodes: Called \"stable\" nodes, like the tree's skeleton\n- **Red** nodes: Called \"flexible\" nodes, can be \"borrowed\" during adjustments\n\n**The most important rule: No Red-Red adjacency!**\n- If a red node's parent is also red, it's a violation\n- This rule ensures the tree doesn't grow too lopsided\n\n**Observe the example tree:**\n- Can you find any red node whose parent is also red?\n- If not, the tree is valid!\n\nIn later lessons, you'll learn how to fix \"Red-Red\" violations."
+      },
+      "black_height": {
+        "title": "Black Height",
+        "desc": "This is one of the most fundamental concepts in Red-Black Trees!\n\n**What is \"Black Height\"?**\nWhen you walk from a node down to any leaf, count the **black** nodes you pass. That count is the black height.\n\n💡 **Important: Leaf children (NULL) count as black!**\nEvery leaf node (with no children) has left and right child positions that are invisible but considered **black NIL nodes**.\nWhen calculating black height, these invisible NIL nodes count too!\n\n**Key rule: All paths must have the same black height!**\n- Starting from the root, whether you go left or right\n- Reaching any leaf, the number of black nodes passed is always the same (including the final NIL)\n\n💡 **Why does this matter?**\nThis rule ensures the tree isn't deep on one side and shallow on the other, guaranteeing search efficiency!\n\n**Practice:**\nLook at the tree on the right, try counting:\n1. From root, taking the leftmost path - how many black nodes?\n2. From root, taking the rightmost path - how many black nodes?\n3. The two numbers should be equal!"
+      },
+      "rotations": {
+        "title": "Rotation Operations",
+        "desc": "**Rotation** is the key technique for fixing Red-Black Tree violations!\n\n💡 **What is rotation?**\n\"Rotating\" the tree changes parent-child relationships without changing their size order.\n\n**Two types of rotation:**\n- **Left Rotate**: Rotate a node to the left\n- **Right Rotate**: Rotate a node to the right\n\n**How to operate:**\nIn this playground, you can **drag nodes** to perform rotations:\n- Drag a node left = Left rotation\n- Drag a node right = Right rotation\n\n**Try it now:**\n1. Find a node in the tree\n2. Drag it left or right with your mouse\n3. Observe how the tree structure changes\n\nThis skill will be used frequently in later lessons!"
+      },
+      "foundation_quiz": {
+        "title": "Foundation Quiz",
+        "desc": "Congratulations on completing the basics! Let's test your understanding.\n\nObserve the example tree on the right and answer this question:\n\n💡 **Remember:** NULL children of leaf nodes count as black!",
+        "question": "What is the \"Black Height\" of this tree? (From root to any leaf, how many black nodes? Remember to include the final NIL)"
+      },
+      "insert_case0": {
+        "title": "Simple Insert (No Violation)",
+        "desc": "Now let's learn insert operations!\n\n**Basic insert rule:**\nNew nodes are **always inserted as red**. Why?\n- Inserting black immediately breaks the \"equal black height\" rule\n- Inserting red is safer, at worst violates \"no Red-Red\"\n\n**The simplest case:**\nIf the new node's parent is **black**, no problem! No fix needed.\n\n**Your task:**\n1. Enter **3** in the input box below and click \"Insert\"\n2. Watch the **Algorithm Log** on the right to see how the system handles it\n\n💡 The system will auto-switch to \"Auto\" mode so you can observe the entire process."
+      },
+      "insert_case1_1": {
+        "title": "Insert Case 1-1: Uncle is Red (Recolor)",
+        "desc": "Let's look at the case that needs **recoloring** only!\n\n**Wiki Reference: Insert Case 1**\n\n**Situation:**\n- Parent is Red, Uncle is Red\n- No rotation needed yet, just color changes\n\n**Fix method:**\n1. Make parent **black**\n2. Make uncle **black**\n3. Make grandparent **red**\n\nThis \"pushes\" the red upward. In this level, the Grandparent becomes Red but its parent is Black, so no new violation occurs.\n\n**Your task:**\n1. Insert **5**\n2. Recolor Parent and Uncle to Black\n3. Recolor Grandparent to Red"
+      },
+      "insert_case1_2": {
+        "title": "Insert Case 1-2: Uncle is Red (Root Fix)",
+        "desc": "What if the Red color travels to the Root?\n\n**Wiki Reference: Insert Case 1**\n\n**Situation:**\n- Same as before: Parent Red, Uncle Red\n- BUT: Grandparent is the **Root**\n\n**Fix method:**\n1. First apply standard fix: Parent Black, Uncle Black, Grandparent Red\n2. **Critical Rule:** Root must always be **BLACK**!\n3. So, finally turn the Root back to **Black**\n\nThis is how the Red-Black tree increases its Black Height.\n\n**Your task:**\n1. Insert **1**\n2. Fix the Red-Red violation\n3. Observe the Root becoming Red, then fix it!"
+      },
+      "insert_case2_1": {
+        "title": "Insert Case 2-1: Left-Left Line",
+        "desc": "When uncle is black and forms a **line** (not triangle):\n\n**Wiki Reference: Insert Case 2 (Line)**\n\n**This case's shape: Line**\n- New node is parent's **left** child\n- Parent is grandparent's **left** child\n- Forms a \"left-left\" line\n\n**Fix method:**\n1. Make parent **black**\n2. Make grandparent **red**\n3. **Right-rotate** the **grandparent**\n\n💡 Remember: Recolor first, then rotate!\n\n**Your task:**\n1. Insert **5**\n2. Observe the Line: 15(GP) -> 10(P) -> 5(New)\n3. Follow hints: Recolor → Rotate"
+      },
+      "insert_case2_2": {
+        "title": "Insert Case 2-2: Right-Right Line",
+        "desc": "This is the mirror version of Case 2-1!\n\n**Wiki Reference: Insert Case 2 (Line)**\n\n**This case's shape: Line**\n- New node is parent's **right** child\n- Parent is grandparent's **right** child\n- Forms a \"right-right\" line\n\n**Fix method:**\n1. Make parent **black**\n2. Make grandparent **red**\n3. **Left-rotate** the **grandparent**\n\n**Your task:**\n1. Insert **25**\n2. Observe the Line: 15(GP) -> 20(P) -> 25(New)\n3. Execute the fix steps"
+      },
+      "insert_case3_1": {
+        "title": "Insert Case 3-1: Left-Right Triangle",
+        "desc": "When uncle is **black (or doesn't exist)**, we need rotation!\n\n**Wiki Reference: Insert Case 3 (Triangle)**\n\n**This case's shape: Triangle (zigzag)**\n- New node is parent's **right** child\n- Parent is grandparent's **left** child\n- Forms a \"left-right\" zigzag\n\n**Fix method (two steps):**\n1. First **left-rotate** the **parent** (turning triangle into a line)\n2. Then handle the resulting line case (detailed in next lesson)\n\n**Your task:**\n1. Insert **7**\n2. Observe the Triangle: 10(GP) -> 5(L) -> 7(R)\n3. Use \"Show Hint\" and follow the steps to fix"
+      },
+      "insert_case3_2": {
+        "title": "Insert Case 3-2: Right-Left Triangle",
+        "desc": "This is the mirror version of Case 3-1!\n\n**Wiki Reference: Insert Case 3 (Triangle)**\n\n**This case's shape: Triangle (zigzag)**\n- New node is parent's **left** child\n- Parent is grandparent's **right** child\n- Forms a \"right-left\" zigzag\n\n**Fix method (two steps):**\n1. First **right-rotate** the **parent** (turning triangle into a line)\n2. Then handle the resulting line case\n\n**Your task:**\n1. Insert **22**\n2. Observe the Triangle: 20(GP) -> 25(R) -> 22(L)\n3. Follow hints to fix"
+      },
+      "insert_challenge": {
+        "title": "Insert Challenge",
+        "desc": "Time to prove your skills! This challenge tests all three cases sequentially.\n\n**Insert the following numbers in order:**\n\n1. **Foundation:** 20, 10, 30\n2. **Case 1 (Uncle Red):** Insert **5**\n3. **Case 2 (Line):** Insert **4**\n4. **Setup Next:** Insert **40**\n5. **Case 3 (Triangle):** Insert **35**\n\nComplete this sequence to build a perfect Red-Black Tree!"
+      },
+      "delete_red_leaf": {
+        "title": "Delete Red Leaf Node",
+        "desc": "Now let's learn delete operations!\n\n**Delete complexity:**\nDeletion is more complex than insertion because we must consider the deleted node's color and child situation.\n\n**Simplest case: Delete a red leaf node**\n- \"Leaf node\": A node with no children\n- Deleting a red node **doesn't affect black height**\n- So just delete it directly, no fix needed!\n\n**Your task:**\n1. Find node **5** (should be a red leaf)\n2. Enter **5** and click \"Delete\"\n3. Observe: the tree is still valid after deletion!"
+      },
+      "delete_red_replacement": {
+        "title": "Delete Black Node (Red Replacement)",
+        "desc": "What if we need to delete a **black** node?\n\n**This case: Black node has a red child**\n- Deleting a black node decreases black height (violation!)\n- But if it has a red child, this child \"replaces\" it\n- Just make this **red replacement node black**!\n\n💡 **Why does this work?**\nThat position was originally black, after replacement it's still black, black height unchanged.\n\n**Your task:**\n1. Find node **5** (it's black, but has a red child 2)\n2. Delete **5**\n3. Click hint, make the replacement node (2) black"
+      },
+      "delete_case1": {
+        "title": "Delete Case 1: Sibling is Red",
+        "desc": "After deleting a black node, a \"double-black\" problem may occur.\n\n**Wiki Reference: Delete Case 1**\n\n💡 **What is double-black?**\nAfter deleting a black node, that position \"lacks one black\", needs to \"borrow\" one from elsewhere.\n\n**Case 1: Sibling node is red**\n- \"Sibling\" is your parent's other child\n- If sibling is red, we need to first turn it into a black case\n\n**Fix method:**\n1. Make sibling **black**\n2. Make parent **red**\n3. Rotate parent\n4. Continue processing (may become case 2, 3, or 4)\n\n**Your task:**\nFollow hints to delete **10** and fix"
+      },
+      "delete_case2": {
+        "title": "Delete Case 2: All Black Family",
+        "desc": "When sibling and both its children are all black:\n\n**Wiki Reference: Delete Case 2**\n\n**Case description:**\n- Sibling is **black**\n- Sibling's two children (if any) are also **black**\n- No red nodes to \"borrow\" from\n\n**Fix method:**\nMake sibling **red**\n\n💡 **Effect of this:**\n- Both sides \"lack one black\", relatively balanced\n- But problem moves up to parent, may need continued processing\n\n**Your task:**\nDelete **10** and observe the fix process"
+      },
+      "delete_case3": {
+        "title": "Delete Case 3: Near Nephew is Red",
+        "desc": "When sibling is black and the nephew **closer to us** is red:\n\n**Wiki Reference: Delete Case 3**\n\n💡 **What are \"near nephew\" and \"far nephew\"?**\n- \"Near nephew\": among sibling's children, the one closer to us\n- \"Far nephew\": among sibling's children, the one farther from us\n\n**Case description:**\n- Sibling is **black**\n- Near nephew is **red**\n- Far nephew is **black** (or doesn't exist)\n\n**Fix method:**\n1. Make near nephew **black**\n2. Make sibling **red**\n3. Rotate sibling\n4. This becomes case 4, continue processing\n\n**Your task:**\nDelete **10** and follow hints to fix"
+      },
+      "delete_case4": {
+        "title": "Delete Case 4: Far Nephew is Red",
+        "desc": "This is the **terminal case** for delete fixup!\n\n**Wiki Reference: Delete Case 4**\n\n**Case description:**\n- Sibling is **black**\n- Far nephew is **red**\n\n**Fix method:**\n1. **Set sibling's color to match parent's**\n2. Make parent **black**\n3. Make far nephew **black**\n4. Rotate parent\n\n✅ **After these steps, fixup is complete!**\n\nThis is the most important case, must remember!\n\n**Your task:**\nDelete **10** and complete the fix"
+      },
+      "delete_challenge": {
+        "title": "Delete Challenge",
+        "desc": "Congratulations on learning all delete cases!\n\nNow for a challenge without looking at hints:\n\n**Task:**\n1. Delete **25**\n2. Delete **75**\n3. Judge what fix is needed yourself\n4. Execute fixes to restore valid state\n\n💡 Remember delete cases:\n- Red leaf: delete directly\n- Red replacement: replacement becomes black\n- Cases 1-4: judge based on sibling and nephew colors"
+      },
+      "final_challenge": {
+        "title": "Final Challenge",
+        "desc": "You've learned all Red-Black Tree operations!\n\n**Ultimate Challenge: Mixed Operations**\n\nWithout looking at any hints, complete these tasks:\n\n1. Insert **5** (fix all violations)\n2. Insert **25** (fix all violations)\n3. Delete **10** (fix all violations)\n\nEnsure the final tree is completely valid:\n- No Red-Red adjacency\n- All paths have same black height\n\nCan you do it? 💪"
+      },
+      "graduation": {
+        "title": "🎓 Congratulations Graduate!",
+        "desc": "**Amazing! You've mastered Red-Black Trees!** 🎉\n\n**What you learned:**\n\n✅ **Foundations**\n- The five RB Tree properties\n- Meaning and purpose of colors\n- Black height concept\n- Rotation operations\n\n✅ **Insert Operations**\n- Case 1: Uncle is red → Recolor\n- Case 2/3: Triangle → Rotate into line first\n- Case 4/5: Line → Recolor + Rotate\n\n✅ **Delete Operations**\n- Red leaf: delete directly\n- Red replacement: make black\n- Cases 1-4: Complex fix flow\n\n**What's next?**\nKeep practicing in \"Manual Mode\", or apply this knowledge in real programming projects!\n\nThank you for learning, and good luck with your coding! 🚀"
+      }
+    },
+    "next": "Next Level",
+    "reset": "Reset Level",
+    "finishBtn": "Finish Course",
+    "quiz": {
+      "submit": "Submit",
+      "correct": "Correct!",
+      "wrong": "Try again!"
+    }
+  },
+  "guide": {
+    "helpTitle": "Red-Black Tree Help",
+    "helpDesc": "A Red-Black tree is a self-balancing binary search tree where each node has an extra bit for color (Red or Black).",
+    "showHint": "💡 SHOW HINT",
+    "caseRootRed": "Root is Red",
+    "actionRootRed": "Click on node **{{val}}** to toggle its color to **Black**. The root must always be black.",
+    "caseUncleRed": "Uncle is Red (Recolor)",
+    "actionUncleRed": "Click on nodes **{{parentVal}}**, **{{uncleVal}}**, and **{{gpVal}}** to recolor. Parent and Uncle become Black, Grandparent becomes Red.",
+    "caseLLBlack": "LL Case (Right Rotate)",
+    "actionLLBlack": "First recolor: **{{parentVal}}** → Black, **{{gpVal}}** → Red. Then drag **{{gpVal}}** to the **RIGHT** to rotate.",
+    "caseRRBlack": "RR Case (Left Rotate)",
+    "actionRRBlack": "First recolor: **{{parentVal}}** → Black, **{{gpVal}}** → Red. Then drag **{{gpVal}}** to the **LEFT** to rotate.",
+    "caseLRBlack": "LR Case (Double Rotation)",
+    "actionLRBlack_step1": "Drag **{{parentVal}}** to the **LEFT** to convert to LL case.",
+    "caseRLBlack": "RL Case (Double Rotation)",
+    "actionRLBlack_step1": "Drag **{{parentVal}}** to the **RIGHT** to convert to RR case.",
+    "wrongNodeWarning": "Wrong node! You should focus on:",
+    "step": "Step",
+    "focus": "Focus",
+    "remaining": "Steps Overview",
+    "clickToRecolor": "Click to recolor",
+    "dragToRotateLabel": "Drag to rotate",
+    "dragNode": "Drag node",
+    "toThe": "to the",
+    "dragToRotate": "Drag {{val}} to the {{dir}}",
+    "wrongAction": "Wrong action!",
+    "wrongDirection": "Wrong direction!",
+    "expected": "Expected",
+    "clickNode": "Click node",
+    "currentAction": "Current Action",
+    "skippedRootStaysBlack": "Skipped: Root must stay Black",
+    "allStepsComplete": "Fix Complete",
+    "showHintDelete": "Show Delete Fixup Hint",
+    "deleteSimpleCase": "Simple Case: Recolor to Black",
+    "deleteCase1": "Case 1: Sibling is Red",
+    "deleteCase2": "Case 2: Black Sibling, Black Nephews",
+    "deleteCase3": "Case 3: Black Sibling, Near Red Nephew",
+    "deleteCase4": "Case 4: Black Sibling, Far Red Nephew",
+    "alreadyCorrectColor": "Skipped: {{val}} is already {{color}}",
+    "alreadyDone": "Step already completed",
+    "skippedStep": "Skipped",
+    "completedStep": "Completed",
+    "wikiReference": "Wiki Ref",
+    "performAnyPending": "Perform any pending action to continue",
+    "performRecolorFirst": "Please complete all recoloring steps before rotating",
+    "ui": {
+      "mode": "Mode Switcher",
+      "sidebar": "History & Info",
+      "canvas": "Interactive Tree",
+      "action": "Operations",
+      "timeline": "Playback Controls"
+    },
+    "manual": {
+      "drag": "Drag nodes to rotate them.",
+      "click": "Click nodes to toggle color.",
+      "violation": "Fix the highlighted violations!"
+    }
+  },
   "wiki": {
     "concept": "1. What is a Red-Black Tree?",
-    "conceptDesc": "A **Red-Black Tree** is a self-balancing binary search tree where each node has an extra bit for color (red or black). These colors ensure the tree remains approximately balanced during insertions and deletions, guaranteeing O(log n) operations.\n\nKey characteristics:\n- Every node is either **red** or **black**\n- Simpler balancing than AVL trees (fewer rotations)\n- Widely used in standard libraries (e.g., C++ STL map/set, Java TreeMap)",
-    
-    "properties": "2. Red-Black Tree Properties",
-    "propertiesDesc": "A valid Red-Black Tree must satisfy these five properties:\n\n1. **Root Property**: The root is always **black**\n2. **External Property**: All NULL leaves (external nodes) are considered **black**\n3. **Red Property**: If a node is **red**, both children must be **black** (no two consecutive red nodes)\n4. **Black Height Property**: All paths from a node to its descendant NULL nodes contain the same number of **black** nodes\n5. **Binary Search Tree Property**: For any node, all values in left subtree < node value < all values in right subtree\n\nThese properties ensure the tree height is at most **2 log(n+1)**, guaranteeing balanced operations.",
-    
-    "insertion": "3. Insertion Algorithm",
-    "insertionDesc": "Insert as a **red** node using standard BST insertion, then fix violations:\n\n**Case 1: New node is root**\n- Color it **black**\n\n**Case 2: Parent is black**\n- No violations, done\n\n**Case 3: Parent and uncle are both red**\n- Recolor: parent → **black**, uncle → **black**, grandparent → **red**\n- Continue fixing from grandparent\n\n**Case 4: Parent is red, uncle is black (Triangle)**\n- If node is **right child** and parent is **left child** (or vice versa)\n- Rotate on parent to convert to Case 5\n\n**Case 5: Parent is red, uncle is black (Line)**\n- Recolor: parent → **black**, grandparent → **red**\n- Rotate on grandparent\n\n**Maximum 2 rotations** needed per insertion (simpler than AVL's potential rotation chains).",
-    
-    "deletion": "4. Deletion Algorithm",
-    "deletionDesc": "Deletion is more complex than insertion, involving node replacement and fixup:\n\n**Step 1: Standard BST Deletion**\n- If node has **0 or 1 child**: Replace with child\n- If node has **2 children**: Replace with inorder predecessor/successor, then delete that node\n\n**Important: If the deleted node is RED, no fixup needed!** Removing a red node doesn't violate any properties.\n\n**Step 2: Fix Violations (only if deleted node was BLACK)**\n\n**Case 1: Sibling is red**\n- Recolor: sibling → **black**, parent → **red**\n- Rotate on parent, convert to Case 2/3/4\n\n**Case 2: Sibling is black, both nephews are black**\n- Recolor: sibling → **red**\n- Move problem up to parent\n\n**Case 3: Sibling is black, close nephew is red, far nephew is black**\n- Recolor: close nephew → **black**, sibling → **red**\n- Rotate on sibling to convert to Case 4\n\n**Case 4: Sibling is black, far nephew is red**\n- Copy parent's color to sibling\n- Recolor: parent → **black**, far nephew → **black**\n- Rotate on parent, done\n\n**Maximum 3 rotations** needed per deletion.",
-    
-    "complexity": "5. Time Complexity",
-    "complexityDesc": "| Operation | Average | Worst Case |\n|-----------|---------|------------|\n| Search    | O(log n) | O(log n)   |\n| Insert    | O(log n) | O(log n)   |\n| Delete    | O(log n) | O(log n)   |\n\n**Space Complexity**: O(n) for storing n nodes\n\n**Advantages over AVL Trees**:\n- Fewer rotations during insertion/deletion (faster updates)\n- Simpler implementation\n- Better for insert/delete-heavy workloads\n\n**Comparison with AVL**:\n- AVL is more strictly balanced (better for search-heavy)\n- RB-Tree is better for mixed operations (real-world databases)"
+    "conceptDesc": "A Red-Black Tree is a self-balancing binary search tree where each node has an extra bit for color (Red or Black).",
+    "nilNodes": "2. External Nodes (NIL)",
+    "nilNodesDesc": "**NIL Nodes** (External Nodes) are key to Red-Black Trees:\n\n- Every `null` child pointer is treated as a **Black NIL Node**\n- Leaf nodes actually have two black NIL children\n- NIL nodes **don't consume memory**, just conceptual\n\n**Why it matters:**\n- Black Height must include NIL nodes\n- Red nodes can have NIL children (since they are black)\n- Deleting black nodes often involves NILs creating 'double black' issues",
+    "properties": "3. RB Tree Properties",
+    "propertiesDesc": "1. Every node is either **red** or **black**.\n2. The **root** is always **black**.\n3. Every leaf (NIL/null) is **black** - missing children count as black nodes.\n4. If a node is **red**, then both its children are **black** (No Red-Red).\n5. All paths from any node to its descendant NIL nodes contain the **same number of black nodes** (black-height).",
+    "blackHeight": "4. Black Height",
+    "blackHeightDesc": "**Black Height** is the number of black nodes from a node to its descendant leaves (excluding the node itself).\n\n**Why it matters:**\n- All paths must have the same black height (Property 5).\n- Insert/Delete operations aim to preserve this (or fix via rotation/recolor).\n- Deleting a black node reduces path black height, causing violations.",
+    "insertion": "5. Insertion Algorithm",
+    "insertionDesc": "Always insert new nodes as **RED**. Then fix any violations:\n\n**Case 1: Uncle is RED**\n- **Action**: Recolor Parent/Uncle to Black, Grandparent to Red.\n- **Why**: Pushes redness up without affecting black height.\n\n**Case 2: Uncle is BLACK (Line)**\n- **Action**: Recolor (Parent→Black, GP→Red), then Rotate Grandparent.\n- **Why**: Balances the height locally.\n\n**Case 3: Uncle is BLACK (Triangle)**\n- **Action**: Rotate Parent to form Line (Case 2), then fix Case 2.",
+    "deletion": "6. Deletion Algorithm",
+    "deletionDesc": "Deletion is more complex than insertion:\n\n1. **Find** the node and remove it (standard BST delete)\n2. If deleted node was **RED**: No fixup needed\n3. If deleted node was **BLACK**: Creates a 'double-black' situation\n\n**Delete Fixup Cases:**\n- **Case 1**: Sibling is RED → Recolor + Rotate parent\n- **Case 2**: Sibling BLACK, both nephews BLACK → Recolor sibling\n- **Case 3**: Sibling BLACK, near nephew RED → Rotate sibling\n- **Case 4**: Sibling BLACK, far nephew RED → **Recolor Sib to Parent** + Rotate parent\n\nIn manual mode, you must perform these fixes step-by-step.",
+    "complexity": "7. Complexity",
+    "complexityDesc": "| Operation | Avg | Worst |\n|-----------|-----|-------|\n| Search | O(log n) | O(log n) |\n| Insert | O(log n) | O(log n) |\n| Delete | O(log n) | O(log n) |\n\n**Space**: O(n)\n\n**Advantages over AVL**:\n- Fewer rotations during updates\n- Simpler implementation\n- Better for write-heavy workloads"
+  },
+  "bottomBar": {
+    "operations": "Operations",
+    "timeline": "Timeline"
   }
 }

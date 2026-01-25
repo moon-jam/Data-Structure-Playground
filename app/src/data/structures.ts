@@ -15,6 +15,13 @@ export const structures: StructureDef[] = [
     implemented: true,
   },
   {
+    id: 'red-black-tree',
+    name: 'Red-Black Tree',
+    description: 'A kind of self-balancing binary search tree where each node has an extra bit for denoting the color of the node, either red or black.',
+    path: '/red-black-tree',
+    implemented: true,
+  },
+  {
     id: 'bloom-filter',
     name: 'Bloom Filter',
     description: 'A space-efficient probabilistic data structure used to test whether an element is a member of a set.',
@@ -54,13 +61,6 @@ export const structures: StructureDef[] = [
     name: 'B-Tree',
     description: 'A self-balancing tree data structure that maintains sorted data and allows searches, sequential access, insertions, and deletions in logarithmic time.',
     path: '/b-tree',
-    implemented: true,
-  },
-  {
-    id: 'red-black-tree',
-    name: 'Red-Black Tree',
-    description: 'A kind of self-balancing binary search tree where each node has an extra bit for denoting the color of the node, either red or black.',
-    path: '/red-black-tree',
     implemented: true,
   },
   {

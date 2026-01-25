@@ -8,6 +8,8 @@
   "find": "Find",
   "delete": "Delete",
   "clear": "Clear",
+  "backToMenu": "返回選單",
+  "iUnderstand": "我了解了 ✓",
   "randomize": "Randomize",
   "algorithmLog": "Algorithm Log",
   "ready": "Ready",
@@ -19,6 +21,10 @@
     "auto": "Auto",
     "manual": "Manual"
   },
+  "black": "黑色",
+  "red": "紅色",
+  "left": "左",
+  "right": "右",
   "home": {
     "title": "Data Structure Playground",
     "subtitle": "玩玩資料結構的地方",
@@ -26,18 +32,54 @@
     "startLearning": "開始探索",
     "comingSoon": "開發中",
     "structures": {
-      "avl-tree": { "name": "AVL Tree", "description": "最早被發明的自平衡二元搜尋樹，確保任何節點的左右子樹高度差不超過 1，提供極其穩定的 O(log N) 效能。" },
-      "bloom-filter": { "name": "Bloom Filter", "description": "空間效率極高的機率型資料結構，能以極小記憶體判斷一個元素是否「可能存在」或「絕對不在」集合中。" },
-      "min-max-heap": { "name": "Min-Max Heap", "description": "特殊的完全二元樹結構，能同時以常數時間存取最小與最大元素，常用於雙端優先佇列。" },
-      "deap": { "name": "Double-Ended Heap (DEAP)", "description": "一種完全二元樹結構，根節點為空，左子樹為最小堆積，右子樹為最大堆積，支援高效的雙端操作。" },
-      "smmh": { "name": "Symmetric Min-Max Heap (SMMH)", "description": "SMMH 透過維護兄弟節點間的對稱順序性質，實現了極其高效的雙端優先佇列操作。" },
-      "binomial-heap": { "name": "Binomial Heap", "description": "一組二項樹的集合，不僅支援標準堆積操作，更能以 logarithmic 時間完成兩個堆積的合併。" },
-      "fibonacci-heap": { "name": "Fibonacci Heap", "description": "具有卓越平攤時間複雜度的優先佇列，是 Dijkstra 等關鍵圖論演算法效能優化的核心。" },
-      "b-tree": { "name": "B-Tree", "description": "多路自平衡搜尋樹，專為磁碟存取優化，廣泛應用於檔案系統以減少大量數據讀寫時的 I/O 次數。" },
-      "b-plus-tree": { "name": "B+ Tree", "description": "B 樹的變體，所有數據皆存於葉子節點，提供更優異的範圍查詢能力，是現代資料庫索引的基石。" },
-      "red-black-tree": { "name": "Red-Black Tree", "description": "經典的自平衡搜尋樹，透過節點著色與旋轉規則維持平衡，是 C++ STL 與 Java Collections 的底層實作。" },
-      "trie": { "name": "Trie (字典樹)", "description": "高效檢索字串集合的樹狀結構，利用共同前綴節省空間，常用於搜尋引擎自動補全與拼字檢查。" },
-      "patricia-trie": { "name": "Patricia Trie", "description": "空間優化的字典樹，透過壓縮只有單個孩子的路徑節點來大幅節省記憶體佔用。" }
+      "avl-tree": {
+        "name": "AVL Tree",
+        "description": "最早被發明的自平衡二元搜尋樹，確保任何節點的左右子樹高度差不超過 1，提供極其穩定的 O(log N) 效能。"
+      },
+      "bloom-filter": {
+        "name": "Bloom Filter",
+        "description": "空間效率極高的機率型資料結構，能以極小記憶體判斷一個元素是否「可能存在」或「絕對不在」集合中。"
+      },
+      "min-max-heap": {
+        "name": "Min-Max Heap",
+        "description": "特殊的完全二元樹結構，能同時以常數時間存取最小與最大元素，常用於雙端優先佇列。"
+      },
+      "deap": {
+        "name": "Double-Ended Heap (DEAP)",
+        "description": "一種完全二元樹結構，根節點為空，左子樹為最小堆積，右子樹為最大堆積，支援高效的雙端操作。"
+      },
+      "smmh": {
+        "name": "Symmetric Min-Max Heap (SMMH)",
+        "description": "SMMH 透過維護兄弟節點間的對稱順序性質，實現了極其高效的雙端優先佇列操作。"
+      },
+      "binomial-heap": {
+        "name": "Binomial Heap",
+        "description": "一組二項樹的集合，不僅支援標準堆積操作，更能以 logarithmic 時間完成兩個堆積的合併。"
+      },
+      "fibonacci-heap": {
+        "name": "Fibonacci Heap",
+        "description": "具有卓越平攤時間複雜度的優先佇列，是 Dijkstra 等關鍵圖論演算法效能優化的核心。"
+      },
+      "b-tree": {
+        "name": "B-Tree",
+        "description": "多路自平衡搜尋樹，專為磁碟存取優化，廣泛應用於檔案系統以減少大量數據讀寫時的 I/O 次數。"
+      },
+      "b-plus-tree": {
+        "name": "B+ Tree",
+        "description": "B 樹的變體，所有數據皆存於葉子節點，提供更優異的範圍查詢能力，是現代資料庫索引的基石。"
+      },
+      "red-black-tree": {
+        "name": "Red-Black Tree",
+        "description": "經典的自平衡搜尋樹，透過節點著色與旋轉規則維持平衡，是 C++ STL 與 Java Collections 的底層實作。"
+      },
+      "trie": {
+        "name": "Trie (字典樹)",
+        "description": "高效檢索字串集合的樹狀結構，利用共同前綴節省空間，常用於搜尋引擎自動補全與拼字檢查。"
+      },
+      "patricia-trie": {
+        "name": "Patricia Trie",
+        "description": "空間優化的字典樹，透過壓縮只有單個孩子的路徑節點來大幅節省記憶體佔用。"
+      }
     }
   }
 }
