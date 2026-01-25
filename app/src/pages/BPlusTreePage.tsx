@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BPlusTree } from '../structures/b-plus-tree/BPlusTree';
+import { SEO } from '../components/SEO';
 import type { BPlusTreeSnapshot } from '../structures/b-plus-tree/BPlusTree';
 import { BPlusTreeNode } from '../components/b-plus-tree/BPlusTreeNode';
 import { calculateLayout } from '../components/b-plus-tree/layout';
@@ -206,8 +207,13 @@ export const BPlusTreePage: React.FC = () => {
       return null;
   };
 
-  return (
+    return (
     <div className={`h-full w-full flex bg-slate-100 overflow-hidden relative font-sans text-slate-900 ${isResizing ? 'cursor-col-resize select-none' : ''}`}>
+             <SEO 
+                title="B+ Tree Visualization"
+                description="Interactive B+ Tree visualization. Understand why B+ Trees are preferred for database indexing and range queries."
+                keywords={["B+ Tree", "BPlus Tree", "Database Index", "Range Query", "Visualization", "Algorithm"]}
+            />
       <style>{isResizing ? `* { transition: none !important; cursor: col-resize !important; user-select: none !important; }` : ''}</style>
 
       <div 

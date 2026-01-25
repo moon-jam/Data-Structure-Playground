@@ -33,10 +33,14 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
   }
 }
 
+import { HelmetProvider } from 'react-helmet-async'
+
 createRoot(document.getElementById('root')!).render(
   <ErrorBoundary>
     <Suspense fallback={<div className="flex items-center justify-center h-screen bg-slate-900 text-white font-mono uppercase tracking-widest text-xs">Loading Playground...</div>}>
-      <App />
+      <HelmetProvider>
+        <App />
+      </HelmetProvider>
     </Suspense>
   </ErrorBoundary>,
 )

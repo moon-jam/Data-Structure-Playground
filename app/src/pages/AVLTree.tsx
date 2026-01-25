@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { AVLTree, AVLNode } from '../structures/avl-tree/AVLTree';
+import { SEO } from '../components/SEO';
 import { TreeNode } from '../components/TreeNode';
 import type { VisualizationStep } from '../structures/common/types';
 import {
@@ -619,6 +620,11 @@ export const AVLTreePage: React.FC = () => {
 
     return (
         <div className={`h-full w-full flex bg-slate-100 overflow-hidden relative font-sans text-slate-900 ${isResizing ? 'cursor-col-resize select-none' : ''}`}>
+             <SEO 
+                title="AVL Tree Visualization"
+                description="Interactive AVL Tree visualization. Learn how self-balancing binary search trees work with step-by-step animations."
+                keywords={["AVL Tree", "Balanced Binary Search Tree", "BS Tree", "Visualization", "Algorithm"]}
+            />
             {/* FORCE DISABLE TRANSITION DURING RESIZE */}
             <style>{isResizing ? `* { transition: none !important; cursor: col-resize !important; user-select: none !important; }` : ''}</style>
 

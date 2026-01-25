@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BTree } from '../structures/b-tree/BTree';
+import { SEO } from '../components/SEO';
 import type { BTreeSnapshot } from '../structures/b-tree/BTree';
 import { BTreeNode } from '../components/b-tree/BTreeNode';
 import { calculateLayout } from '../components/b-tree/layout';
@@ -209,8 +210,13 @@ export const BTreePage: React.FC = () => {
       return null;
   };
 
-  return (
+    return (
     <div className={`h-full w-full flex bg-slate-100 overflow-hidden relative font-sans text-slate-900 ${isResizing ? 'cursor-col-resize select-none' : ''}`}>
+             <SEO 
+                title="B-Tree Visualization"
+                description="Interactive B-Tree visualization. Learn about this self-balancing tree data structure widely used in databases and file systems."
+                keywords={["B-Tree", "BTree", "Balanced Tree", "Database Index", "Visualization", "Algorithm"]}
+            />
       <style>{isResizing ? `* { transition: none !important; cursor: col-resize !important; user-select: none !important; }` : ''}</style>
 
       {/* SIDEBAR */}

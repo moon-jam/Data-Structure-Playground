@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FibonacciHeap } from '../structures/fibonacci-heap/FibonacciHeap';
+import { SEO } from '../components/SEO';
 import type { FibHeapSnapshot } from '../structures/fibonacci-heap/FibonacciHeap';
 import { FibNode } from '../components/fibonacci-heap/FibNode';
 import { calculateLayout } from '../components/fibonacci-heap/layout';
@@ -250,6 +251,11 @@ export const FibonacciHeapPage: React.FC = () => {
 
   return (
     <div className={`h-full w-full flex bg-slate-100 overflow-hidden relative font-sans text-slate-900 ${isResizing ? 'cursor-col-resize select-none' : ''}`}>
+             <SEO 
+                title="Fibonacci Heap Visualization"
+                description="Interactive Fibonacci Heap visualization. Explore amortized efficiency, lazy operations, and cascading cuts."
+                keywords={["Fibonacci Heap", "Amortized Analysis", "Graph Theory", "Visualization", "Algorithm"]}
+            />
       {/* FORCE DISABLE TRANSITION DURING RESIZE */}
       <style>{isResizing ? `* { transition: none !important; cursor: col-resize !important; user-select: none !important; }` : ''}</style>
 

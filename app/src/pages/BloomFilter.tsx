@@ -1,9 +1,14 @@
 import React from 'react';
 import { ExternalLink, Sparkles } from 'lucide-react';
+import { SEO } from '../components/SEO';
 
 export const BloomFilterPage: React.FC = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] text-center px-6">
+      <SEO 
+        title="Bloom Filter"
+        description="Bloom Filter visualization placeholder. Learn about this probabilistic data structure."
+      />
       <div className="bg-blue-50 p-6 rounded-full mb-8 animate-in zoom-in duration-500">
         <Sparkles size={64} className="text-blue-500" />
       </div>

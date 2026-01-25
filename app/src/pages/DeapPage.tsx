@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { DEAP } from '../structures/deap/DEAP';
+import { SEO } from '../components/SEO';
 import type { DeapSnapshot } from '../structures/deap/DEAP';
 import { DeapNode } from '../components/deap/DeapNode';
 import type { VisualizationStep } from '../structures/common/types';
@@ -201,8 +202,13 @@ export const DeapPage: React.FC = () => {
       return null;
   };
 
-  return (
+    return (
     <div className={`h-full w-full flex bg-slate-100 overflow-hidden relative font-sans text-slate-900 ${isResizing ? 'cursor-col-resize select-none' : ''}`}>
+             <SEO 
+                title="DEAP Visualization"
+                description="Interactive DEAP (Double-Ended Heap) visualization. Understand this efficient double-ended priority queue structure."
+                keywords={["DEAP", "Double Ended Heap", "Priority Queue", "Visualization", "Algorithm"]}
+            />
       <style>{isResizing ? `* { transition: none !important; cursor: col-resize !important; user-select: none !important; }` : ''}</style>
 
       {/* SIDEBAR */}

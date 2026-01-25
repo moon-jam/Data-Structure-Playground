@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MinMaxHeap } from '../structures/min-max-heap/MinMaxHeap';
+import { SEO } from '../components/SEO';
 import type { MinMaxSnapshot } from '../structures/min-max-heap/MinMaxHeap';
 import { MinMaxNode } from '../components/min-max-heap/MinMaxNode';
 import type { VisualizationStep } from '../structures/common/types';
@@ -204,8 +205,13 @@ export const MinMaxHeapPage: React.FC = () => {
       return null;
   };
 
-  return (
+    return (
     <div className={`h-full w-full flex bg-slate-100 overflow-hidden relative font-sans text-slate-900 ${isResizing ? 'cursor-col-resize select-none' : ''}`}>
+             <SEO 
+                title="Min-Max Heap Visualization"
+                description="Interactive Min-Max Heap visualization. Learn how alternating min and max levels allow for efficient double-ended priority queue operations."
+                keywords={["Min-Max Heap", "Double Ended Priority Queue", "Heap", "Visualization", "Algorithm"]}
+            />
       <style>{isResizing ? `* { transition: none !important; cursor: col-resize !important; user-select: none !important; }` : ''}</style>
 
       {/* SIDEBAR */}

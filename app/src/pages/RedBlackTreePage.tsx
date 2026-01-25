@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { RedBlackTree, RBNode } from '../structures/red-black-tree/RedBlackTree';
+import { SEO } from '../components/SEO';
 import type { RBSnapshot } from '../structures/red-black-tree/RedBlackTree';
 import { RedBlackNode } from '../components/red-black-tree/RedBlackNode';
 import type { VisualizationStep } from '../structures/common/types';
@@ -1234,6 +1235,12 @@ export const RedBlackTreePage: React.FC = () => {
 
     return (
         <div className={`h-full w-full flex bg-slate-100 overflow-hidden relative font-sans text-slate-900 ${isResizing ? 'cursor-col-resize select-none' : ''}`}>
+             <SEO 
+                title="Red-Black Tree Visualization"
+                description="Interactive Red-Black Tree visualization. Understand how color properties and rotations maintain balance."
+                keywords={["Red-Black Tree", "RB Tree", "Balanced Binary Search Tree", "Visualization", "Algorithm"]}
+            />
+            {/* FORCE DISABLE TRANSITION DURING RESIZE */}
             <style>{isResizing ? `* { transition: none !important; cursor: col-resize !important; user-select: none !important; }` : ''}</style>
 
             {/* FLOATING WARNING TOAST */}

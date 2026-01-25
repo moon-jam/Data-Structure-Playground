@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { structures } from '../data/structures';
 import { ArrowRight, Construction, CheckCircle2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { SEO } from '../components/SEO';
 
 export const HomePage: React.FC = () => {
   const { t } = useTranslation();
@@ -18,6 +19,21 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="relative min-h-screen bg-white font-sans">
+      <SEO 
+        title="Data Structure Playground" 
+        description={t('home.description')} 
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "Data Structure Playground",
+          "url": "https://ds-play.moon-jam.me/",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://ds-play.moon-jam.me/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }}
+      />
       {/* Subtle Background */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
           <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:32px_32px] opacity-30" />

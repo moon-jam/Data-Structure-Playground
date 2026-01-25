@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { SMMH } from '../structures/smmh/SMMH';
+import { SEO } from '../components/SEO';
 import type { SmmhSnapshot } from '../structures/smmh/SMMH';
 import { SmmhNode } from '../components/smmh/SmmhNode';
 import type { VisualizationStep } from '../structures/common/types';
@@ -195,8 +196,13 @@ export const SmmhPage: React.FC = () => {
       return null;
   };
 
-  return (
+    return (
     <div className={`h-full w-full flex bg-slate-100 overflow-hidden relative font-sans text-slate-900 ${isResizing ? 'cursor-col-resize select-none' : ''}`}>
+             <SEO 
+                title="SMMH Visualization"
+                description="Interactive Symmetric Min-Max Heap visualization. Learn about this double-ended priority queue structure."
+                keywords={["SMMH", "Symmetric Min-Max Heap", "Double Ended Priority Queue", "Visualization", "Algorithm"]}
+            />
       <style>{isResizing ? `* { transition: none !important; cursor: col-resize !important; user-select: none !important; }` : ''}</style>
 
       {/* SIDEBAR */}
