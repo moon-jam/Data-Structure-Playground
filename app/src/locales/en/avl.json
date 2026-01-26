@@ -48,7 +48,8 @@
   },
   "error": {
     "noRightChild": "Rotation Failed! Node {{val}} has no **Right Child** to promote.",
-    "noLeftChild": "Rotation Failed! Node {{val}} has no **Left Child** to promote."
+    "noLeftChild": "Rotation Failed! Node {{val}} has no **Left Child** to promote.",
+    "valueNotFound": "Value {{val}} not found in the tree."
   },
   "wiki": {
     "title": "AVL Encyclopedia",

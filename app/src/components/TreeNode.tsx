@@ -34,9 +34,9 @@ const VERTICAL_SPACING = 80;
 export const TreeNode: React.FC<TreeNodeProps> = ({
   node, x, y, level, parentX, parentY, unbalancedIds = [], selectedId, highlightedIds = [], onNodeClick, onNodeDrag, onMouseEnter, onMouseLeave, getBalance, pulsingId, showHeight = true, showBF = true
 }) => {
+  const [isHovering, setIsHovering] = useState(false);
   if (!node) return null;
 
-  const [isHovering, setIsHovering] = useState(false);
   const isUnbalanced = unbalancedIds.includes(node.id);
   const isSelected = selectedId === node.id;
   const isHighlighted = highlightedIds.includes(node.id);
@@ -46,11 +46,29 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
 
   const spread = Math.pow(2, Math.max(0, node.height - 2)) * 50;
 
-  const leftChildX = x - spread;
+  // Use explicit layout coordinates if available (from Layout Engine)
+  // Otherwise fall back to recursive spread (legacy/default)
+  const leftChildX = (node.left?.x !== undefined) ? node.left.x : (x - spread);
+  const rightChildX = (node.right?.x !== undefined) ? node.right.x : (x + spread);
 
-  const rightChildX = x + spread;
-
-  const childY = y + VERTICAL_SPACING;
+  const childY = (node.left?.y !== undefined) ? node.left.y : (y + VERTICAL_SPACING); // Assume same level Y
+  // Note: For right child, if using explicit, we'd use node.right.y too, but passing single Y prop here.
+  // Actually TreeNode takes `y` prop. 
+  // Wait, I pass `y={childY}` to both children.
+  // If I have explicit Y, I should pass `node.left.y` to left child and `node.right.y` to right child.
+  
+  // Let's refactor the render call instead of just var calc.
+  // But to minimize changes, let's keep var calc if possible.
+  // If explicit mode is on, we should ignore `childY` variable for the Y prop and pass explicit.
+  
+  // Actually, let's just use the logic in the props below:
+  // x={node.left?.x ?? leftChildX} 
+  // But I can't change the prop value in this tool call unless I target the render block.
+  
+  // Let's change how `childY` is defined to be generic, BUT we need specific Y for left/right?
+  // Usually levels are uniform, so `childY` works for both.
+  // But to be safe, I will change the render block in a separate tool call if needed.
+  // For now, let's assume uniform Y (level-based) which is true for Reingold-Tilford partial implementation.
   return (
 
     <>
@@ -80,10 +98,11 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
         </svg>
       )}
       {/* Draw Children recursively */}
+      {/* Draw Children recursively */}
       <TreeNode
         node={node.left}
         x={leftChildX}
-        y={childY}
+        y={node.left?.y ?? childY}
         level={level + 1}
         parentX={x}
         parentY={y}
@@ -104,7 +123,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
       <TreeNode
         node={node.right}
         x={rightChildX}
-        y={childY}
+        y={node.right?.y ?? childY}
         level={level + 1}
         parentX={x}
         parentY={y}

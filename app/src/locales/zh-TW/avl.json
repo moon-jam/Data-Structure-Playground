@@ -48,7 +48,8 @@
   },
   "error": {
     "noRightChild": "無法左旋！節點 {{val}} 沒有**右孩子**可以升上來。",
-    "noLeftChild": "無法右旋！節點 {{val}} 沒有**左孩子**可以升上來。"
+    "noLeftChild": "無法右旋！節點 {{val}} 沒有**左孩子**可以升上來。",
+    "valueNotFound": "在樹中找不到數值 {{val}}。"
   },
   "wiki": {
     "title": "AVL 樹深度百科",

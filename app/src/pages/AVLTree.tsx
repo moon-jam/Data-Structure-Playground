@@ -139,8 +139,43 @@ export const AVLTreePage: React.FC = () => {
     const [tourStep, setTourStep] = useState(-1);
     const tourHighlight = (step: number) => tourStep === step ? 'z-[10001] relative ring-4 ring-yellow-400 shadow-[0_0_0_9999px_rgba(0,0,0,0.7)]' : '';
 
+    const [deletionStrategy, setDeletionStrategy] = useState<'predecessor' | 'successor'>('successor');
+
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const pauseRef = useRef(false);
+
+    // --- Layout Engine (Inorder Traversal for compact tree) ---
+    const calculateLayout = (root: AVLNode | null) => {
+        if (!root) return null;
+
+        // Calculate subtree widths to center children properly? 
+        // Actually the RB layout uses strictly global inorder index for X.
+        // Let's use that for uniform compaction.
+        
+        let nextX = 0;
+        const assignX = (node: AVLNode | null, depth: number) => {
+            if (!node) return;
+            assignX(node.left, depth + 1);
+            node.x = nextX * 60; // 60px spacing
+            node.y = depth * 80;
+            nextX++;
+            assignX(node.right, depth + 1);
+        };
+
+        assignX(root, 0);
+
+        // Recenter root to 0 to align with container center
+        const rootX = root.x;
+        const shift = (node: AVLNode | null) => {
+            if (!node) return;
+            node.x -= rootX;
+            shift(node.left);
+            shift(node.right);
+        };
+        shift(root);
+
+        return root;
+    };
 
     // Resize Handlers
     const startResizing = useCallback(() => setIsResizing(true), []);
@@ -169,7 +204,13 @@ export const AVLTreePage: React.FC = () => {
             const prerequisiteSeen = localStorage.getItem('ds-playground-avl-prerequisite-seen') === 'true';
 
             if (!isCompleted && !savedMax) {
-                setShowHelp(true);
+                // Check if help has been seen before
+                const helpSeen = localStorage.getItem('ds-playground-avl-help-seen') === 'true';
+                if (!helpSeen) {
+                    setShowHelp(true);
+                    localStorage.setItem('ds-playground-avl-help-seen', 'true');
+                }
+                
                 setActiveTab('tutorial');
                 if (!prerequisiteSeen) setShowPrerequisite(true);
             }
@@ -229,7 +270,10 @@ export const AVLTreePage: React.FC = () => {
             const step = activeOpSteps[currentStepIdx];
             if (step.payload?.rootSnapshot !== undefined) {
                 const snapshot = step.payload.rootSnapshot;
-                if (snapshot) avlTree.updateAllHeights(snapshot);
+                if (snapshot) {
+                    avlTree.updateAllHeights(snapshot);
+                    calculateLayout(snapshot); // APPLY LAYOUT
+                }
 
                 setRoot(snapshot);
                 if (mode === 'manual') setUnbalancedData(avlTree.checkBalance(snapshot));
@@ -240,6 +284,7 @@ export const AVLTreePage: React.FC = () => {
         }
     }, [currentStepIdx, activeOpSteps, mode, avlTree]);
 
+    // ... (lines 243-264)
     useEffect(() => { if (errorToast) { const timer = setTimeout(() => setErrorToast(null), 3000); return () => clearTimeout(timer); } }, [errorToast]);
     useEffect(() => { if (warningToast) { const timer = setTimeout(() => setWarningToast(null), 5000); return () => clearTimeout(timer); } }, [warningToast]);
     useEffect(() => { if (resetConfirm) { const timer = setTimeout(() => setResetConfirm(false), 3000); return () => clearTimeout(timer); } }, [resetConfirm]);
@@ -267,13 +312,17 @@ export const AVLTreePage: React.FC = () => {
         const errorStep = steps.find(s => s.type === 'error');
         if (errorStep) { setErrorToast(String(t(errorStep.message?.replace('error.', 'avl:error.') || 'Error', errorStep.payload))); return; }
         setShowHint(false); setPulsingId(null); setActiveOpSteps(steps); setCurrentStepIdx(0);
+        
+        // Calculate layout for current tree state before snapshotting
+        calculateLayout(avlTree.root);
+        
         const newEntry: HistoryEntry = { id: Math.random().toString(36).substr(2, 9), action, steps, finalSnapshot: avlTree.toJSON() };
         const newHistory = history.slice(0, historyIndex + 1);
         newHistory.push(newEntry); setHistory(newHistory); setHistoryIndex(newHistory.length - 1);
         startPlayback(steps.length);
     };
 
-    const handleInsert = () => { if (isPlaying) return; const val = parseInt(inputValue); if (!isNaN(val)) { startNewOperation(`${t('insert')} ${val}`, mode === 'manual' ? avlTree.insertManual(val) : avlTree.insert(val)); setInputValue(''); } };
+    const handleInsert = () => { const val = parseInt(inputValue); if (!isNaN(val)) { startNewOperation(`${t('insert')} ${val}`, mode === 'manual' ? avlTree.insertManual(val) : avlTree.insert(val)); setInputValue(''); } };
     const handleDelete = () => { if (isPlaying) return; const val = selectedNode ? selectedNode.value : parseInt(inputValue); if (!isNaN(val)) { startNewOperation(`${t('delete')} ${val}`, mode === 'manual' ? avlTree.deleteManual(val) : avlTree.delete(val)); setInputValue(''); setSelectedNode(null); } };
 
     // Heuristic: Prefer the lowest node, but stick to a target if we are in a multi-step rotation
@@ -323,15 +372,6 @@ export const AVLTreePage: React.FC = () => {
         startNewOperation(`${direction === 'left' ? t('avl:left') : t('avl:right')} @ ${node.value}`, avlTree.rotateNode(node.value, direction));
     };
 
-    const handleUndo = () => {
-        if (historyIndex <= 0 || isPlaying) return;
-        stopPlayback(); const targetIdx = historyIndex - 1; const entry = history[targetIdx];
-        avlTree.fromJSON(entry.finalSnapshot); setRoot(avlTree.root ? avlTree.root.clone() : null);
-        setActiveOpSteps(entry.steps); setCurrentStepIdx(entry.steps.length > 0 ? entry.steps.length - 1 : -1);
-        setHistoryIndex(targetIdx); setUnbalancedData(mode === 'manual' ? avlTree.checkBalance(avlTree.root) : { allIds: [], lowestId: null });
-        setShowHint(false); setLockedTargetId(null);
-    };
-
     const handleRedo = () => {
         if (historyIndex >= history.length - 1 || isPlaying) return;
         stopPlayback(); const targetIdx = historyIndex + 1; const entry = history[targetIdx];
@@ -377,8 +417,26 @@ export const AVLTreePage: React.FC = () => {
         }
     };
 
+
+    const handleUndo = () => {
+        if (historyIndex <= 0 || isPlaying) return;
+        stopPlayback(); const targetIdx = historyIndex - 1; const entry = history[targetIdx];
+        avlTree.fromJSON(entry.finalSnapshot);
+        // Recalculate layout just in case, though snapshot should have it
+        if (avlTree.root) calculateLayout(avlTree.root);
+        setRoot(avlTree.root ? avlTree.root.clone() : null);
+        setActiveOpSteps(entry.steps); setCurrentStepIdx(entry.steps.length > 0 ? entry.steps.length - 1 : -1);
+        setHistoryIndex(targetIdx); setUnbalancedData(mode === 'manual' ? avlTree.checkBalance(avlTree.root) : { allIds: [], lowestId: null });
+        setShowHint(false); setLockedTargetId(null);
+    };
+
+    // ... (lines 380-384)
+
     const updateViewDirectly = (node: AVLNode | null) => {
-        if (node) avlTree.updateAllHeights(node);
+        if (node) {
+            avlTree.updateAllHeights(node);
+            calculateLayout(node);
+        }
         setRoot(node ? node.clone() : null);
         setUnbalancedData(avlTree.checkBalance(node));
     };
@@ -693,6 +751,8 @@ export const AVLTreePage: React.FC = () => {
                             <button onClick={() => setMode('auto')} className={`px-2 sm:px-3 py-1 text-[8px] sm:text-[10px] font-black rounded-lg transition-all ${mode === 'auto' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-slate-400 hover:text-slate-600'}`}>AUTO</button>
                             <button onClick={() => setMode('manual')} className={`px-2 sm:px-3 py-1 text-[8px] sm:text-[10px] font-black rounded-lg transition-all ${mode === 'manual' ? 'bg-amber-500 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>MANUAL</button>
                         </div>
+                        {/* Deletion Strategy Toggle - MOVED TO BOTTOM BAR */}
+
                         {currentStepMsg && (
                             <div className="bg-blue-600/90 backdrop-blur-md px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl text-white shadow-lg border border-blue-400 flex items-center gap-2 animate-in slide-in-from-left-4 overflow-hidden w-fit pointer-events-auto">
                                 <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-white animate-pulse shrink-0"></div>
@@ -719,7 +779,20 @@ export const AVLTreePage: React.FC = () => {
                                         onClick={() => setSelectedNode(null)}
                                     >
                                         <div className="absolute left-1/2 top-[100px] -translate-x-1/2" style={{ overflow: 'visible' }}>
-                                            <TreeNode node={root} x={0} y={0} level={0} unbalancedIds={unbalancedData.allIds} selectedId={selectedNode?.id} highlightedIds={highlightedIds} pulsingId={pulsingId} onNodeClick={setSelectedNode} onNodeDrag={mode === 'manual' ? handleNodeDrag : undefined} onMouseEnter={() => setIsHoveringNode(true)} onMouseLeave={() => setIsHoveringNode(false)} getBalance={(n) => avlTree.getBalance(n)}
+                                            <TreeNode 
+                                                node={root} 
+                                                x={root ? root.x : 0} 
+                                                y={root ? root.y : 0} 
+                                                level={0} 
+                                                unbalancedIds={unbalancedData.allIds} 
+                                                selectedId={selectedNode?.id} 
+                                                highlightedIds={highlightedIds} 
+                                                pulsingId={pulsingId} 
+                                                onNodeClick={setSelectedNode} 
+                                                onNodeDrag={mode === 'manual' ? handleNodeDrag : undefined} 
+                                                onMouseEnter={() => setIsHoveringNode(true)} 
+                                                onMouseLeave={() => setIsHoveringNode(false)} 
+                                                getBalance={(n) => avlTree.getBalance(n)}
                                                 showHeight={!(activeTab === 'tutorial' && tutorialView === 'lesson' && lessonIndex <= 1)}
                                                 showBF={!(activeTab === 'tutorial' && tutorialView === 'lesson' && lessonIndex <= 2)}
                                             />
@@ -747,6 +820,22 @@ export const AVLTreePage: React.FC = () => {
                             </div>
                             <button onClick={handleDelete} disabled={isPlaying} className={`px-4 py-2.5 rounded-xl font-black text-white text-[11px] shadow-lg flex items-center gap-2 transition-all active:scale-95 shrink-0 ${selectedNode ? 'bg-red-600 hover:bg-red-700' : 'bg-slate-300'}`}><Trash2 size={12} /><span className="hidden sm:inline">DELETE</span></button>
                         </div>
+                        
+                        {/* Delete Strategy Toggle */}
+                        <div className="flex items-center gap-2 text-xs">
+                             <span className="text-slate-500 font-bold">Delete Strategy:</span>
+                             <button 
+                                onClick={() => { 
+                                    const newStrategy = deletionStrategy === 'successor' ? 'predecessor' : 'successor';
+                                    avlTree.deletionStrategy = newStrategy; 
+                                    setDeletionStrategy(newStrategy); 
+                                }} 
+                                className="flex-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg font-bold transition-all text-[10px] uppercase tracking-wider"
+                             >
+                                {deletionStrategy === 'successor' ? '📍 Inorder Successor' : '📍 Inorder Predecessor'}
+                             </button>
+                        </div>
+
                         <button onClick={handleClear} disabled={isPlaying} className={`w-full flex items-center justify-center gap-2 py-1.5 border border-dashed text-[10px] font-black rounded-lg transition-all uppercase tracking-widest ${resetConfirm ? 'bg-red-600 border-red-600 text-white animate-bounce' : 'border-slate-200 text-slate-400 hover:bg-red-50 hover:text-red-500'}`}><RefreshCw size={12} className={resetConfirm ? 'animate-spin' : ''} /> {resetConfirm ? 'Confirm Reset?' : 'Reset Playground'}</button>
                     </ControlIsland>
 
@@ -786,7 +875,15 @@ export const AVLTreePage: React.FC = () => {
                 </div>
             </div>
 
-            {showHelp && (<div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in"><div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden relative animate-in zoom-in-95 duration-200">
+            {showHelp && (
+            <div 
+                className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in"
+                onClick={(e) => {
+                    if (e.target === e.currentTarget) setShowHelp(false);
+                }}
+            >
+                <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden relative animate-in zoom-in-95 duration-200">
+
                 <X onClick={() => setShowHelp(false)} className="absolute top-6 right-6 cursor-pointer text-slate-400 hover:text-slate-600 transition-colors z-10" />
 
                 <div className="bg-blue-600 p-6 text-white">
