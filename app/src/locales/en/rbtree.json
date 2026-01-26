@@ -112,6 +112,10 @@
   "guide": {
     "helpTitle": "Red-Black Tree Help",
     "helpDesc": "A Red-Black tree is a self-balancing binary search tree where each node has an extra bit for color (Red or Black).",
+    "helpRecolor": "Recoloring",
+    "helpRecolorDesc": "Click on nodes to toggle their color between **Red** and **Black**. This is often the first step in fixing violations.",
+    "helpRotate": "Rotations",
+    "helpRotateDesc": "Drag nodes to rotate data. Pulling a node **Left** performs a Left Rotation (right child moves up). Pulling **Right** performs a Right Rotation (left child moves up).",
     "showHint": "💡 SHOW HINT",
     "caseRootRed": "Root is Red",
     "actionRootRed": "Click on node **{{val}}** to toggle its color to **Black**. The root must always be black.",
@@ -155,11 +159,14 @@
     "performAnyPending": "Perform any pending action to continue",
     "performRecolorFirst": "Please complete all recoloring steps before rotating",
     "ui": {
-      "mode": "Mode Switcher",
-      "sidebar": "History & Info",
-      "canvas": "Interactive Tree",
-      "action": "Operations",
-      "timeline": "Playback Controls"
+      "mode": "Mode Switch: Auto plays animations; Manual lets you drag nodes to rotate.",
+      "sidebar": "Sidebar: View Logs, Wiki, or Course.",
+      "canvas": "Canvas: Drag to pan, Scroll to zoom.",
+      "action": "Actions: Insert, Delete nodes, or Reset the canvas.",
+      "timeline": "Timeline: Pause, play, or scrub to review history.",
+      "start": "Start Interface Tour",
+      "startDesc": "Explore the timeline, actions, and canvas controls with an interactive guide.",
+      "startBtn": "Start Tour"
     },
     "manual": {
       "drag": "Drag nodes to rotate them.",

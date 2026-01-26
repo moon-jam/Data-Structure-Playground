@@ -8,11 +8,7 @@ import { ControlIsland } from '../components/playground/ControlIsland';
 import { PlaybackControls } from '../components/playground/PlaybackControls';
 import { SimpleMarkdown } from '../components/playground/SimpleMarkdown';
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import {
-    Plus, Minus, LocateFixed, PanelLeftClose, PanelLeft,
-    RefreshCw, Trash2, BookOpen, ScrollText, GraduationCap,
-    Info, X, AlertCircle, Check
-} from 'lucide-react';
+import { PanelLeft, PanelLeftClose, Plus, Minus, LocateFixed, Trash2, RefreshCw, ScrollText, BookOpen, GraduationCap, Check, AlertCircle, X, Info, HelpCircle, Palette, Undo2, Sparkles, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PrerequisiteBanner } from '../components/playground/PrerequisiteBanner';
 import { CongratsModal } from '../components/playground/CongratsModal';
@@ -49,6 +45,11 @@ export const RedBlackTreePage: React.FC = () => {
     const [currentMsg, setCurrentStepMsg] = useState<string | null>(null);
     const [currentMsgType, setCurrentStepMsgType] = useState<string>('info');
     const [resetConfirm, setResetConfirm] = useState(false);
+    
+    // Help & Tour States
+    const [tourStep, setTourStep] = useState(-1);
+    const tourHighlight = (step: number) => tourStep === step ? `z-[10001] relative ring-4 ring-yellow-400 ${step === 0 ? '' : 'shadow-[0_0_0_9999px_rgba(0,0,0,0.7)]'}` : '';
+
     const [selectedNode, setSelectedNode] = useState<RBNode | null>(null);
     const [deletionStrategy, setDeletionStrategy] = useState<'predecessor' | 'successor'>('successor');
 
@@ -199,6 +200,26 @@ export const RedBlackTreePage: React.FC = () => {
             return () => clearTimeout(timer);
         }
     }, [resetConfirm]);
+
+    useEffect(() => {
+        // Check if help has been seen before
+        const helpSeen = localStorage.getItem('ds-playground-rbtree-help-seen') === 'true';
+        if (!helpSeen) {
+            setShowHelp(true);
+            localStorage.setItem('ds-playground-rbtree-help-seen', 'true');
+        }
+        
+        // Check tutorial progress to auto-open tab
+        const savedMax = localStorage.getItem('ds-playground-rbtree-max-level');
+        const isCompleted = localStorage.getItem('ds-playground-rbtree-completed') === 'true';
+        
+        if (!isCompleted && !savedMax && !helpSeen) {
+             // If first time user (no max level, not completed, help just shown), 
+             // we might want to default to tutorial, but maybe after help is closed?
+             // AVL logic: if (!isCompleted && !savedMax) setActiveTab('tutorial');
+             setActiveTab('tutorial');
+        }
+    }, []);
 
     // --- Layout Engine (Basic Binary Tree) ---
     const calculateLayout = (root: RBNode | null) => {
@@ -1205,6 +1226,29 @@ export const RedBlackTreePage: React.FC = () => {
 
 
 
+    const renderTourTooltip = () => {
+        if (tourStep === -1) return null;
+        const steps = [
+            { title: t('rbtree:guide.ui.mode'), pos: 'top-34 left-88' },
+            { title: t('rbtree:guide.ui.sidebar'), pos: 'top-1/2 left-80' },
+            { title: t('rbtree:guide.ui.canvas'), pos: 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' },
+            { title: t('rbtree:guide.ui.action'), pos: 'bottom-26 left-88' },
+            { title: t('rbtree:guide.ui.timeline'), pos: 'bottom-26 right-80' },
+        ];
+        const step = steps[tourStep];
+        if (!step) return null;
+        return (
+            <div className={`fixed ${step.pos} z-[10002] bg-slate-900 text-white p-4 rounded-xl shadow-2xl max-w-xs animate-in zoom-in-95 border border-slate-700`}>
+                <h4 className="font-bold mb-3 text-sm leading-relaxed">{step.title}</h4>
+                <div className="flex gap-2 justify-end">
+                    <button onClick={() => setTourStep(-1)} className="text-slate-400 hover:text-white text-[10px] font-bold px-2 uppercase tracking-wider">Exit</button>
+                    {tourStep > 0 && <button onClick={() => setTourStep(tourStep - 1)} className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider">Prev</button>}
+                    <button onClick={() => setTourStep(tourStep < steps.length - 1 ? tourStep + 1 : -1)} className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider">{tourStep < steps.length - 1 ? 'Next' : 'Finish'}</button>
+                </div>
+            </div>
+        );
+    };
+
     const renderExtraTutorialContent = () => {
         const lesson = tutorial.currentLesson;
         const violationsContent = violations.length > 0 ? (
@@ -1255,7 +1299,7 @@ export const RedBlackTreePage: React.FC = () => {
             {/* SIDEBAR */}
             <div
                 style={{ width: isSidebarOpen ? (window.innerWidth > 768 ? `${sidebarWidth}px` : '100%') : '0px' }}
-                className={`h-full flex flex-col bg-slate-900 border-r border-slate-800 shrink-0 z-[100] shadow-2xl relative ${!isSidebarOpen ? 'overflow-hidden' : ''} ${window.innerWidth <= 768 ? 'fixed left-0 top-0' : 'relative'}`}
+                className={`h-full flex flex-col bg-slate-900 border-r border-slate-800 shrink-0 z-[100] shadow-2xl relative ${!isSidebarOpen ? 'overflow-hidden' : ''} ${window.innerWidth <= 768 ? 'fixed left-0 top-0' : 'relative'} ${tourHighlight(1)}`}
             >
                 {window.innerWidth <= 768 && isSidebarOpen && <button onClick={() => setIsSidebarOpen(false)} className="absolute top-4 right-4 text-white z-[110]"><PanelLeftClose size={24} /></button>}
                 <div className="flex flex-col h-full w-full">
@@ -1323,7 +1367,7 @@ export const RedBlackTreePage: React.FC = () => {
                 <div className="flex-grow relative overflow-hidden bg-grid-slate-100">
                     <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="absolute bottom-6 left-6 z-30 w-10 h-10 bg-slate-900 text-white rounded-2xl shadow-xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all">{isSidebarOpen ? <PanelLeftClose size={20} /> : <PanelLeft size={20} />}</button>
 
-                    <div className="absolute top-6 left-6 z-20 pointer-events-none flex flex-col gap-2">
+                    <div className={`absolute top-6 left-6 z-20 pointer-events-none flex flex-col gap-2 ${tourHighlight(0)}`}>
                         <div className="flex gap-2 pointer-events-auto">
                             <button onClick={() => setMode('auto')} className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all ${mode === 'auto' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white/50 text-slate-500 hover:bg-white'}`}>Auto</button>
                             <button onClick={() => setMode('manual')} className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all ${mode === 'manual' ? 'bg-amber-500 text-white shadow-lg' : 'bg-white/50 text-slate-500 hover:bg-white'}`}>Manual</button>
@@ -1382,6 +1426,7 @@ export const RedBlackTreePage: React.FC = () => {
                                     <button onClick={() => resetTransform()} className="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-lg active:scale-90 mt-2"><LocateFixed size={20} /></button>
 
                                 </div>
+                                {renderTourTooltip()}
                             </>
                         )}
                     </TransformWrapper>
@@ -1400,39 +1445,60 @@ export const RedBlackTreePage: React.FC = () => {
                         )
                     }
 
-                    {
-                        showHelp && (
-                            <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in">
-                                <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden relative animate-in zoom-in-95 duration-200">
-                                    <X onClick={() => setShowHelp(false)} className="absolute top-6 right-6 cursor-pointer text-slate-400 hover:text-slate-600 transition-colors z-10" />
-                                    <div className="bg-blue-600 p-6 text-white">
-                                        <h3 className="text-xl font-bold flex items-center gap-2"><Info /> {t('rbtree:guide.helpTitle')}</h3>
-                                        <div className="flex gap-2 mt-4">
-                                            <button onClick={() => setHelpTab('concept')} className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${helpTab === 'concept' ? 'bg-white text-blue-600' : 'bg-blue-700 text-blue-200 hover:bg-blue-500'}`}>Concept</button>
-                                            <button onClick={() => setHelpTab('ui')} className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${helpTab === 'ui' ? 'bg-white text-blue-600' : 'bg-blue-700 text-blue-200 hover:bg-blue-500'}`}>Controls</button>
-                                        </div>
-                                    </div>
-                                    <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
-                                        {helpTab === 'concept' ? (
-                                            <div className="text-slate-600 text-sm leading-relaxed space-y-4">
-                                                <SimpleMarkdown text={t('rbtree:guide.helpDesc')} />
-                                            </div>
-                                        ) : (
-                                            <div className="space-y-3">
-                                                <div className="flex gap-3 items-start"><div className="bg-slate-100 p-2 rounded-lg text-slate-500 font-black text-xs uppercase w-20 shrink-0 text-center">Auto</div><p className="text-sm text-slate-600">Standard operations with auto-balancing.</p></div>
-                                                <div className="flex gap-3 items-start"><div className="bg-amber-100 p-2 rounded-lg text-amber-600 font-black text-xs uppercase w-20 shrink-0 text-center">Manual</div><p className="text-sm text-slate-600">Insert nodes without balancing. Click nodes to <b>Recolor</b>. Drag nodes (left/right) to <b>Rotate</b>.</p></div>
-                                            </div>
-                                        )}
+                    {showHelp && (
+                        <div 
+                            className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in"
+                            onClick={(e) => {
+                                if (e.target === e.currentTarget) setShowHelp(false);
+                            }}
+                        >
+                            <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden relative animate-in zoom-in-95 duration-200">
+                                <X onClick={() => setShowHelp(false)} className="absolute top-6 right-6 cursor-pointer text-slate-400 hover:text-slate-600 transition-colors z-10" />
+
+                                <div className="bg-blue-600 p-6 text-white">
+                                    <h3 className="text-2xl font-bold flex items-center gap-2"><HelpCircle /> {t('rbtree:guide.helpTitle')}</h3>
+
+                                    <div className="flex gap-2 mt-4">
+                                        <button onClick={() => setHelpTab('concept')} className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${helpTab === 'concept' ? 'bg-white text-blue-600' : 'bg-blue-700 text-blue-200 hover:bg-blue-500'}`}>Operation</button>
+                                        <button onClick={() => setHelpTab('ui')} className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${helpTab === 'ui' ? 'bg-white text-blue-600' : 'bg-blue-700 text-blue-200 hover:bg-blue-500'}`}>Interface</button>
                                     </div>
                                 </div>
+
+                                <div className="p-8 space-y-6">
+                                    {helpTab === 'concept' ? (
+                                        <>
+                                            <p className="text-slate-600 font-medium text-sm leading-relaxed">{t('rbtree:guide.helpDesc')}</p>
+                                            <div className="grid grid-cols-1 gap-4">
+                                                <div className="group flex gap-4 p-4 rounded-2xl bg-blue-50 border border-blue-100 transition-colors hover:bg-blue-100"><div className="bg-white p-3 rounded-xl shadow-sm h-fit"><Palette className="text-blue-600" /></div><div><h4 className="font-bold text-blue-900 text-sm">{t('rbtree:guide.helpRecolor')}</h4><SimpleMarkdown text={t('rbtree:guide.helpRecolorDesc')} className="text-blue-700" /></div></div>
+                                                <div className="group flex gap-4 p-4 rounded-2xl bg-indigo-50 border border-indigo-100 transition-colors hover:bg-indigo-100"><div className="bg-white p-3 rounded-xl shadow-sm h-fit"><Undo2 className="text-indigo-600" /></div><div><h4 className="font-bold text-indigo-900 text-sm">{t('rbtree:guide.helpRotate')}</h4><SimpleMarkdown text={t('rbtree:guide.helpRotateDesc')} className="text-sm text-indigo-700" /></div></div>
+                                            </div>
+                                            <button onClick={() => setHelpTab('ui')} className="w-full bg-slate-100 text-slate-500 py-4 rounded-2xl font-bold hover:bg-slate-200 active:scale-95 transition-all mt-6 text-xs uppercase tracking-widest">Next: Interface Guide</button>
+                                        </>
+                                    ) : (
+                                        <div className="flex flex-col items-center gap-6 py-4">
+                                            <div className="relative">
+                                                <div className="absolute inset-0 bg-blue-500 rounded-full blur-xl opacity-20 animate-pulse"></div>
+                                                <Sparkles size={48} className="text-blue-500 relative z-10" />
+                                            </div>
+                                            <div className="text-center space-y-2">
+                                                <h4 className="font-bold text-slate-900 text-lg">{t('rbtree:guide.ui.start')}</h4>
+                                                <p className="text-sm text-slate-500 max-w-xs mx-auto">{t('rbtree:guide.ui.startDesc')}</p>
+                                            </div>
+                                            <button onClick={() => { setShowHelp(false); setTourStep(0); }} className="px-8 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-xl shadow-blue-500/20 hover:scale-105 active:scale-95 transition-all text-xs uppercase tracking-widest flex items-center gap-2">
+                                                {t('rbtree:guide.ui.startBtn')} <ChevronRight size={14} />
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                        )
-                    }
+                        </div>
+                    )}
+                    {renderTourTooltip()}
                 </div >
 
                 {/* Bottom Bar */}
-                < div className="bg-white border-t border-slate-200 p-3 sm:p-4 flex flex-col lg:flex-row gap-4 lg:gap-4 items-stretch overflow-visible shadow-[0_-10px_40px_rgba(0,0,0,0.03)] z-[100]" >
-                    <ControlIsland label="Operations" className="w-full lg:w-[320px]">
+                <div className="bg-white border-t border-slate-200 p-3 sm:p-4 flex flex-col lg:flex-row gap-4 lg:gap-4 items-stretch overflow-visible shadow-[0_-10px_40px_rgba(0,0,0,0.03)] z-[100]">
+                    <ControlIsland label="Operations" className={`w-full lg:w-[320px] ${tourHighlight(3)}`}>
                         <div className="grid grid-cols-[1fr_auto] gap-2 w-full">
                             <div className="flex gap-2 items-center bg-white p-1 rounded-xl border border-slate-200 flex-grow overflow-hidden shadow-sm">
                                 <input value={inputValue} onChange={e => setInputValue(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleInsert()} className="flex-grow min-w-0 px-2 text-xs font-bold outline-none text-center" placeholder="Val" />
@@ -1454,7 +1520,7 @@ export const RedBlackTreePage: React.FC = () => {
                         <button onClick={handleClear} disabled={isPlaying} className={`w-full flex items-center justify-center gap-2 py-1.5 border border-dashed text-[10px] font-black rounded-lg transition-all uppercase tracking-widest ${resetConfirm ? 'bg-red-600 border-red-600 text-white animate-bounce' : 'border-slate-200 text-slate-400 hover:bg-red-50 hover:text-red-500'}`}><RefreshCw size={12} className={resetConfirm ? 'animate-spin' : ''} /> {resetConfirm ? 'Confirm Reset?' : 'Reset Playground'}</button>
                     </ControlIsland>
 
-                    <ControlIsland label="Timeline" className="flex-grow" metadata={`Step ${Math.max(0, currentStepIdx + 1)} / ${activeSteps.length}`}>
+                    <ControlIsland label="Timeline" className={`flex-grow ${tourHighlight(4)}`} metadata={`Step ${Math.max(0, currentStepIdx + 1)} / ${activeSteps.length}`}>
                         <PlaybackControls
                             isPlaying={isPlaying}
                             isPaused={!isPlaying}
