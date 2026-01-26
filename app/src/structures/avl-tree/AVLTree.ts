@@ -290,8 +290,8 @@ export class AVLTree {
         node.value = successor.value;
         node.id = successor.id;
         
-        // First, silently delete the successor from its original position (no rotation yet)
-        node.right = this._deleteMinSilent(node.right);
+        // First, delete the successor from its original position (with rebalancing if autoBalance)
+        node.right = this._deleteMinSilent(node.right, autoBalance);
         
         // NOW add the delete step - snapshot shows tree AFTER deletion
         this.addStep('delete', `Deleted successor node from original position`, []);
@@ -308,8 +308,8 @@ export class AVLTree {
         node.value = predecessor.value;
         node.id = predecessor.id;
         
-        // First, silently delete the predecessor from its original position (no rotation yet)
-        node.left = this._deleteMaxSilent(node.left);
+        // First, delete the predecessor from its original position (with rebalancing if autoBalance)
+        node.left = this._deleteMaxSilent(node.left, autoBalance);
         
         // NOW add the delete step - snapshot shows tree AFTER deletion
         this.addStep('delete', `Deleted predecessor node from original position`, []);
@@ -352,21 +352,51 @@ export class AVLTree {
     return node;
   }
 
-  /** Silently delete the minimum node (no addStep calls, no rebalancing). Used for successor deletion. */
-  private _deleteMinSilent(node: AVLNode | null): AVLNode | null {
+  /** Delete the minimum node. When autoBalance is true, rebalances the subtree. */
+  private _deleteMinSilent(node: AVLNode | null, autoBalance: boolean = false): AVLNode | null {
     if (!node) return null;
     if (!node.left) return node.right; // This is the min, return its right child
-    node.left = this._deleteMinSilent(node.left);
+    node.left = this._deleteMinSilent(node.left, autoBalance);
     node.height = Math.max(this.height(node.left), this.height(node.right)) + 1;
+    
+    if (!autoBalance) return node;
+    
+    // Rebalance this node after deletion
+    const b = this.getBalance(node);
+    if (b > 1 && this.getBalance(node.left) >= 0) return this.rightRotate(node, false);
+    if (b > 1 && this.getBalance(node.left) < 0) {
+        node.left = this.leftRotate(node.left!, false);
+        return this.rightRotate(node, false);
+    }
+    if (b < -1 && this.getBalance(node.right) <= 0) return this.leftRotate(node, false);
+    if (b < -1 && this.getBalance(node.right) > 0) {
+        node.right = this.rightRotate(node.right!, false);
+        return this.leftRotate(node, false);
+    }
     return node;
   }
 
-  /** Silently delete the maximum node (no addStep calls, no rebalancing). Used for predecessor deletion. */
-  private _deleteMaxSilent(node: AVLNode | null): AVLNode | null {
+  /** Delete the maximum node. When autoBalance is true, rebalances the subtree. */
+  private _deleteMaxSilent(node: AVLNode | null, autoBalance: boolean = false): AVLNode | null {
     if (!node) return null;
     if (!node.right) return node.left; // This is the max, return its left child
-    node.right = this._deleteMaxSilent(node.right);
+    node.right = this._deleteMaxSilent(node.right, autoBalance);
     node.height = Math.max(this.height(node.left), this.height(node.right)) + 1;
+    
+    if (!autoBalance) return node;
+    
+    // Rebalance this node after deletion
+    const b = this.getBalance(node);
+    if (b > 1 && this.getBalance(node.left) >= 0) return this.rightRotate(node, false);
+    if (b > 1 && this.getBalance(node.left) < 0) {
+        node.left = this.leftRotate(node.left!, false);
+        return this.rightRotate(node, false);
+    }
+    if (b < -1 && this.getBalance(node.right) <= 0) return this.leftRotate(node, false);
+    if (b < -1 && this.getBalance(node.right) > 0) {
+        node.right = this.rightRotate(node.right!, false);
+        return this.leftRotate(node, false);
+    }
     return node;
   }
 
