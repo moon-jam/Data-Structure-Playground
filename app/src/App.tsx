@@ -1,6 +1,20 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  useParams,
+} from 'react-router-dom';
 import { MainLayout } from './layouts/MainLayout';
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+  detectBrowserLang,
+  isUrlLang,
+  urlLangToI18n,
+  type UrlLang,
+} from './lib/locale';
 
 // Lazy load pages with named exports
 const HomePage = lazy(() => import('./pages/Home').then(module => ({ default: module.HomePage })));
@@ -20,11 +34,46 @@ const Loading = () => (
   </div>
 );
 
+const RootRedirect = () => {
+  const lang = detectBrowserLang();
+  return <Navigate to={`/${lang}`} replace />;
+};
+
+const LangGate = ({ children }: { children: ReactNode }) => {
+  const { lang } = useParams<{ lang: string }>();
+  const location = useLocation();
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    if (isUrlLang(lang)) {
+      const target = urlLangToI18n(lang);
+      if (i18n.language !== target) {
+        i18n.changeLanguage(target);
+      }
+    }
+  }, [lang, i18n]);
+
+  if (!isUrlLang(lang)) {
+    const fallback = detectBrowserLang();
+    return <Navigate to={`/${fallback}${location.pathname}`} replace />;
+  }
+
+  return <>{children}</>;
+};
+
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<MainLayout />}>
+        <Route path="/" element={<RootRedirect />} />
+        <Route
+          path="/:lang"
+          element={
+            <LangGate>
+              <MainLayout />
+            </LangGate>
+          }
+        >
           <Route index element={
             <Suspense fallback={<Loading />}>
               <HomePage />
@@ -75,11 +124,12 @@ function App() {
               <RedBlackTreePage />
             </Suspense>
           } />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="" replace />} />
         </Route>
       </Routes>
     </Router>
   );
 }
 
+export type AppLang = UrlLang;
 export default App;

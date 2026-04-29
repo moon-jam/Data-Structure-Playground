@@ -1,22 +1,37 @@
 import React, { useState } from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Home, Github, Languages, ChevronRight, Menu, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { DEFAULT_LANG, isUrlLang, type UrlLang } from '../lib/locale';
 
 export const MainLayout: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { lang: langParam } = useParams<{ lang: string }>();
+  const lang: UrlLang = isUrlLang(langParam) ? langParam : DEFAULT_LANG;
   const { t, i18n } = useTranslation();
-  const isHome = location.pathname === '/';
+
+  const segments = location.pathname.split('/').filter(Boolean);
+  const isHome = segments.length <= 1;
+  const isPlayground = !isHome;
+  const subPathLabel = segments[1]?.replace(/-/g, ' ') ?? '';
+
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Playground detection
-  const isPlayground = location.pathname !== '/'; 
-
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
+  const switchLanguage = (target: UrlLang) => {
+    if (target === lang) {
+      setIsLangMenuOpen(false);
+      setIsMenuOpen(false);
+      return;
+    }
+    const newPath = location.pathname.replace(/^\/(en|zh-tw)(?=\/|$)/, `/${target}`);
+    navigate(newPath || `/${target}`);
     setIsLangMenuOpen(false);
+    setIsMenuOpen(false);
   };
+
+  const homePath = `/${lang}`;
 
   return (
     <div className={`flex flex-col font-sans text-slate-900 bg-white ${isPlayground ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
@@ -24,47 +39,47 @@ export const MainLayout: React.FC = () => {
       <header className="bg-slate-900 text-white shadow-md z-50 shrink-0 border-b border-white/5">
         <div className="w-full px-6 h-14 flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Link to="/" className="flex items-center space-x-2 group">
+            <Link to={homePath} className="flex items-center space-x-2 group">
               <div className="bg-blue-600 p-1.5 rounded-lg group-hover:bg-blue-500 transition-colors shadow-lg shadow-blue-900/20">
                 <Home size={18} className="text-white" />
               </div>
               <span className="font-black text-base tracking-tight uppercase">{t('appTitle')}</span>
             </Link>
-            
+
             {!isHome && (
               <div className="flex items-center space-x-2 animate-in fade-in slide-in-from-left-2">
                 <ChevronRight size={14} className="text-slate-600" />
                 <span className="text-blue-400 font-bold text-xs uppercase tracking-widest bg-blue-400/10 px-2 py-1 rounded">
-                  {location.pathname.substring(1).replace(/-/g, ' ')}
+                  {subPathLabel}
                 </span>
               </div>
             )}
           </div>
-          
+
           <div className="flex items-center">
              {/* Desktop Navigation */}
              <div className="hidden sm:flex items-center space-x-6">
                 <div className="relative">
-                    <button 
+                    <button
                       onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
                       className="flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-widest"
                     >
                       <Languages size={16} />
                       <span>{i18n.language === 'zh-TW' ? '繁體中文' : 'English'}</span>
                     </button>
-                    
+
                     {isLangMenuOpen && (
                       <div className="absolute right-0 mt-3 w-40 bg-white rounded-xl shadow-2xl border border-slate-200 py-2 text-slate-900 z-50 animate-in fade-in zoom-in-95">
-                        <button onClick={() => changeLanguage('zh-TW')} className={`w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-50 ${i18n.language === 'zh-TW' ? 'text-blue-600' : 'text-slate-600'}`}>繁體中文</button>
-                        <button onClick={() => changeLanguage('en')} className={`w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-50 ${i18n.language === 'en' ? 'text-blue-600' : 'text-slate-600'}`}>English</button>
+                        <button onClick={() => switchLanguage('zh-tw')} className={`w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-50 ${lang === 'zh-tw' ? 'text-blue-600' : 'text-slate-600'}`}>繁體中文</button>
+                        <button onClick={() => switchLanguage('en')} className={`w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-50 ${lang === 'en' ? 'text-blue-600' : 'text-slate-600'}`}>English</button>
                       </div>
                     )}
                 </div>
 
                 <div className="h-4 w-px bg-slate-800"></div>
 
-                <a 
-                    href="https://github.com/moon-jam/Data-Structure-Playground" 
+                <a
+                    href="https://github.com/moon-jam/Data-Structure-Playground"
                     target="_blank" rel="noopener noreferrer"
                     className="text-slate-400 hover:text-white transition-colors"
                 >
@@ -73,7 +88,7 @@ export const MainLayout: React.FC = () => {
              </div>
 
              {/* Mobile Menu Button */}
-             <button 
+             <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="sm:hidden p-2 text-slate-400 hover:text-white transition-colors"
              >
@@ -86,13 +101,13 @@ export const MainLayout: React.FC = () => {
                    <div className="flex flex-col gap-4">
                       <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Language</span>
                       <div className="grid grid-cols-2 gap-2">
-                         <button onClick={() => { changeLanguage('zh-TW'); setIsMenuOpen(false); }} className={`py-2 px-4 rounded-lg text-xs font-bold transition-all ${i18n.language === 'zh-TW' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400'}`}>繁體中文</button>
-                         <button onClick={() => { changeLanguage('en'); setIsMenuOpen(false); }} className={`py-2 px-4 rounded-lg text-xs font-bold transition-all ${i18n.language === 'en' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400'}`}>English</button>
+                         <button onClick={() => switchLanguage('zh-tw')} className={`py-2 px-4 rounded-lg text-xs font-bold transition-all ${lang === 'zh-tw' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400'}`}>繁體中文</button>
+                         <button onClick={() => switchLanguage('en')} className={`py-2 px-4 rounded-lg text-xs font-bold transition-all ${lang === 'en' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400'}`}>English</button>
                       </div>
                    </div>
                    <div className="h-px bg-white/5 w-full"></div>
-                   <a 
-                      href="https://github.com/moon-jam/Data-Structure-Playground" 
+                   <a
+                      href="https://github.com/moon-jam/Data-Structure-Playground"
                       target="_blank" rel="noopener noreferrer"
                       className="flex items-center justify-between group"
                    >

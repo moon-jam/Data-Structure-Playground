@@ -1,12 +1,15 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { structures } from '../data/structures';
 import { ArrowRight, Construction, CheckCircle2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { SEO } from '../components/SEO';
+import { DEFAULT_LANG, isUrlLang } from '../lib/locale';
 
 export const HomePage: React.FC = () => {
   const { t } = useTranslation();
+  const { lang: langParam } = useParams<{ lang: string }>();
+  const lang = isUrlLang(langParam) ? langParam : DEFAULT_LANG;
   const [completedMap, setCompletedStatus] = React.useState<Record<string, boolean>>({});
 
   React.useEffect(() => {
@@ -56,9 +59,9 @@ export const HomePage: React.FC = () => {
           {structures.map((struct) => {
             const isCompleted = completedMap[struct.id];
             return (
-              <Link 
-                key={struct.id} 
-                to={struct.implemented ? struct.path : '#'}
+              <Link
+                key={struct.id}
+                to={struct.implemented ? `/${lang}${struct.path}` : '#'}
                 className={`
                   group relative overflow-hidden rounded-3xl border transition-all duration-300
                   ${struct.implemented 

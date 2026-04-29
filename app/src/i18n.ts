@@ -1,6 +1,5 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
 
 import enCommon from './locales/en/common.json';
 import zhTWCommon from './locales/zh-TW/common.json';
@@ -21,8 +20,12 @@ import zhTWBPlusTree from './locales/zh-TW/bplustree.json';
 import enRBTree from './locales/en/rbtree.json';
 import zhTWRBTree from './locales/zh-TW/rbtree.json';
 
+import { readLangFromPath, urlLangToI18n, DEFAULT_LANG } from './lib/locale';
+
+const initialUrlLang =
+  (typeof window !== 'undefined' && readLangFromPath(window.location.pathname)) || DEFAULT_LANG;
+
 i18n
-  .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources: {
@@ -49,7 +52,8 @@ i18n
         rbtree: zhTWRBTree,
       },
     },
-    fallbackLng: 'zh-TW', // Default to Traditional Chinese as requested
+    lng: urlLangToI18n(initialUrlLang),
+    fallbackLng: 'en',
     interpolation: {
       escapeValue: false,
     },

@@ -1,7 +1,7 @@
 import { copyFileSync, mkdirSync, existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { readImplementedRoutes } from './_routes.mjs';
+import { readImplementedRoutes, URL_LANGS } from './_routes.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const distDir = resolve(__dirname, '..', 'dist');
@@ -14,13 +14,20 @@ if (!existsSync(indexHtml)) {
 
 const routes = readImplementedRoutes().map(path => path.slice(1));
 
-console.log(`[copy-routes] Found ${routes.length} implemented route(s) from structures.ts`);
+console.log(`[copy-routes] ${routes.length} route(s) × ${URL_LANGS.length} language(s)`);
 
-for (const route of routes) {
-  const targetDir = resolve(distDir, route);
-  mkdirSync(targetDir, { recursive: true });
-  copyFileSync(indexHtml, resolve(targetDir, 'index.html'));
-  console.log(`[copy-routes] /${route}/index.html`);
+for (const lang of URL_LANGS) {
+  const langDir = resolve(distDir, lang);
+  mkdirSync(langDir, { recursive: true });
+  copyFileSync(indexHtml, resolve(langDir, 'index.html'));
+  console.log(`[copy-routes] /${lang}/index.html`);
+
+  for (const route of routes) {
+    const routeDir = resolve(langDir, route);
+    mkdirSync(routeDir, { recursive: true });
+    copyFileSync(indexHtml, resolve(routeDir, 'index.html'));
+    console.log(`[copy-routes] /${lang}/${route}/index.html`);
+  }
 }
 
 copyFileSync(indexHtml, resolve(distDir, '404.html'));
