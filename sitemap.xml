@@ -1,63 +1,184 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://ds-play.moon-jam.me/</loc>
+    <loc>https://ds-play.moon-jam.me/en</loc>
     <lastmod>2026-04-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ds-play.moon-jam.me/en"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ds-play.moon-jam.me/zh-tw"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ds-play.moon-jam.me/en"/>
   </url>
   <url>
-    <loc>https://ds-play.moon-jam.me/avl-tree</loc>
+    <loc>https://ds-play.moon-jam.me/zh-tw</loc>
+    <lastmod>2026-04-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ds-play.moon-jam.me/en"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ds-play.moon-jam.me/zh-tw"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ds-play.moon-jam.me/en"/>
+  </url>
+  <url>
+    <loc>https://ds-play.moon-jam.me/en/avl-tree</loc>
     <lastmod>2026-04-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ds-play.moon-jam.me/en/avl-tree"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ds-play.moon-jam.me/zh-tw/avl-tree"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ds-play.moon-jam.me/en/avl-tree"/>
   </url>
   <url>
-    <loc>https://ds-play.moon-jam.me/red-black-tree</loc>
+    <loc>https://ds-play.moon-jam.me/zh-tw/avl-tree</loc>
     <lastmod>2026-04-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ds-play.moon-jam.me/en/avl-tree"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ds-play.moon-jam.me/zh-tw/avl-tree"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ds-play.moon-jam.me/en/avl-tree"/>
   </url>
   <url>
-    <loc>https://ds-play.moon-jam.me/bloom-filter</loc>
+    <loc>https://ds-play.moon-jam.me/en/red-black-tree</loc>
     <lastmod>2026-04-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ds-play.moon-jam.me/en/red-black-tree"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ds-play.moon-jam.me/zh-tw/red-black-tree"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ds-play.moon-jam.me/en/red-black-tree"/>
   </url>
   <url>
-    <loc>https://ds-play.moon-jam.me/fibonacci-heap</loc>
+    <loc>https://ds-play.moon-jam.me/zh-tw/red-black-tree</loc>
     <lastmod>2026-04-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ds-play.moon-jam.me/en/red-black-tree"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ds-play.moon-jam.me/zh-tw/red-black-tree"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ds-play.moon-jam.me/en/red-black-tree"/>
   </url>
   <url>
-    <loc>https://ds-play.moon-jam.me/min-max-heap</loc>
+    <loc>https://ds-play.moon-jam.me/en/bloom-filter</loc>
     <lastmod>2026-04-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ds-play.moon-jam.me/en/bloom-filter"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ds-play.moon-jam.me/zh-tw/bloom-filter"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ds-play.moon-jam.me/en/bloom-filter"/>
   </url>
   <url>
-    <loc>https://ds-play.moon-jam.me/deap</loc>
+    <loc>https://ds-play.moon-jam.me/zh-tw/bloom-filter</loc>
     <lastmod>2026-04-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ds-play.moon-jam.me/en/bloom-filter"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ds-play.moon-jam.me/zh-tw/bloom-filter"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ds-play.moon-jam.me/en/bloom-filter"/>
   </url>
   <url>
-    <loc>https://ds-play.moon-jam.me/smmh</loc>
+    <loc>https://ds-play.moon-jam.me/en/fibonacci-heap</loc>
     <lastmod>2026-04-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ds-play.moon-jam.me/en/fibonacci-heap"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ds-play.moon-jam.me/zh-tw/fibonacci-heap"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ds-play.moon-jam.me/en/fibonacci-heap"/>
   </url>
   <url>
-    <loc>https://ds-play.moon-jam.me/b-tree</loc>
+    <loc>https://ds-play.moon-jam.me/zh-tw/fibonacci-heap</loc>
     <lastmod>2026-04-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ds-play.moon-jam.me/en/fibonacci-heap"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ds-play.moon-jam.me/zh-tw/fibonacci-heap"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ds-play.moon-jam.me/en/fibonacci-heap"/>
   </url>
   <url>
-    <loc>https://ds-play.moon-jam.me/b-plus-tree</loc>
+    <loc>https://ds-play.moon-jam.me/en/min-max-heap</loc>
     <lastmod>2026-04-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ds-play.moon-jam.me/en/min-max-heap"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ds-play.moon-jam.me/zh-tw/min-max-heap"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ds-play.moon-jam.me/en/min-max-heap"/>
+  </url>
+  <url>
+    <loc>https://ds-play.moon-jam.me/zh-tw/min-max-heap</loc>
+    <lastmod>2026-04-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ds-play.moon-jam.me/en/min-max-heap"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ds-play.moon-jam.me/zh-tw/min-max-heap"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ds-play.moon-jam.me/en/min-max-heap"/>
+  </url>
+  <url>
+    <loc>https://ds-play.moon-jam.me/en/deap</loc>
+    <lastmod>2026-04-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ds-play.moon-jam.me/en/deap"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ds-play.moon-jam.me/zh-tw/deap"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ds-play.moon-jam.me/en/deap"/>
+  </url>
+  <url>
+    <loc>https://ds-play.moon-jam.me/zh-tw/deap</loc>
+    <lastmod>2026-04-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ds-play.moon-jam.me/en/deap"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ds-play.moon-jam.me/zh-tw/deap"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ds-play.moon-jam.me/en/deap"/>
+  </url>
+  <url>
+    <loc>https://ds-play.moon-jam.me/en/smmh</loc>
+    <lastmod>2026-04-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ds-play.moon-jam.me/en/smmh"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ds-play.moon-jam.me/zh-tw/smmh"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ds-play.moon-jam.me/en/smmh"/>
+  </url>
+  <url>
+    <loc>https://ds-play.moon-jam.me/zh-tw/smmh</loc>
+    <lastmod>2026-04-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ds-play.moon-jam.me/en/smmh"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ds-play.moon-jam.me/zh-tw/smmh"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ds-play.moon-jam.me/en/smmh"/>
+  </url>
+  <url>
+    <loc>https://ds-play.moon-jam.me/en/b-tree</loc>
+    <lastmod>2026-04-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ds-play.moon-jam.me/en/b-tree"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ds-play.moon-jam.me/zh-tw/b-tree"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ds-play.moon-jam.me/en/b-tree"/>
+  </url>
+  <url>
+    <loc>https://ds-play.moon-jam.me/zh-tw/b-tree</loc>
+    <lastmod>2026-04-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ds-play.moon-jam.me/en/b-tree"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ds-play.moon-jam.me/zh-tw/b-tree"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ds-play.moon-jam.me/en/b-tree"/>
+  </url>
+  <url>
+    <loc>https://ds-play.moon-jam.me/en/b-plus-tree</loc>
+    <lastmod>2026-04-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ds-play.moon-jam.me/en/b-plus-tree"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ds-play.moon-jam.me/zh-tw/b-plus-tree"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ds-play.moon-jam.me/en/b-plus-tree"/>
+  </url>
+  <url>
+    <loc>https://ds-play.moon-jam.me/zh-tw/b-plus-tree</loc>
+    <lastmod>2026-04-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ds-play.moon-jam.me/en/b-plus-tree"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ds-play.moon-jam.me/zh-tw/b-plus-tree"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ds-play.moon-jam.me/en/b-plus-tree"/>
   </url>
 </urlset>
