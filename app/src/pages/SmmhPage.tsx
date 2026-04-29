@@ -199,9 +199,25 @@ export const SmmhPage: React.FC = () => {
     return (
     <div className={`h-full w-full flex bg-slate-100 overflow-hidden relative font-sans text-slate-900 ${isResizing ? 'cursor-col-resize select-none' : ''}`}>
              <SEO 
-                title="SMMH Visualization"
-                description="Interactive Symmetric Min-Max Heap visualization. Learn about this double-ended priority queue structure."
-                keywords={["SMMH", "Symmetric Min-Max Heap", "Double Ended Priority Queue", "Visualization", "Algorithm"]}
+                title="SMMH Visualizer — Symmetric Min-Max Heap"
+                description="Learn Symmetric Min-Max Heap (SMMH) with interactive step-by-step visualization. Understand the symmetric order property and efficient double-ended priority queue operations."
+                keywords={["SMMH", "Symmetric Min-Max Heap", "double-ended priority queue", "heap visualization", "data structure", "對稱最小最大堆", "雙端優先筇"]}
+                jsonLd={{
+                  "@context": "https://schema.org",
+                  "@type": "LearningResource",
+                  "name": "SMMH Interactive Visualizer",
+                  "description": "Interactive visualization for Symmetric Min-Max Heap (SMMH) — an efficient double-ended priority queue using symmetric ordering between sibling nodes.",
+                  "url": "https://ds-play.moon-jam.me/smmh",
+                  "educationalLevel": "University",
+                  "learningResourceType": "Interactive",
+                  "inLanguage": ["en", "zh-TW"],
+                  "keywords": "SMMH, Symmetric Min-Max Heap, double-ended priority queue, data structure",
+                  "isPartOf": {
+                    "@type": "WebSite",
+                    "name": "Data Structure Playground",
+                    "url": "https://ds-play.moon-jam.me/"
+                  }
+                }}
             />
       <style>{isResizing ? `* { transition: none !important; cursor: col-resize !important; user-select: none !important; }` : ''}</style>
 

@@ -679,9 +679,25 @@ export const AVLTreePage: React.FC = () => {
     return (
         <div className={`h-full w-full flex bg-slate-100 overflow-hidden relative font-sans text-slate-900 ${isResizing ? 'cursor-col-resize select-none' : ''}`}>
              <SEO 
-                title="AVL Tree Visualization"
-                description="Interactive AVL Tree visualization. Learn how self-balancing binary search trees work with step-by-step animations."
-                keywords={["AVL Tree", "Balanced Binary Search Tree", "BS Tree", "Visualization", "Algorithm"]}
+                title="AVL Tree Visualizer — Interactive Self-Balancing BST"
+                description="Learn AVL Trees with interactive step-by-step visualization. Insert, delete, and watch rotations (LL, LR, RL, RR) in real time. Perfect for CS students and interview prep. 互動式 AVL 樹視覺化學習工具。"
+                keywords={["AVL Tree", "AVL Tree visualizer", "self-balancing binary search tree", "BST rotation", "LL rotation", "LR rotation", "RL rotation", "RR rotation", "tree rebalancing", "balance factor", "data structure visualization", "algorithm animation", "AVL樹", "自平衡二元搜尋樹"]}
+                jsonLd={{
+                  "@context": "https://schema.org",
+                  "@type": "LearningResource",
+                  "name": "AVL Tree Interactive Visualizer",
+                  "description": "Interactive visualization tool to learn AVL Trees — a self-balancing binary search tree. See LL, LR, RL, RR rotations with step-by-step animations.",
+                  "url": "https://ds-play.moon-jam.me/avl-tree",
+                  "educationalLevel": "University",
+                  "learningResourceType": "Interactive",
+                  "inLanguage": ["en", "zh-TW"],
+                  "keywords": "AVL tree, self-balancing BST, tree rotation, data structure",
+                  "isPartOf": {
+                    "@type": "WebSite",
+                    "name": "Data Structure Playground",
+                    "url": "https://ds-play.moon-jam.me/"
+                  }
+                }}
             />
             {/* FORCE DISABLE TRANSITION DURING RESIZE */}
             <style>{isResizing ? `* { transition: none !important; cursor: col-resize !important; user-select: none !important; }` : ''}</style>

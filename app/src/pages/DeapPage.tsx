@@ -205,9 +205,25 @@ export const DeapPage: React.FC = () => {
     return (
     <div className={`h-full w-full flex bg-slate-100 overflow-hidden relative font-sans text-slate-900 ${isResizing ? 'cursor-col-resize select-none' : ''}`}>
              <SEO 
-                title="DEAP Visualization"
-                description="Interactive DEAP (Double-Ended Heap) visualization. Understand this efficient double-ended priority queue structure."
-                keywords={["DEAP", "Double Ended Heap", "Priority Queue", "Visualization", "Algorithm"]}
+                title="DEAP Visualizer — Double-Ended Heap"
+                description="Learn Double-Ended Heap (DEAP) with step-by-step interactive visualization. Understand the empty root structure, min-heap on the left and max-heap on the right, and O(log n) insert and extract operations."
+                keywords={["DEAP", "Double-Ended Heap", "double-ended priority queue", "DEPQ", "heap visualization", "min heap", "max heap", "data structure", "雙端堆", "優先筇"]}
+                jsonLd={{
+                  "@context": "https://schema.org",
+                  "@type": "LearningResource",
+                  "name": "DEAP Interactive Visualizer",
+                  "description": "Interactive visualization for Double-Ended Heap (DEAP) — a complete binary tree with an empty root where the left subtree is a Min-Heap and right is a Max-Heap.",
+                  "url": "https://ds-play.moon-jam.me/deap",
+                  "educationalLevel": "University",
+                  "learningResourceType": "Interactive",
+                  "inLanguage": ["en", "zh-TW"],
+                  "keywords": "DEAP, double-ended heap, priority queue, data structure",
+                  "isPartOf": {
+                    "@type": "WebSite",
+                    "name": "Data Structure Playground",
+                    "url": "https://ds-play.moon-jam.me/"
+                  }
+                }}
             />
       <style>{isResizing ? `* { transition: none !important; cursor: col-resize !important; user-select: none !important; }` : ''}</style>
 

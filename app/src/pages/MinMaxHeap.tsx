@@ -208,9 +208,25 @@ export const MinMaxHeapPage: React.FC = () => {
     return (
     <div className={`h-full w-full flex bg-slate-100 overflow-hidden relative font-sans text-slate-900 ${isResizing ? 'cursor-col-resize select-none' : ''}`}>
              <SEO 
-                title="Min-Max Heap Visualization"
-                description="Interactive Min-Max Heap visualization. Learn how alternating min and max levels allow for efficient double-ended priority queue operations."
-                keywords={["Min-Max Heap", "Double Ended Priority Queue", "Heap", "Visualization", "Algorithm"]}
+                title="Min-Max Heap Visualizer — Double-Ended Priority Queue"
+                description="Learn Min-Max Heap with interactive step-by-step visualization. Understand alternating min and max levels, insert with push-up, and extract operations. Perfect for double-ended priority queue problems."
+                keywords={["Min-Max Heap", "Min-Max Heap visualizer", "double-ended priority queue", "DEPQ", "extract min", "extract max", "heap visualization", "data structure", "最小最大堆", "雙端優先筇"]}
+                jsonLd={{
+                  "@context": "https://schema.org",
+                  "@type": "LearningResource",
+                  "name": "Min-Max Heap Interactive Visualizer",
+                  "description": "Interactive visualization for Min-Max Heap, a complete binary tree with alternating min and max levels supporting O(1) access to both min and max.",
+                  "url": "https://ds-play.moon-jam.me/min-max-heap",
+                  "educationalLevel": "University",
+                  "learningResourceType": "Interactive",
+                  "inLanguage": ["en", "zh-TW"],
+                  "keywords": "Min-Max Heap, double-ended priority queue, heap visualization",
+                  "isPartOf": {
+                    "@type": "WebSite",
+                    "name": "Data Structure Playground",
+                    "url": "https://ds-play.moon-jam.me/"
+                  }
+                }}
             />
       <style>{isResizing ? `* { transition: none !important; cursor: col-resize !important; user-select: none !important; }` : ''}</style>
 

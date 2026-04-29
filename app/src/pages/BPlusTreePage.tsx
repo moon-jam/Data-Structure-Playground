@@ -210,9 +210,25 @@ export const BPlusTreePage: React.FC = () => {
     return (
     <div className={`h-full w-full flex bg-slate-100 overflow-hidden relative font-sans text-slate-900 ${isResizing ? 'cursor-col-resize select-none' : ''}`}>
              <SEO 
-                title="B+ Tree Visualization"
-                description="Interactive B+ Tree visualization. Understand why B+ Trees are preferred for database indexing and range queries."
-                keywords={["B+ Tree", "BPlus Tree", "Database Index", "Range Query", "Visualization", "Algorithm"]}
+                title="B+ Tree Visualizer — Interactive Database Index Tutorial"
+                description="Learn B+ Trees with interactive step-by-step visualization. See how leaf nodes are linked for range queries. Understand why MySQL InnoDB and PostgreSQL use B+ Trees as their primary index structure. B+樹視覺化工具。"
+                keywords={["B+ Tree", "B Plus Tree", "B+ Tree visualizer", "database index structure", "range query", "MySQL InnoDB", "leaf node linked list", "data structure visualization", "B+樹", "資料庫索引", "區間查詢"]}
+                jsonLd={{
+                  "@context": "https://schema.org",
+                  "@type": "LearningResource",
+                  "name": "B+ Tree Interactive Visualizer",
+                  "description": "Interactive visualization tool for B+ Trees — the backbone of modern database indexing. Learn how linked leaf nodes enable efficient range queries.",
+                  "url": "https://ds-play.moon-jam.me/b-plus-tree",
+                  "educationalLevel": "University",
+                  "learningResourceType": "Interactive",
+                  "inLanguage": ["en", "zh-TW"],
+                  "keywords": "B+ Tree, database index, range query, data structure",
+                  "isPartOf": {
+                    "@type": "WebSite",
+                    "name": "Data Structure Playground",
+                    "url": "https://ds-play.moon-jam.me/"
+                  }
+                }}
             />
       <style>{isResizing ? `* { transition: none !important; cursor: col-resize !important; user-select: none !important; }` : ''}</style>
 

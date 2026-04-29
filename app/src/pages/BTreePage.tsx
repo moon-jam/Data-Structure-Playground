@@ -213,9 +213,25 @@ export const BTreePage: React.FC = () => {
     return (
     <div className={`h-full w-full flex bg-slate-100 overflow-hidden relative font-sans text-slate-900 ${isResizing ? 'cursor-col-resize select-none' : ''}`}>
              <SEO 
-                title="B-Tree Visualization"
-                description="Interactive B-Tree visualization. Learn about this self-balancing tree data structure widely used in databases and file systems."
-                keywords={["B-Tree", "BTree", "Balanced Tree", "Database Index", "Visualization", "Algorithm"]}
+                title="B-Tree Visualizer — Interactive Multi-Way Tree Tutorial"
+                description="Learn B-Trees step by step. Visualize insertion with splits and deletion with merges/rotations. Understand why databases use B-Trees for disk I/O. Interactive B-Tree visualizer for order 3, 4, 5. B樹視覺化工具。"
+                keywords={["B-Tree", "B Tree visualizer", "B-Tree tutorial", "multi-way tree", "database index", "disk storage", "B-tree insertion", "B-tree deletion", "node split", "node merge", "data structure visualization", "B樹", "資料庫索引", "多路平衡樹"]}
+                jsonLd={{
+                  "@context": "https://schema.org",
+                  "@type": "LearningResource",
+                  "name": "B-Tree Interactive Visualizer",
+                  "description": "Interactive visualization tool for B-Trees — a multi-way self-balancing tree used in databases and file systems. Watch node splits, merges, and rotations with step-by-step animations.",
+                  "url": "https://ds-play.moon-jam.me/b-tree",
+                  "educationalLevel": "University",
+                  "learningResourceType": "Interactive",
+                  "inLanguage": ["en", "zh-TW"],
+                  "keywords": "B-Tree, database index, multi-way tree, data structure",
+                  "isPartOf": {
+                    "@type": "WebSite",
+                    "name": "Data Structure Playground",
+                    "url": "https://ds-play.moon-jam.me/"
+                  }
+                }}
             />
       <style>{isResizing ? `* { transition: none !important; cursor: col-resize !important; user-select: none !important; }` : ''}</style>
 

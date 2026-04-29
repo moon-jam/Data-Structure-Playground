@@ -1280,9 +1280,25 @@ export const RedBlackTreePage: React.FC = () => {
     return (
         <div className={`h-full w-full flex bg-slate-100 overflow-hidden relative font-sans text-slate-900 ${isResizing ? 'cursor-col-resize select-none' : ''}`}>
              <SEO 
-                title="Red-Black Tree Visualization"
-                description="Interactive Red-Black Tree visualization. Understand how color properties and rotations maintain balance."
-                keywords={["Red-Black Tree", "RB Tree", "Balanced Binary Search Tree", "Visualization", "Algorithm"]}
+                title="Red-Black Tree Visualizer — Interactive RBT Tutorial"
+                description="Learn Red-Black Trees step by step. Visualize insert, delete, rotations, and recoloring. Interactive course with guided challenges. Used in C++ STL map, Java TreeMap. 互動式紅黑樹視覺化教學。"
+                keywords={["Red-Black Tree", "RB Tree", "red black tree visualizer", "red black tree tutorial", "self-balancing BST", "tree recoloring", "tree rotation", "STL map", "Java TreeMap", "data structure visualization", "algorithm animation", "紅黑樹", "紅黑樹視覺化", "二元搜尋樹"]}
+                jsonLd={{
+                  "@context": "https://schema.org",
+                  "@type": "LearningResource",
+                  "name": "Red-Black Tree Interactive Visualizer",
+                  "description": "Interactive visualization and tutorial for Red-Black Trees. Learn insertion, deletion, rotations, and recoloring rules with step-by-step animations and guided challenges.",
+                  "url": "https://ds-play.moon-jam.me/red-black-tree",
+                  "educationalLevel": "University",
+                  "learningResourceType": "Interactive",
+                  "inLanguage": ["en", "zh-TW"],
+                  "keywords": "Red-Black Tree, RB Tree, balanced BST, tree rotation, data structure",
+                  "isPartOf": {
+                    "@type": "WebSite",
+                    "name": "Data Structure Playground",
+                    "url": "https://ds-play.moon-jam.me/"
+                  }
+                }}
             />
             {/* FORCE DISABLE TRANSITION DURING RESIZE */}
             <style>{isResizing ? `* { transition: none !important; cursor: col-resize !important; user-select: none !important; }` : ''}</style>

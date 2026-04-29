@@ -252,9 +252,25 @@ export const FibonacciHeapPage: React.FC = () => {
   return (
     <div className={`h-full w-full flex bg-slate-100 overflow-hidden relative font-sans text-slate-900 ${isResizing ? 'cursor-col-resize select-none' : ''}`}>
              <SEO 
-                title="Fibonacci Heap Visualization"
-                description="Interactive Fibonacci Heap visualization. Explore amortized efficiency, lazy operations, and cascading cuts."
-                keywords={["Fibonacci Heap", "Amortized Analysis", "Graph Theory", "Visualization", "Algorithm"]}
+                title="Fibonacci Heap Visualizer — Amortized Priority Queue"
+                description="Learn Fibonacci Heap with interactive visualization. Watch lazy insert, extract-min with consolidation, decrease-key with cascading cuts. Key data structure for Dijkstra's and Prim's algorithms. 鐶波那契堆視覺化工具。"
+                keywords={["Fibonacci Heap", "Fibonacci Heap visualizer", "amortized analysis", "priority queue", "extract min", "decrease key", "cascading cut", "Dijkstra algorithm", "Prim algorithm", "data structure visualization", "鐶波那契堆", "優先筇"]}
+                jsonLd={{
+                  "@context": "https://schema.org",
+                  "@type": "LearningResource",
+                  "name": "Fibonacci Heap Interactive Visualizer",
+                  "description": "Interactive visualization for Fibonacci Heap — a priority queue with O(1) amortized insert and decrease-key. Watch consolidation and cascading cuts in action.",
+                  "url": "https://ds-play.moon-jam.me/fibonacci-heap",
+                  "educationalLevel": "University",
+                  "learningResourceType": "Interactive",
+                  "inLanguage": ["en", "zh-TW"],
+                  "keywords": "Fibonacci Heap, priority queue, amortized analysis, Dijkstra",
+                  "isPartOf": {
+                    "@type": "WebSite",
+                    "name": "Data Structure Playground",
+                    "url": "https://ds-play.moon-jam.me/"
+                  }
+                }}
             />
       {/* FORCE DISABLE TRANSITION DURING RESIZE */}
       <style>{isResizing ? `* { transition: none !important; cursor: col-resize !important; user-select: none !important; }` : ''}</style>

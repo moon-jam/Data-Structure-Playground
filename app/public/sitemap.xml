@@ -1,8 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <!-- Homepage -->
   <url>
     <loc>https://ds-play.moon-jam.me/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <lastmod>2026-03-11</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ds-play.moon-jam.me/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ds-play.moon-jam.me/"/>
+  </url>
+  <!-- AVL Tree -->
+  <url>
+    <loc>https://ds-play.moon-jam.me/avl-tree</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <lastmod>2026-03-11</lastmod>
+  </url>
+  <!-- Red-Black Tree -->
+  <url>
+    <loc>https://ds-play.moon-jam.me/red-black-tree</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <lastmod>2026-03-11</lastmod>
+  </url>
+  <!-- B-Tree -->
+  <url>
+    <loc>https://ds-play.moon-jam.me/b-tree</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-03-11</lastmod>
+  </url>
+  <!-- B+ Tree -->
+  <url>
+    <loc>https://ds-play.moon-jam.me/b-plus-tree</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-03-11</lastmod>
+  </url>
+  <!-- Fibonacci Heap -->
+  <url>
+    <loc>https://ds-play.moon-jam.me/fibonacci-heap</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-03-11</lastmod>
+  </url>
+  <!-- Min-Max Heap -->
+  <url>
+    <loc>https://ds-play.moon-jam.me/min-max-heap</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-03-11</lastmod>
+  </url>
+  <!-- DEAP -->
+  <url>
+    <loc>https://ds-play.moon-jam.me/deap</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <lastmod>2026-03-11</lastmod>
+  </url>
+  <!-- SMMH -->
+  <url>
+    <loc>https://ds-play.moon-jam.me/smmh</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <lastmod>2026-03-11</lastmod>
   </url>
 </urlset>
